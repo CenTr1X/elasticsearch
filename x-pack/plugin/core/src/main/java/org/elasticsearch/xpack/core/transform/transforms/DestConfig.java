@@ -7,6 +7,7 @@
 
 package org.elasticsearch.xpack.core.transform.transforms;
 
+import org.elasticsearch.Version;
 import org.elasticsearch.action.ActionRequestValidationException;
 import org.elasticsearch.common.io.stream.StreamInput;
 import org.elasticsearch.common.io.stream.StreamOutput;
@@ -57,7 +58,11 @@ public class DestConfig implements Writeable, ToXContentObject {
 
     public DestConfig(final StreamInput in) throws IOException {
         index = in.readString();
-        pipeline = in.readOptionalString();
+        if (in.getVersion().onOrAfter(Version.V_7_3_0)) {
+            pipeline = in.readOptionalString();
+        } else {
+            pipeline = null;
+        }
     }
 
     public String getIndex() {
@@ -80,7 +85,9 @@ public class DestConfig implements Writeable, ToXContentObject {
     @Override
     public void writeTo(StreamOutput out) throws IOException {
         out.writeString(index);
-        out.writeOptionalString(pipeline);
+        if (out.getVersion().onOrAfter(Version.V_7_3_0)) {
+            out.writeOptionalString(pipeline);
+        }
     }
 
     @Override

@@ -47,6 +47,10 @@ plugins {
   id 'elasticsearch.versions'
 }
 
+
+
+println dependencies;
+
 /**
  * This is a convenient method for declaring test artifact dependencies provided by the internal
  * test artifact plugin. It replaces basically the longer dependency notation with explicit capability
@@ -137,9 +141,9 @@ tasks.register("verifyVersions") {
  * after the backport of the backcompat code is complete.
  */
 
-boolean bwc_tests_enabled = true
+boolean bwc_tests_enabled = false
 // place a PR link here when committing bwc changes:
-String bwc_tests_disabled_issue = ""
+String bwc_tests_disabled_issue = "https://github.com/elastic/elasticsearch/pull/90230"
 if (bwc_tests_enabled == false) {
   if (bwc_tests_disabled_issue.isEmpty()) {
     throw new GradleException("bwc_tests_disabled_issue must be set when bwc_tests_enabled == false")
@@ -258,7 +262,12 @@ allprojects {
       }
     }
   }
-
+  repositories {
+  	mavenLocal()
+      flatDir {
+          dirs './dependency', 'libs', 'sadasda'
+      }
+  }
   apply plugin: 'elasticsearch.formatting'
 }
 

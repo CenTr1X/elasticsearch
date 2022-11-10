@@ -55,7 +55,7 @@ public class IndicesPermissionsWithAliasesWildcardsAndRegexsTests extends Securi
 
     @Override
     protected String configRoles() {
-        return formatted("""
+        return """
             %s
             role1:
               cluster: [ all ]
@@ -72,7 +72,7 @@ public class IndicesPermissionsWithAliasesWildcardsAndRegexsTests extends Securi
                     privileges: [ALL]
                     field_security:
                        grant: [ field3 ]
-            """, super.configRoles());
+            """.formatted(super.configRoles());
     }
 
     @Override

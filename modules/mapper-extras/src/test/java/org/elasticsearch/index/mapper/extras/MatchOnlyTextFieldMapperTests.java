@@ -208,13 +208,7 @@ public class MatchOnlyTextFieldMapperTests extends MapperTestCase {
     }
 
     @Override
-    protected boolean supportsIgnoreMalformed() {
-        return false;
-    }
-
-    @Override
-    protected SyntheticSourceSupport syntheticSourceSupport(boolean ignoreMalformed) {
-        assertFalse("match_only_text doesn't support ignoreMalformed", ignoreMalformed);
+    protected SyntheticSourceSupport syntheticSourceSupport() {
         return new MatchOnlyTextSyntheticSourceSupport();
     }
 

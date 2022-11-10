@@ -103,10 +103,7 @@ public class RestGetTokenActionTests extends ESTestCase {
         assertThat(map, hasKey("authentication"));
         @SuppressWarnings("unchecked")
         final Map<String, Object> authentication = (Map<String, Object>) (map.get("authentication"));
-        assertThat(
-            authentication,
-            hasEntry("username", createTokenResponse.getAuthentication().getEffectiveSubject().getUser().principal())
-        );
+        assertThat(authentication, hasEntry("username", createTokenResponse.getAuthentication().getUser().principal()));
         assertEquals(6, map.size());
     }
 
@@ -142,13 +139,13 @@ public class RestGetTokenActionTests extends ESTestCase {
     }
 
     public void testParser() throws Exception {
-        final String request = formatted("""
+        final String request = """
             {
               "grant_type": "password",
               "username": "user1",
               "password": "%s",
               "scope": "FULL"
-            }""", SecuritySettingsSourceField.TEST_PASSWORD);
+            }""".formatted(SecuritySettingsSourceField.TEST_PASSWORD);
         try (XContentParser parser = XContentType.JSON.xContent().createParser(XContentParserConfiguration.EMPTY, request)) {
             CreateTokenRequest createTokenRequest = RestGetTokenAction.PARSER.parse(parser, null);
             assertEquals("password", createTokenRequest.getGrantType());
@@ -160,12 +157,12 @@ public class RestGetTokenActionTests extends ESTestCase {
 
     public void testParserRefreshRequest() throws Exception {
         final String token = randomAlphaOfLengthBetween(4, 32);
-        final String request = formatted("""
+        final String request = """
             {
               "grant_type": "refresh_token",
               "refresh_token": "%s",
               "scope": "FULL"
-            }""", token);
+            }""".formatted(token);
         try (XContentParser parser = XContentType.JSON.xContent().createParser(XContentParserConfiguration.EMPTY, request)) {
             CreateTokenRequest createTokenRequest = RestGetTokenAction.PARSER.parse(parser, null);
             assertEquals("refresh_token", createTokenRequest.getGrantType());

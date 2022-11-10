@@ -7,10 +7,10 @@
 package org.elasticsearch.xpack.ml.job.process.normalizer;
 
 import org.elasticsearch.common.io.stream.Writeable.Reader;
-import org.elasticsearch.test.AbstractXContentSerializingTestCase;
+import org.elasticsearch.test.AbstractSerializingTestCase;
 import org.elasticsearch.xcontent.XContentParser;
 
-public class NormalizerResultTests extends AbstractXContentSerializingTestCase<NormalizerResult> {
+public class NormalizerResultTests extends AbstractSerializingTestCase<NormalizerResult> {
 
     private static final double EPSILON = 0.0000000001;
 

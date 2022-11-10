@@ -98,7 +98,7 @@ import java.util.stream.Stream;
 
 import static java.util.Objects.requireNonNull;
 import static java.util.Optional.ofNullable;
-import static org.elasticsearch.gradle.plugin.BasePluginBuildPlugin.EXPLODED_BUNDLE_CONFIG;
+import static org.elasticsearch.gradle.plugin.PluginBuildPlugin.EXPLODED_BUNDLE_CONFIG;
 
 public class ElasticsearchNode implements TestClusterConfiguration {
 
@@ -114,8 +114,7 @@ public class ElasticsearchNode implements TestClusterConfiguration {
         "path.repo",
         "discovery.seed_providers",
         "cluster.deprecation_indexing.enabled",
-        "cluster.initial_master_nodes",
-        "xpack.security.enabled"
+        "cluster.initial_master_nodes"
 
     );
 
@@ -1585,11 +1584,6 @@ public class ElasticsearchNode implements TestClusterConfiguration {
         return settings.getNormalizedCollection();
     }
 
-    @Internal
-    Set<String> getSettingKeys() {
-        return settings.keySet();
-    }
-
     @Nested
     public List<?> getSystemProperties() {
         return systemProperties.getNormalizedCollection();
@@ -1681,8 +1675,7 @@ public class ElasticsearchNode implements TestClusterConfiguration {
         if (settings.containsKey("xpack.security.http.ssl.certificate")) {
             wait.setCertificateAuthorities(getConfigDir().resolve(settings.get("xpack.security.http.ssl.certificate").toString()).toFile());
         }
-        if (settings.containsKey("xpack.security.http.ssl.keystore.path")
-            && settings.containsKey("xpack.security.http.ssl.certificate_authorities") == false) { // Can not set both trust stores and CA
+        if (settings.containsKey("xpack.security.http.ssl.keystore.path")) {
             wait.setTrustStoreFile(getConfigDir().resolve(settings.get("xpack.security.http.ssl.keystore.path").toString()).toFile());
         }
         if (keystoreSettings.containsKey("xpack.security.http.ssl.keystore.secure_password")) {

@@ -63,7 +63,7 @@ public class GetTransformStatsAction extends ActionType<GetTransformStatsAction.
         public Request(StreamInput in) throws IOException {
             super(in);
             id = in.readString();
-            expandedIds = in.readImmutableList(StreamInput::readString);
+            expandedIds = Collections.unmodifiableList(in.readStringList());
             pageParams = new PageParams(in);
             allowNoMatch = in.readBoolean();
         }

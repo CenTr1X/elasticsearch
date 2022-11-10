@@ -130,9 +130,13 @@ public class MigrateToDataTiersIT extends ESRestTestCase {
         );
 
         // wait for the index to advance to the warm phase
-        assertBusy(() -> assertThat(getStepKeyForIndex(client(), index).phase(), equalTo("warm")), 30, TimeUnit.SECONDS);
+        assertBusy(() -> assertThat(getStepKeyForIndex(client(), index).getPhase(), equalTo("warm")), 30, TimeUnit.SECONDS);
         // let's wait for this index to have received the `require.data` configuration from the warm phase/allocate action
-        assertBusy(() -> assertThat(getStepKeyForIndex(client(), index).name(), equalTo(AllocationRoutedStep.NAME)), 30, TimeUnit.SECONDS);
+        assertBusy(
+            () -> assertThat(getStepKeyForIndex(client(), index).getName(), equalTo(AllocationRoutedStep.NAME)),
+            30,
+            TimeUnit.SECONDS
+        );
 
         // let's also have a policy that doesn't need migrating
         String rolloverOnlyPolicyName = "rollover-policy";
@@ -182,9 +186,9 @@ public class MigrateToDataTiersIT extends ESRestTestCase {
         updateIndexSettings(indexWithDataWarmRouting, Settings.builder().putNull(DataTier.TIER_PREFERENCE));
 
         Request migrateRequest = new Request("POST", "_ilm/migrate_to_data_tiers");
-        migrateRequest.setJsonEntity(formatted("""
+        migrateRequest.setJsonEntity("""
             {"legacy_template_to_delete": "%s", "node_attribute": "data"}
-            """, templateName));
+            """.formatted(templateName));
         Response migrateDeploymentResponse = client().performRequest(migrateRequest);
         assertOK(migrateDeploymentResponse);
 
@@ -406,9 +410,13 @@ public class MigrateToDataTiersIT extends ESRestTestCase {
         );
 
         // wait for the index to advance to the warm phase
-        assertBusy(() -> assertThat(getStepKeyForIndex(client(), index).phase(), equalTo("warm")), 30, TimeUnit.SECONDS);
+        assertBusy(() -> assertThat(getStepKeyForIndex(client(), index).getPhase(), equalTo("warm")), 30, TimeUnit.SECONDS);
         // let's wait for this index to have received the `require.data` configuration from the warm phase/allocate action
-        assertBusy(() -> assertThat(getStepKeyForIndex(client(), index).name(), equalTo(AllocationRoutedStep.NAME)), 30, TimeUnit.SECONDS);
+        assertBusy(
+            () -> assertThat(getStepKeyForIndex(client(), index).getName(), equalTo(AllocationRoutedStep.NAME)),
+            30,
+            TimeUnit.SECONDS
+        );
 
         String indexWithDataWarmRouting = "indexwithdatawarmrouting";
         Settings.Builder settings = Settings.builder()
@@ -473,7 +481,7 @@ public class MigrateToDataTiersIT extends ESRestTestCase {
 
     private void createLegacyTemplate(String templateName) throws IOException {
         String indexPrefix = randomAlphaOfLengthBetween(5, 15).toLowerCase(Locale.ROOT);
-        final StringEntity template = new StringEntity(formatted("""
+        final StringEntity template = new StringEntity("""
             {
               "index_patterns": "%s*",
               "settings": {
@@ -484,7 +492,7 @@ public class MigrateToDataTiersIT extends ESRestTestCase {
                   }
                 }
               }
-            }""", indexPrefix), ContentType.APPLICATION_JSON);
+            }""".formatted(indexPrefix), ContentType.APPLICATION_JSON);
         Request templateRequest = new Request("PUT", "_template/" + templateName);
         templateRequest.setEntity(template);
         templateRequest.setOptions(expectWarnings(RestPutIndexTemplateAction.DEPRECATION_WARNING));

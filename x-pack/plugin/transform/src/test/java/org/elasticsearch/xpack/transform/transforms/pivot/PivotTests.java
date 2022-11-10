@@ -418,14 +418,14 @@ public class PivotTests extends ESTestCase {
                 {"pivot_global": {"global": {}}}""");
         }
 
-        return parseAggregations(formatted("""
+        return parseAggregations("""
             {
               "pivot_%s": {
                 "%s": {
                   "field": "values"
                 }
               }
-            }""", agg, agg));
+            }""".formatted(agg, agg));
     }
 
     private AggregationConfig parseAggregations(String json) throws IOException {

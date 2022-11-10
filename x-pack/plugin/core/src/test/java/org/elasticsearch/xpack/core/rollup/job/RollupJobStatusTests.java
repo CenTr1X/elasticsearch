@@ -7,14 +7,14 @@
 package org.elasticsearch.xpack.core.rollup.job;
 
 import org.elasticsearch.common.io.stream.Writeable;
-import org.elasticsearch.test.AbstractXContentSerializingTestCase;
+import org.elasticsearch.test.AbstractSerializingTestCase;
 import org.elasticsearch.xcontent.XContentParser;
 import org.elasticsearch.xpack.core.indexing.IndexerState;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class RollupJobStatusTests extends AbstractXContentSerializingTestCase<RollupJobStatus> {
+public class RollupJobStatusTests extends AbstractSerializingTestCase<RollupJobStatus> {
     private Map<String, Object> randomPosition() {
         if (randomBoolean()) {
             return null;

@@ -21,7 +21,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
@@ -92,7 +91,7 @@ public class FieldLevelSecurityRandomTests extends SecurityIntegTestCase {
             roleFields.append("          - ").append(field).append('\n');
         }
 
-        return String.format(Locale.ROOT, """
+        return """
             %s
             role1:
               cluster: [ none ]
@@ -131,7 +130,7 @@ public class FieldLevelSecurityRandomTests extends SecurityIntegTestCase {
                   privileges: [ ALL ]
                   field_security:
                      grant: [ id, field3 ]
-            """, super.configRoles(), roleFields);
+            """.formatted(super.configRoles(), roleFields.toString());
     }
 
     @Override

@@ -56,9 +56,9 @@ public class ExplainDataFrameAnalyticsRestIT extends ESRestTestCase {
         String password = new String(SecuritySettingsSourceField.TEST_PASSWORD_SECURE_STRING.getChars());
 
         Request request = new Request("PUT", "/_security/user/" + user);
-        request.setJsonEntity(formatted("""
+        request.setJsonEntity("""
             { "password" : "%s",  "roles" : [ %s ] }
-            """, password, roles.stream().map(unquoted -> "\"" + unquoted + "\"").collect(Collectors.joining(", "))));
+            """.formatted(password, roles.stream().map(unquoted -> "\"" + unquoted + "\"").collect(Collectors.joining(", "))));
         client().performRequest(request);
     }
 

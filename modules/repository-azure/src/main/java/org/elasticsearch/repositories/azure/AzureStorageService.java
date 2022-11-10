@@ -30,7 +30,7 @@ import java.util.function.BiConsumer;
 import static java.util.Collections.emptyMap;
 
 public class AzureStorageService {
-    public static final ByteSizeValue MIN_CHUNK_SIZE = ByteSizeValue.ofBytes(1);
+    public static final ByteSizeValue MIN_CHUNK_SIZE = new ByteSizeValue(1, ByteSizeUnit.BYTES);
 
     /**
      * The maximum size of a BlockBlob block.
@@ -48,11 +48,12 @@ public class AzureStorageService {
      * Default block size for multi-block uploads. The Azure repository will use the Put block and Put block list APIs to split the
      * stream into several part, each of block_size length, and will upload each part in its own request.
      */
-    private static final ByteSizeValue DEFAULT_BLOCK_SIZE = ByteSizeValue.ofBytes(
+    private static final ByteSizeValue DEFAULT_BLOCK_SIZE = new ByteSizeValue(
         Math.max(
             ByteSizeUnit.MB.toBytes(5), // minimum value
             Math.min(MAX_BLOCK_SIZE.getBytes(), JvmInfo.jvmInfo().getMem().getHeapMax().getBytes() / 20)
-        )
+        ),
+        ByteSizeUnit.BYTES
     );
 
     /**
@@ -64,7 +65,7 @@ public class AzureStorageService {
     /**
      * Maximum allowed blob size in Azure blob store.
      */
-    public static final ByteSizeValue MAX_CHUNK_SIZE = ByteSizeValue.ofBytes(MAX_BLOB_SIZE);
+    public static final ByteSizeValue MAX_CHUNK_SIZE = new ByteSizeValue(MAX_BLOB_SIZE, ByteSizeUnit.BYTES);
 
     private static final long DEFAULT_UPLOAD_BLOCK_SIZE = DEFAULT_BLOCK_SIZE.getBytes();
 

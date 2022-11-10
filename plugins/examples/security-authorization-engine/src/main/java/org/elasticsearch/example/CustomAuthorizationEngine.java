@@ -50,10 +50,9 @@ public class CustomAuthorizationEngine implements AuthorizationEngine {
         if (authentication.isRunAs()) {
             final CustomAuthorizationInfo authenticatedUserAuthzInfo =
                 new CustomAuthorizationInfo(authentication.getAuthenticatingSubject().getUser().roles(), null);
-            listener.onResponse(new CustomAuthorizationInfo(authentication.getEffectiveSubject().getUser().roles(),
-                authenticatedUserAuthzInfo));
+            listener.onResponse(new CustomAuthorizationInfo(authentication.getUser().roles(), authenticatedUserAuthzInfo));
         } else {
-            listener.onResponse(new CustomAuthorizationInfo(authentication.getEffectiveSubject().getUser().roles(), null));
+            listener.onResponse(new CustomAuthorizationInfo(authentication.getUser().roles(), null));
         }
     }
 
@@ -74,7 +73,7 @@ public class CustomAuthorizationEngine implements AuthorizationEngine {
     @Override
     public void authorizeClusterAction(RequestInfo requestInfo, AuthorizationInfo authorizationInfo,
                                        ActionListener<AuthorizationResult> listener) {
-        if (isSuperuser(requestInfo.getAuthentication().getEffectiveSubject().getUser())) {
+        if (isSuperuser(requestInfo.getAuthentication().getUser())) {
             listener.onResponse(AuthorizationResult.granted());
         } else {
             listener.onResponse(AuthorizationResult.deny());
@@ -86,25 +85,25 @@ public class CustomAuthorizationEngine implements AuthorizationEngine {
                                      AsyncSupplier<ResolvedIndices> indicesAsyncSupplier,
                                      Map<String, IndexAbstraction> aliasOrIndexLookup,
                                      ActionListener<IndexAuthorizationResult> listener) {
-        if (isSuperuser(requestInfo.getAuthentication().getEffectiveSubject().getUser())) {
+        if (isSuperuser(requestInfo.getAuthentication().getUser())) {
             indicesAsyncSupplier.getAsync(ActionListener.wrap(resolvedIndices -> {
                 Map<String, IndexAccessControl> indexAccessControlMap = new HashMap<>();
                 for (String name : resolvedIndices.getLocal()) {
-                    indexAccessControlMap.put(name, new IndexAccessControl(FieldPermissions.DEFAULT, null));
+                    indexAccessControlMap.put(name, new IndexAccessControl(true, FieldPermissions.DEFAULT, null));
                 }
                 IndicesAccessControl indicesAccessControl =
                     new IndicesAccessControl(true, Collections.unmodifiableMap(indexAccessControlMap));
-                listener.onResponse(new IndexAuthorizationResult(indicesAccessControl));
+                listener.onResponse(new IndexAuthorizationResult(true, indicesAccessControl));
             }, listener::onFailure));
         } else {
-            listener.onResponse(new IndexAuthorizationResult(IndicesAccessControl.DENIED));
+            listener.onResponse(new IndexAuthorizationResult(true, IndicesAccessControl.DENIED));
         }
     }
 
     @Override
     public void loadAuthorizedIndices(RequestInfo requestInfo, AuthorizationInfo authorizationInfo,
                                       Map<String, IndexAbstraction> indicesLookup, ActionListener<Set<String>> listener) {
-        if (isSuperuser(requestInfo.getAuthentication().getEffectiveSubject().getUser())) {
+        if (isSuperuser(requestInfo.getAuthentication().getUser())) {
             listener.onResponse(indicesLookup.keySet());
         } else {
             listener.onResponse(Collections.emptySet());
@@ -115,7 +114,7 @@ public class CustomAuthorizationEngine implements AuthorizationEngine {
     public void validateIndexPermissionsAreSubset(RequestInfo requestInfo, AuthorizationInfo authorizationInfo,
                                                   Map<String, List<String>> indexNameToNewNames,
                                                   ActionListener<AuthorizationResult> listener) {
-        if (isSuperuser(requestInfo.getAuthentication().getEffectiveSubject().getUser())) {
+        if (isSuperuser(requestInfo.getAuthentication().getUser())) {
             listener.onResponse(AuthorizationResult.granted());
         } else {
             listener.onResponse(AuthorizationResult.deny());

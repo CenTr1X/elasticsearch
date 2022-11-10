@@ -209,9 +209,9 @@ public class QueryBuilderBWCIT extends AbstractFullClusterRestartTestCase {
             for (int i = 0; i < CANDIDATES.size(); i++) {
                 QueryBuilder expectedQueryBuilder = (QueryBuilder) CANDIDATES.get(i)[1];
                 Request request = new Request("GET", "/" + index + "/_search");
-                request.setJsonEntity(formatted("""
+                request.setJsonEntity("""
                     {"query": {"ids": {"values": ["%s"]}}, "docvalue_fields": [{"field":"query.query_builder_field"}]}
-                    """, i));
+                    """.formatted(i));
                 Response rsp = client().performRequest(request);
                 assertEquals(200, rsp.getStatusLine().getStatusCode());
                 var hitRsp = (Map<?, ?>) ((List<?>) ((Map<?, ?>) responseAsMap(rsp).get("hits")).get("hits")).get(0);

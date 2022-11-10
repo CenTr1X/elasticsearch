@@ -273,8 +273,7 @@ public abstract class EngineTestCase extends ESTestCase {
             config.retentionLeasesSupplier(),
             config.getPrimaryTermSupplier(),
             config.getSnapshotCommitSupplier(),
-            config.getLeafSorter(),
-            config.getRelativeTimeInNanosSupplier()
+            config.getLeafSorter()
         );
     }
 
@@ -302,8 +301,7 @@ public abstract class EngineTestCase extends ESTestCase {
             config.retentionLeasesSupplier(),
             config.getPrimaryTermSupplier(),
             config.getSnapshotCommitSupplier(),
-            config.getLeafSorter(),
-            config.getRelativeTimeInNanosSupplier()
+            config.getLeafSorter()
         );
     }
 
@@ -331,8 +329,7 @@ public abstract class EngineTestCase extends ESTestCase {
             config.retentionLeasesSupplier(),
             config.getPrimaryTermSupplier(),
             config.getSnapshotCommitSupplier(),
-            config.getLeafSorter(),
-            config.getRelativeTimeInNanosSupplier()
+            config.getLeafSorter()
         );
     }
 
@@ -850,8 +847,7 @@ public abstract class EngineTestCase extends ESTestCase {
             retentionLeasesSupplier,
             primaryTerm,
             IndexModule.DEFAULT_SNAPSHOT_COMMIT_SUPPLIER,
-            null,
-            System::nanoTime
+            null
         );
     }
 
@@ -887,8 +883,7 @@ public abstract class EngineTestCase extends ESTestCase {
             config.retentionLeasesSupplier(),
             config.getPrimaryTermSupplier(),
             config.getSnapshotCommitSupplier(),
-            config.getLeafSorter(),
-            config.getRelativeTimeInNanosSupplier()
+            config.getLeafSorter()
         );
     }
 
@@ -1355,7 +1350,7 @@ public abstract class EngineTestCase extends ESTestCase {
             assertThat(luceneOp.toString(), luceneOp.primaryTerm(), equalTo(translogOp.primaryTerm()));
             assertThat(luceneOp.opType(), equalTo(translogOp.opType()));
             if (luceneOp.opType() == Translog.Operation.Type.INDEX) {
-                assertThat(luceneOp.source(), equalTo(translogOp.source()));
+                assertThat(luceneOp.getSource().source, equalTo(translogOp.getSource().source));
             }
         }
     }

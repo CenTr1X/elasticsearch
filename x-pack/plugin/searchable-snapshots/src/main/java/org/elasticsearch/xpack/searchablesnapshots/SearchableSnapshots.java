@@ -197,7 +197,7 @@ public class SearchableSnapshots extends Plugin implements IndexStorePlugin, Eng
     );
     public static final Setting<ByteSizeValue> SNAPSHOT_UNCACHED_CHUNK_SIZE_SETTING = Setting.byteSizeSetting(
         "index.store.snapshot.uncached_chunk_size",
-        ByteSizeValue.MINUS_ONE,
+        new ByteSizeValue(-1, ByteSizeUnit.BYTES),
         Setting.Property.IndexScope,
         Setting.Property.NodeScope,
         Setting.Property.NotCopyableOnResize
@@ -212,7 +212,7 @@ public class SearchableSnapshots extends Plugin implements IndexStorePlugin, Eng
         s -> Setting.parseByteSize(
             s,
             new ByteSizeValue(1L, ByteSizeUnit.KB),
-            ByteSizeValue.ofBytes(Long.MAX_VALUE),
+            new ByteSizeValue(Long.MAX_VALUE),
             SNAPSHOT_BLOB_CACHE_METADATA_FILES_MAX_LENGTH
         ),
         value -> {

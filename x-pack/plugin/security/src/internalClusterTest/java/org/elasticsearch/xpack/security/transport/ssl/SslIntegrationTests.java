@@ -33,6 +33,7 @@ import java.nio.charset.StandardCharsets;
 import java.security.KeyStore;
 import java.security.SecureRandom;
 import java.util.Arrays;
+import java.util.Locale;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLHandshakeException;
@@ -121,6 +122,6 @@ public class SslIntegrationTests extends SecurityIntegTestCase {
             internalCluster().getInstance(HttpServerTransport.class).boundAddress().boundAddresses()
         );
         final InetSocketAddress inetSocketAddress = transportAddress.address();
-        return formatted("https://%s/", NetworkAddress.format(inetSocketAddress));
+        return String.format(Locale.ROOT, "https://%s/", NetworkAddress.format(inetSocketAddress));
     }
 }

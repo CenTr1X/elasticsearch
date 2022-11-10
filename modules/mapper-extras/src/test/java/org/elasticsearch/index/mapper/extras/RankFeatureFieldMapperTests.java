@@ -65,11 +65,6 @@ public class RankFeatureFieldMapperTests extends MapperTestCase {
     }
 
     @Override
-    protected boolean supportsIgnoreMalformed() {
-        return false;
-    }
-
-    @Override
     protected Collection<? extends Plugin> getPlugins() {
         return List.of(new MapperExtrasPlugin());
     }
@@ -165,7 +160,7 @@ public class RankFeatureFieldMapperTests extends MapperTestCase {
     }
 
     @Override
-    protected SyntheticSourceSupport syntheticSourceSupport(boolean ignoreMalformed) {
+    protected SyntheticSourceSupport syntheticSourceSupport() {
         throw new AssumptionViolatedException("not supported");
     }
 

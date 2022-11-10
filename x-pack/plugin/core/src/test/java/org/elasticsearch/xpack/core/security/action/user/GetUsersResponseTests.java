@@ -66,44 +66,43 @@ public class GetUsersResponseTests extends ESTestCase {
             Strings.toString(builder),
             equalTo(
                 XContentHelper.stripWhitespace(
-                    formatted(
-                        """
-                            {
-                              "%s": {
-                                "username": "%s",
-                                "roles": [
-                                  %s
-                                ],
-                                "full_name": null,
-                                "email": null,
-                                "metadata": {
-                                  "_reserved": true
-                                },
-                                "enabled": true%s
-                              },
-                              "%s": {
-                                "username": "%s",
-                                "roles": [
-                                  "superuser"
-                                ],
-                                "full_name": null,
-                                "email": null,
-                                "metadata": {
-                                  "_reserved": true
-                                },
-                                "enabled": true%s
-                              },
-                              "%s": {
-                                "username": "%s",
-                                "roles": [
-                                  %s
-                                ],
-                                "full_name": null,
-                                "email": null,
-                                "metadata": {},
-                                "enabled": true%s
-                              }
-                            }""",
+                    """
+                        {
+                          "%s": {
+                            "username": "%s",
+                            "roles": [
+                              %s
+                            ],
+                            "full_name": null,
+                            "email": null,
+                            "metadata": {
+                              "_reserved": true
+                            },
+                            "enabled": true%s
+                          },
+                          "%s": {
+                            "username": "%s",
+                            "roles": [
+                              "superuser"
+                            ],
+                            "full_name": null,
+                            "email": null,
+                            "metadata": {
+                              "_reserved": true
+                            },
+                            "enabled": true%s
+                          },
+                          "%s": {
+                            "username": "%s",
+                            "roles": [
+                              %s
+                            ],
+                            "full_name": null,
+                            "email": null,
+                            "metadata": {},
+                            "enabled": true%s
+                          }
+                        }""".formatted(
                         reservedUser.principal(),
                         reservedUser.principal(),
                         getRolesOutput(reservedUser),

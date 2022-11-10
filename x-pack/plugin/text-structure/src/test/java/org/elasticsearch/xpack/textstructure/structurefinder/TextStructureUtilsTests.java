@@ -296,12 +296,9 @@ public class TextStructureUtilsTests extends TextStructureTestCase {
     }
 
     public void testGuessMappingGivenNothing() {
-        Consumer<Boolean> testGuessMappingGivenEcsCompatibility = (ecsCompatibility) -> {
-            assertNull(guessMapping(explanation, "foo", Collections.emptyList(), ecsCompatibility));
-            assertNull(
-                guessMapping(explanation, "foo", Collections.emptyList(), ecsCompatibility, TextStructureUtils.NULL_TIMESTAMP_FORMAT)
-            );
-        };
+        Consumer<Boolean> testGuessMappingGivenEcsCompatibility = (ecsCompatibility) -> assertNull(
+            guessMapping(explanation, "foo", Collections.emptyList(), ecsCompatibility)
+        );
         ecsCompatibilityModes.forEach(testGuessMappingGivenEcsCompatibility);
     }
 
@@ -311,51 +308,18 @@ public class TextStructureUtilsTests extends TextStructureTestCase {
         Consumer<Boolean> testGuessMappingGivenEcsCompatibility = (ecsCompatibility) -> {
             assertEquals(expected, guessMapping(explanation, "foo", Arrays.asList("ERROR", "INFO", "DEBUG"), ecsCompatibility));
             assertEquals(expected, guessMapping(explanation, "foo", Arrays.asList("2018-06-11T13:26:47Z", "not a date"), ecsCompatibility));
-            assertEquals(
-                expected,
-                guessMapping(
-                    explanation,
-                    "foo",
-                    Arrays.asList("ERROR", "INFO", "DEBUG"),
-                    ecsCompatibility,
-                    TextStructureUtils.NULL_TIMESTAMP_FORMAT
-                )
-            );
-            assertEquals(
-                expected,
-                guessMapping(
-                    explanation,
-                    "foo",
-                    Arrays.asList("2018-06-11T13:26:47Z", "not a date"),
-                    ecsCompatibility,
-                    TextStructureUtils.NULL_TIMESTAMP_FORMAT
-                )
-            );
         };
 
         ecsCompatibilityModes.forEach(testGuessMappingGivenEcsCompatibility);
     }
 
     public void testGuessMappingGivenText() {
-
         Map<String, String> expected = Collections.singletonMap(TextStructureUtils.MAPPING_TYPE_SETTING, "text");
 
-        Consumer<Boolean> testGuessMappingGivenEcsCompatibility = (ecsCompatibility) -> {
-            assertEquals(
-                expected,
-                guessMapping(explanation, "foo", Arrays.asList("a", "the quick brown fox jumped over the lazy dog"), ecsCompatibility)
-            );
-            assertEquals(
-                expected,
-                guessMapping(
-                    explanation,
-                    "foo",
-                    Arrays.asList("a", "the quick brown fox jumped over the lazy dog"),
-                    ecsCompatibility,
-                    TextStructureUtils.NULL_TIMESTAMP_FORMAT
-                )
-            );
-        };
+        Consumer<Boolean> testGuessMappingGivenEcsCompatibility = (ecsCompatibility) -> assertEquals(
+            expected,
+            guessMapping(explanation, "foo", Arrays.asList("a", "the quick brown fox jumped over the lazy dog"), ecsCompatibility)
+        );
 
         ecsCompatibilityModes.forEach(testGuessMappingGivenEcsCompatibility);
     }
@@ -363,22 +327,10 @@ public class TextStructureUtilsTests extends TextStructureTestCase {
     public void testGuessMappingGivenIp() {
         Map<String, String> expected = Collections.singletonMap(TextStructureUtils.MAPPING_TYPE_SETTING, "ip");
 
-        Consumer<Boolean> testGuessMappingGivenEcsCompatibility = (ecsCompatibility) -> {
-            assertEquals(
-                expected,
-                guessMapping(explanation, "foo", Arrays.asList("10.0.0.1", "172.16.0.1", "192.168.0.1"), ecsCompatibility)
-            );
-            assertEquals(
-                expected,
-                guessMapping(
-                    explanation,
-                    "foo",
-                    Arrays.asList("10.0.0.1", "172.16.0.1", "192.168.0.1"),
-                    ecsCompatibility,
-                    TextStructureUtils.NULL_TIMESTAMP_FORMAT
-                )
-            );
-        };
+        Consumer<Boolean> testGuessMappingGivenEcsCompatibility = (ecsCompatibility) -> assertEquals(
+            expected,
+            guessMapping(explanation, "foo", Arrays.asList("10.0.0.1", "172.16.0.1", "192.168.0.1"), ecsCompatibility)
+        );
 
         ecsCompatibilityModes.forEach(testGuessMappingGivenEcsCompatibility);
     }
@@ -392,48 +344,6 @@ public class TextStructureUtilsTests extends TextStructureTestCase {
             assertEquals(expected, guessMapping(explanation, "foo", Arrays.asList("1", "2", "12345678901234567890"), ecsCompatibility));
             assertEquals(expected, guessMapping(explanation, "foo", Arrays.asList(3.14159265359, 0.0, 1e-308), ecsCompatibility));
             assertEquals(expected, guessMapping(explanation, "foo", Arrays.asList("-1e-1", "-1e308", "1e-308"), ecsCompatibility));
-
-            assertEquals(
-                expected,
-                guessMapping(
-                    explanation,
-                    "foo",
-                    Arrays.asList("3.14159265359", "0", "-8"),
-                    ecsCompatibility,
-                    TextStructureUtils.NULL_TIMESTAMP_FORMAT
-                )
-            );
-            // 12345678901234567890 is too long for long
-            assertEquals(
-                expected,
-                guessMapping(
-                    explanation,
-                    "foo",
-                    Arrays.asList("1", "2", "12345678901234567890"),
-                    ecsCompatibility,
-                    TextStructureUtils.NULL_TIMESTAMP_FORMAT
-                )
-            );
-            assertEquals(
-                expected,
-                guessMapping(
-                    explanation,
-                    "foo",
-                    Arrays.asList(3.14159265359, 0.0, 1e-308),
-                    ecsCompatibility,
-                    TextStructureUtils.NULL_TIMESTAMP_FORMAT
-                )
-            );
-            assertEquals(
-                expected,
-                guessMapping(
-                    explanation,
-                    "foo",
-                    Arrays.asList("-1e-1", "-1e308", "1e-308"),
-                    ecsCompatibility,
-                    TextStructureUtils.NULL_TIMESTAMP_FORMAT
-                )
-            );
         };
 
         ecsCompatibilityModes.forEach(testGuessMappingGivenEcsCompatibility);
@@ -445,65 +355,22 @@ public class TextStructureUtilsTests extends TextStructureTestCase {
         Consumer<Boolean> testGuessMappingGivenEcsCompatibility = (ecsCompatibility) -> {
             assertEquals(expected, guessMapping(explanation, "foo", Arrays.asList("500", "3", "-3"), ecsCompatibility));
             assertEquals(expected, guessMapping(explanation, "foo", Arrays.asList(500, 6, 0), ecsCompatibility));
-            assertEquals(
-                expected,
-                guessMapping(
-                    explanation,
-                    "foo",
-                    Arrays.asList("500", "3", "-3"),
-                    ecsCompatibility,
-                    TextStructureUtils.NULL_TIMESTAMP_FORMAT
-                )
-            );
-            assertEquals(
-                expected,
-                guessMapping(explanation, "foo", Arrays.asList(500, 6, 0), ecsCompatibility, TextStructureUtils.NULL_TIMESTAMP_FORMAT)
-            );
         };
 
         ecsCompatibilityModes.forEach(testGuessMappingGivenEcsCompatibility);
     }
 
     public void testGuessMappingGivenDate() {
-        {
-            Map<String, String> expected = new HashMap<>();
-            expected.put(TextStructureUtils.MAPPING_TYPE_SETTING, "date");
-            expected.put(TextStructureUtils.MAPPING_FORMAT_SETTING, "iso8601");
+        Map<String, String> expected = new HashMap<>();
+        expected.put(TextStructureUtils.MAPPING_TYPE_SETTING, "date");
+        expected.put(TextStructureUtils.MAPPING_FORMAT_SETTING, "iso8601");
 
-            Consumer<Boolean> testGuessMappingGivenEcsCompatibility = (ecsCompatibility) -> {
-                assertEquals(
-                    expected,
-                    guessMapping(explanation, "foo", Arrays.asList("2018-06-11T13:26:47Z", "2018-06-11T13:27:12Z"), ecsCompatibility)
-                );
-            };
+        Consumer<Boolean> testGuessMappingGivenEcsCompatibility = (ecsCompatibility) -> assertEquals(
+            expected,
+            guessMapping(explanation, "foo", Arrays.asList("2018-06-11T13:26:47Z", "2018-06-11T13:27:12Z"), ecsCompatibility)
+        );
 
-            ecsCompatibilityModes.forEach(testGuessMappingGivenEcsCompatibility);
-        }
-        {
-            // The special value of "null" for the timestamp format indicates that the analysis
-            // of semi-structured text should assume the absence of any timestamp.
-            // In the case of structured text, there may be timestamps present in multiple fields
-            // which we want the analysis to identify. For now we don't want the user supplied timestamp
-            // format override to affect this behaviour, hence this check.
-            Map<String, String> expected = new HashMap<>();
-            expected.put(TextStructureUtils.MAPPING_TYPE_SETTING, "date");
-            expected.put(TextStructureUtils.MAPPING_FORMAT_SETTING, "iso8601");
-
-            Consumer<Boolean> testGuessMappingGivenEcsCompatibility = (ecsCompatibility) -> {
-                assertEquals(
-                    expected,
-                    guessMapping(
-                        explanation,
-                        "foo",
-                        Arrays.asList("2018-06-11T13:26:47Z", "2018-06-11T13:27:12Z"),
-                        ecsCompatibility,
-                        TextStructureUtils.NULL_TIMESTAMP_FORMAT
-                    )
-                );
-            };
-
-            ecsCompatibilityModes.forEach(testGuessMappingGivenEcsCompatibility);
-        }
+        ecsCompatibilityModes.forEach(testGuessMappingGivenEcsCompatibility);
     }
 
     public void testGuessMappingGivenBoolean() {
@@ -512,14 +379,6 @@ public class TextStructureUtilsTests extends TextStructureTestCase {
         Consumer<Boolean> testGuessMappingGivenEcsCompatibility = (ecsCompatibility) -> {
             assertEquals(expected, guessMapping(explanation, "foo", Arrays.asList("false", "true"), ecsCompatibility));
             assertEquals(expected, guessMapping(explanation, "foo", Arrays.asList(true, false), ecsCompatibility));
-            assertEquals(
-                expected,
-                guessMapping(explanation, "foo", Arrays.asList("false", "true"), ecsCompatibility, TextStructureUtils.NULL_TIMESTAMP_FORMAT)
-            );
-            assertEquals(
-                expected,
-                guessMapping(explanation, "foo", Arrays.asList(true, false), ecsCompatibility, TextStructureUtils.NULL_TIMESTAMP_FORMAT)
-            );
         };
 
         ecsCompatibilityModes.forEach(testGuessMappingGivenEcsCompatibility);
@@ -532,30 +391,10 @@ public class TextStructureUtilsTests extends TextStructureTestCase {
             Map<String, String> expected = Collections.singletonMap(TextStructureUtils.MAPPING_TYPE_SETTING, "long");
 
             assertEquals(expected, guessMapping(explanation, "foo", Arrays.asList(42, Arrays.asList(1, -99)), ecsCompatibility));
-            assertEquals(
-                expected,
-                guessMapping(
-                    explanation,
-                    "foo",
-                    Arrays.asList(42, Arrays.asList(1, -99)),
-                    ecsCompatibility,
-                    TextStructureUtils.NULL_TIMESTAMP_FORMAT
-                )
-            );
 
             expected = Collections.singletonMap(TextStructureUtils.MAPPING_TYPE_SETTING, "keyword");
 
             assertEquals(expected, guessMapping(explanation, "foo", Arrays.asList(new String[] { "x", "y" }, "z"), ecsCompatibility));
-            assertEquals(
-                expected,
-                guessMapping(
-                    explanation,
-                    "foo",
-                    Arrays.asList(new String[] { "x", "y" }, "z"),
-                    ecsCompatibility,
-                    TextStructureUtils.NULL_TIMESTAMP_FORMAT
-                )
-            );
         };
 
         ecsCompatibilityModes.forEach(testGuessMappingGivenEcsCompatibility);
@@ -574,16 +413,6 @@ public class TextStructureUtilsTests extends TextStructureTestCase {
                     ecsCompatibility
                 )
             );
-            assertEquals(
-                expected,
-                guessMapping(
-                    explanation,
-                    "foo",
-                    Arrays.asList(Collections.singletonMap("name", "value1"), Collections.singletonMap("name", "value2")),
-                    ecsCompatibility,
-                    TextStructureUtils.NULL_TIMESTAMP_FORMAT
-                )
-            );
         };
 
         ecsCompatibilityModes.forEach(testGuessMappingGivenEcsCompatibility);
@@ -600,18 +429,7 @@ public class TextStructureUtilsTests extends TextStructureTestCase {
                     ecsCompatibility
                 )
             );
-            assertEquals("Field [foo] has both object and non-object values - this is not supported by Elasticsearch", e.getMessage());
 
-            e = expectThrows(
-                RuntimeException.class,
-                () -> guessMapping(
-                    explanation,
-                    "foo",
-                    Arrays.asList(Collections.singletonMap("name", "value1"), "value2"),
-                    ecsCompatibility,
-                    TextStructureUtils.NULL_TIMESTAMP_FORMAT
-                )
-            );
             assertEquals("Field [foo] has both object and non-object values - this is not supported by Elasticsearch", e.getMessage());
         };
 
@@ -973,155 +791,64 @@ public class TextStructureUtilsTests extends TextStructureTestCase {
     }
 
     public void testGuessGeoPoint() {
-        {
-            Consumer<Boolean> testGuessMappingGivenEcsCompatibility = (ecsCompatibility) -> {
-                Map<String, String> mapping = TextStructureUtils.guessScalarMapping(
-                    explanation,
-                    "foo",
-                    Arrays.asList("POINT (-77.03653 38.897676)", "POINT (-50.03653 28.8973)"),
-                    NOOP_TIMEOUT_CHECKER,
-                    ecsCompatibility
-                );
-                assertThat(mapping.get(TextStructureUtils.MAPPING_TYPE_SETTING), equalTo("geo_point"));
+        Consumer<Boolean> testGuessMappingGivenEcsCompatibility = (ecsCompatibility) -> {
+            Map<String, String> mapping = TextStructureUtils.guessScalarMapping(
+                explanation,
+                "foo",
+                Arrays.asList("POINT (-77.03653 38.897676)", "POINT (-50.03653 28.8973)"),
+                NOOP_TIMEOUT_CHECKER,
+                ecsCompatibility
+            );
+            assertThat(mapping.get(TextStructureUtils.MAPPING_TYPE_SETTING), equalTo("geo_point"));
 
-                mapping = TextStructureUtils.guessScalarMapping(
-                    explanation,
-                    "foo",
-                    Arrays.asList("POINT (-77.03653 38.897676)", "bar"),
-                    NOOP_TIMEOUT_CHECKER,
-                    ecsCompatibility
-                );
-                assertThat(mapping.get(TextStructureUtils.MAPPING_TYPE_SETTING), equalTo("keyword"));
-            };
+            mapping = TextStructureUtils.guessScalarMapping(
+                explanation,
+                "foo",
+                Arrays.asList("POINT (-77.03653 38.897676)", "bar"),
+                NOOP_TIMEOUT_CHECKER,
+                ecsCompatibility
+            );
+            assertThat(mapping.get(TextStructureUtils.MAPPING_TYPE_SETTING), equalTo("keyword"));
+        };
 
-            ecsCompatibilityModes.forEach(testGuessMappingGivenEcsCompatibility);
-        }
-
-        // There should be no behavioural change between not specifying a timestamp format at all
-        // and explicitly specifying it as the special string "null" (other than performance)
-        {
-            Consumer<Boolean> testGuessMappingGivenEcsCompatibility = (ecsCompatibility) -> {
-                Map<String, String> mapping = TextStructureUtils.guessScalarMapping(
-                    explanation,
-                    "foo",
-                    Arrays.asList("POINT (-77.03653 38.897676)", "POINT (-50.03653 28.8973)"),
-                    NOOP_TIMEOUT_CHECKER,
-                    ecsCompatibility,
-                    TextStructureUtils.NULL_TIMESTAMP_FORMAT
-                );
-                assertThat(mapping.get(TextStructureUtils.MAPPING_TYPE_SETTING), equalTo("geo_point"));
-
-                mapping = TextStructureUtils.guessScalarMapping(
-                    explanation,
-                    "foo",
-                    Arrays.asList("POINT (-77.03653 38.897676)", "bar"),
-                    NOOP_TIMEOUT_CHECKER,
-                    ecsCompatibility,
-                    TextStructureUtils.NULL_TIMESTAMP_FORMAT
-                );
-                assertThat(mapping.get(TextStructureUtils.MAPPING_TYPE_SETTING), equalTo("keyword"));
-            };
-
-            ecsCompatibilityModes.forEach(testGuessMappingGivenEcsCompatibility);
-        }
+        ecsCompatibilityModes.forEach(testGuessMappingGivenEcsCompatibility);
     }
 
     public void testGuessGeoShape() {
-        {
-            Consumer<Boolean> testGuessMappingGivenEcsCompatibility = (ecsCompatibility) -> {
-                Map<String, String> mapping = TextStructureUtils.guessScalarMapping(
-                    explanation,
-                    "foo",
-                    Arrays.asList(
-                        "POINT (-77.03653 38.897676)",
-                        "LINESTRING (-77.03653 38.897676, -77.009051 38.889939)",
-                        "POLYGON ((100.0 0.0, 101.0 0.0, 101.0 1.0, 100.0 1.0, 100.0 0.0))",
-                        "POLYGON ((100.0 0.0, 101.0 0.0, 101.0 1.0, 100.0 1.0, 100.0 0.0), "
-                            + "(100.2 0.2, 100.8 0.2, 100.8 0.8, 100.2 0.8, 100.2 0.2))",
-                        "MULTIPOINT (102.0 2.0, 103.0 2.0)",
-                        "MULTILINESTRING ((102.0 2.0, 103.0 2.0, 103.0 3.0, 102.0 3.0), (100.0 0.0, 101.0 0.0, 101.0 1.0, 100.0 1.0),"
-                            + " (100.2 0.2, 100.8 0.2, 100.8 0.8, 100.2 0.8))",
-                        "MULTIPOLYGON (((102.0 2.0, 103.0 2.0, 103.0 3.0, 102.0 3.0, 102.0 2.0)), ((100.0 0.0, 101.0 0.0, 101.0 1.0, "
-                            + "100.0 1.0, 100.0 0.0), (100.2 0.2, 100.8 0.2, 100.8 0.8, 100.2 0.8, 100.2 0.2)))",
-                        "GEOMETRYCOLLECTION (POINT (100.0 0.0), LINESTRING (101.0 0.0, 102.0 1.0))",
-                        "BBOX (100.0, 102.0, 2.0, 0.0)"
-                    ),
-                    NOOP_TIMEOUT_CHECKER,
-                    ecsCompatibility
-                );
-                assertThat(mapping.get(TextStructureUtils.MAPPING_TYPE_SETTING), equalTo("geo_shape"));
+        Consumer<Boolean> testGuessMappingGivenEcsCompatibility = (ecsCompatibility) -> {
+            Map<String, String> mapping = TextStructureUtils.guessScalarMapping(
+                explanation,
+                "foo",
+                Arrays.asList(
+                    "POINT (-77.03653 38.897676)",
+                    "LINESTRING (-77.03653 38.897676, -77.009051 38.889939)",
+                    "POLYGON ((100.0 0.0, 101.0 0.0, 101.0 1.0, 100.0 1.0, 100.0 0.0))",
+                    "POLYGON ((100.0 0.0, 101.0 0.0, 101.0 1.0, 100.0 1.0, 100.0 0.0), "
+                        + "(100.2 0.2, 100.8 0.2, 100.8 0.8, 100.2 0.8, 100.2 0.2))",
+                    "MULTIPOINT (102.0 2.0, 103.0 2.0)",
+                    "MULTILINESTRING ((102.0 2.0, 103.0 2.0, 103.0 3.0, 102.0 3.0), (100.0 0.0, 101.0 0.0, 101.0 1.0, 100.0 1.0),"
+                        + " (100.2 0.2, 100.8 0.2, 100.8 0.8, 100.2 0.8))",
+                    "MULTIPOLYGON (((102.0 2.0, 103.0 2.0, 103.0 3.0, 102.0 3.0, 102.0 2.0)), ((100.0 0.0, 101.0 0.0, 101.0 1.0, "
+                        + "100.0 1.0, 100.0 0.0), (100.2 0.2, 100.8 0.2, 100.8 0.8, 100.2 0.8, 100.2 0.2)))",
+                    "GEOMETRYCOLLECTION (POINT (100.0 0.0), LINESTRING (101.0 0.0, 102.0 1.0))",
+                    "BBOX (100.0, 102.0, 2.0, 0.0)"
+                ),
+                NOOP_TIMEOUT_CHECKER,
+                ecsCompatibility
+            );
+            assertThat(mapping.get(TextStructureUtils.MAPPING_TYPE_SETTING), equalTo("geo_shape"));
 
-                mapping = TextStructureUtils.guessScalarMapping(
-                    explanation,
-                    "foo",
-                    Arrays.asList("POINT (-77.03653 38.897676)", "LINESTRING (-77.03653 38.897676, -77.009051 38.889939)", "bar"),
-                    NOOP_TIMEOUT_CHECKER,
-                    ecsCompatibility
-                );
-                assertThat(mapping.get(TextStructureUtils.MAPPING_TYPE_SETTING), equalTo("keyword"));
-            };
+            mapping = TextStructureUtils.guessScalarMapping(
+                explanation,
+                "foo",
+                Arrays.asList("POINT (-77.03653 38.897676)", "LINESTRING (-77.03653 38.897676, -77.009051 38.889939)", "bar"),
+                NOOP_TIMEOUT_CHECKER,
+                ecsCompatibility
+            );
+            assertThat(mapping.get(TextStructureUtils.MAPPING_TYPE_SETTING), equalTo("keyword"));
+        };
 
-            ecsCompatibilityModes.forEach(testGuessMappingGivenEcsCompatibility);
-        }
-
-        // There should be no behavioural change between not specifying a timestamp format at all
-        // and explicitly specifying it as the special string "null" (other than performance)
-        {
-            Consumer<Boolean> testGuessMappingGivenEcsCompatibility = (ecsCompatibility) -> {
-                Map<String, String> mapping = TextStructureUtils.guessScalarMapping(
-                    explanation,
-                    "foo",
-                    Arrays.asList(
-                        "POINT (-77.03653 38.897676)",
-                        "LINESTRING (-77.03653 38.897676, -77.009051 38.889939)",
-                        "POLYGON ((100.0 0.0, 101.0 0.0, 101.0 1.0, 100.0 1.0, 100.0 0.0))",
-                        "POLYGON ((100.0 0.0, 101.0 0.0, 101.0 1.0, 100.0 1.0, 100.0 0.0), "
-                            + "(100.2 0.2, 100.8 0.2, 100.8 0.8, 100.2 0.8, 100.2 0.2))",
-                        "MULTIPOINT (102.0 2.0, 103.0 2.0)",
-                        "MULTILINESTRING ((102.0 2.0, 103.0 2.0, 103.0 3.0, 102.0 3.0), (100.0 0.0, 101.0 0.0, 101.0 1.0, 100.0 1.0),"
-                            + " (100.2 0.2, 100.8 0.2, 100.8 0.8, 100.2 0.8))",
-                        "MULTIPOLYGON (((102.0 2.0, 103.0 2.0, 103.0 3.0, 102.0 3.0, 102.0 2.0)), ((100.0 0.0, 101.0 0.0, 101.0 1.0, "
-                            + "100.0 1.0, 100.0 0.0), (100.2 0.2, 100.8 0.2, 100.8 0.8, 100.2 0.8, 100.2 0.2)))",
-                        "GEOMETRYCOLLECTION (POINT (100.0 0.0), LINESTRING (101.0 0.0, 102.0 1.0))",
-                        "BBOX (100.0, 102.0, 2.0, 0.0)"
-                    ),
-                    NOOP_TIMEOUT_CHECKER,
-                    ecsCompatibility,
-                    TextStructureUtils.NULL_TIMESTAMP_FORMAT
-                );
-                assertThat(mapping.get(TextStructureUtils.MAPPING_TYPE_SETTING), equalTo("geo_shape"));
-
-                mapping = TextStructureUtils.guessScalarMapping(
-                    explanation,
-                    "foo",
-                    Arrays.asList("POINT (-77.03653 38.897676)", "LINESTRING (-77.03653 38.897676, -77.009051 38.889939)", "bar"),
-                    NOOP_TIMEOUT_CHECKER,
-                    ecsCompatibility,
-                    TextStructureUtils.NULL_TIMESTAMP_FORMAT
-                );
-                assertThat(mapping.get(TextStructureUtils.MAPPING_TYPE_SETTING), equalTo("keyword"));
-            };
-
-            ecsCompatibilityModes.forEach(testGuessMappingGivenEcsCompatibility);
-        }
-    }
-
-    private Map<String, String> guessMapping(
-        List<String> explanation,
-        String fieldName,
-        List<Object> fieldValues,
-        boolean ecsCompatibility,
-        String timestampFormatOverride
-    ) {
-        Tuple<Map<String, String>, FieldStats> mappingAndFieldStats = TextStructureUtils.guessMappingAndCalculateFieldStats(
-            explanation,
-            fieldName,
-            fieldValues,
-            NOOP_TIMEOUT_CHECKER,
-            ecsCompatibility,
-            timestampFormatOverride
-        );
-        return (mappingAndFieldStats == null) ? null : mappingAndFieldStats.v1();
+        ecsCompatibilityModes.forEach(testGuessMappingGivenEcsCompatibility);
     }
 
     private Map<String, String> guessMapping(

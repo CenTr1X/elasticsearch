@@ -25,6 +25,7 @@ import java.nio.file.Path;
 import java.security.SecureRandom;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 import java.util.stream.Collectors;
 
 import javax.net.ssl.KeyManager;
@@ -141,6 +142,6 @@ public class PkiAuthenticationTests extends SecuritySingleNodeTestCase {
             node().injector().getInstance(HttpServerTransport.class).boundAddress().boundAddresses()
         );
         final InetSocketAddress inetSocketAddress = transportAddress.address();
-        return formatted("https://%s/", NetworkAddress.format(inetSocketAddress));
+        return String.format(Locale.ROOT, "https://%s/", NetworkAddress.format(inetSocketAddress));
     }
 }

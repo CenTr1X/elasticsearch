@@ -274,18 +274,17 @@ example, `https://<your_kibana_host>.com`.
 
 [[configure-beats-security]]
 ==== Configure {beats} security
-{beats} are open source data shippers that you install as agents on your
+
+The {beats} are open source data shippers that you install as agents on your
 servers to send operational data to {es}. Each Beat is a separately
 installable product. The following steps cover configuring security for
-{metricbeat}. Follow these steps for each 
-{beats-ref}/getting-started.html[additional Beat] you want to configure security
-for.
+{metricbeat}. Follow these steps for each https://www.elastic.co/guide/en/elastic-stack-get-started/7.9/get-started-elastic-stack.html#install-beats[additonal Beat] you want to configure security for.
 
 ===== Prerequisites
 
-{metricbeat-ref}/metricbeat-installation-configuration.html[Install {metricbeat}] using your preferred method.
+https://www.elastic.co/guide/en/beats/metricbeat/7.9/metricbeat-installation-configuration.html[Install {metricbeat}] using your preferred method.
 
-IMPORTANT: You cannot connect to the {stack} or configure assets for {metricbeat}
+NOTE: You cannot connect to the Elastic Stack or set up assets for {metricbeat}
 before completing the following steps.
 
 ===== Create roles for {metricbeat}
@@ -293,8 +292,8 @@ Typically, you need to create the following separate roles:
 
 - **setup** role for setting up index templates and other dependencies
 - **monitoring** role for sending monitoring information
-- **writer** role for publishing events collected by {metricbeat}
-- **reader** role for Kibana users who need to view and create visualizations that access {metricbeat} data
+- **writer** role for publishing events collected by Metricbeat
+- **reader** role for Kibana users who need to view and create visualizations that access Metricbeat data
 
 NOTE: These instructions assume that you are using the default name for
 {metricbeat} indices. If the indicated index names are not listed, or you are
@@ -318,25 +317,25 @@ WARNING: Setting up {metricbeat} is an admin-level task that requires extra
 privileges. As a best practice, grant the setup role to administrators only,
 and use a more restrictive role for event publishing.
 
-. Create the setup role:
+1. Create the setup role:
 
-   . Enter **metricbeat_setup** as the role name.
+   a. Enter **metricbeat_setup** as the role name.
 
-   . Choose the **monitor** and **manage_ilm** cluster privileges.
+   b. Choose the **monitor** and **manage_ilm** cluster privileges.
 
-   . On the **metricbeat-\*** indices, choose the **manage** and **write**
+   c. On the **metricbeat-\*** indices, choose the **manage** and **write**
    privileges.
 +
 If the **metricbeat-\*** indices aren't listed, enter that pattern into the
 list of indices.
 
-. Create the setup user:
+2. Create the setup user:
 
-   . Enter **metricbeat_setup** as the user name.
+   a. Enter **metricbeat_setup** as the user name.
 
-   . Enter the username, password, and other user details.
+   b. Enter the username, password, and other user details.
 
-   . Assign the following roles to the **metricbeat_setup** user:
+   c. Assign the following roles to the **metricbeat_setup** user:
 +
 [cols="1,1"]
 |===
@@ -357,46 +356,26 @@ To send monitoring data securely, create a monitoring user and grant it the
 necessary privileges.
 
 You can use the built-in `beats_system` user, if it’s available in your
-environment. Because the built-in users are not available in {ecloud},
+environment. Because the built-in users are not available in Elastic Cloud,
 these instructions create a user that is explicitly used for monitoring
 {metricbeat}.
 
-. If you're using the built-in `beats_system` user, on any node in your cluster,
-run the <<reset-password,`elasticsearch-reset-password`>> utility to set the
-password for that user:
-+
-This command resets the password for the `beats_system` user to an 
-auto-generated value.
-+
-[source,shell]
-----
-./bin/elasticsearch-reset-password -u beats_system
-----
-+
-If you want to set the password to a specific value, run the command with the 
-interactive (`-i`) parameter.
-+
-[source,shell]
-----
-./bin/elasticsearch-reset-password -i -u beats_system
-----
+1. Create the monitoring role:
 
-. Create the monitoring role:
+   a. Enter **metricbeat_monitoring** as the role name.
 
-   . Enter **metricbeat_monitoring** as the role name.
+   b. Choose the **monitor** cluster privilege.
 
-   . Choose the **monitor** cluster privilege.
-
-   . On the **.monitoring-beats-\*** indices, choose the **create_index** and
+   c. On the **.monitoring-beats-\*** indices, choose the **create_index** and
    **create_doc** privileges.
 
-. Create the monitoring user:
+2. Create the monitoring user:
 
-   . Enter **metricbeat_monitoring** as the user name.
+   a. Enter **metricbeat_monitoring** as the user name.
 
-   . Enter the username, password, and other user details.
+   b. Enter the username, password, and other user details.
 
-   . Assign the following roles to the **metricbeat_monitoring** user:
+   c. Assign the following roles to the **metricbeat_monitoring** user:
 +
 [cols="1,1"]
 |===
@@ -416,21 +395,21 @@ interactive (`-i`) parameter.
 Users who publish events to {es} need to create and write to {metricbeat} indices. To minimize the privileges required by the writer role, use the setup role to pre-load dependencies. This section assumes that you’ve
 <<beats-setup-role,created the setup role>>.
 
-. Create the writer role:
+1. Create the writer role:
 
-   . Enter **metricbeat_writer** as the role name.
+   a. Enter **metricbeat_writer** as the role name.
 
-   . Choose the **monitor** and **read_ilm** cluster privileges.
+   b. Choose the **monitor** and **read_ilm** cluster privileges.
 
-   . On the **metricbeat-\*** indices, choose the **create_doc**, **create_index**, and **view_index_metadata** privileges.
+   c. On the **metricbeat-\*** indices, choose the **create_doc**, **create_index**, and **view_index_metadata** privileges.
 
-. Create the writer user:
+2. Create the writer user:
 
-   . Enter **metricbeat_writer** as the user name.
+   a. Enter **metricbeat_writer** as the user name.
 
-   . Enter the username, password, and other user details.
+   b. Enter the username, password, and other user details.
 
-   . Assign the following roles to the **metricbeat_writer** user:
+   c. Assign the following roles to the **metricbeat_writer** user:
 +
 [cols="1,1"]
 |===
@@ -452,25 +431,25 @@ Users who publish events to {es} need to create and write to {metricbeat} indice
 and visualizations. Create the reader role to assign proper privileges to these
 users.
 
-. Create the reader role:
+1. Create the reader role:
 
-   . Enter **metricbeat_reader** as the role name.
+   a. Enter **metricbeat_reader** as the role name.
 
-   . On the **metricbeat-\*** indices, choose the **read** privilege.
+   b. On the **metricbeat-\*** indices, choose the **read** privilege.
 
-   . Under **Kibana**, click **Add Kibana privilege**.
+   c. Under **Kibana**, click **Add Kibana privilege**.
 
    - Under **Spaces**, choose **Default**.
 
    - Choose **Read** or **All** for Discover, Visualize, Dashboard, and Metrics.
 
-. Create the reader user:
+2. Create the reader user:
 
-   . Enter **metricbeat_reader** as the user name.
+   a. Enter **metricbeat_reader** as the user name.
 
-   . Enter the username, password, and other user details.
+   b. Enter the username, password, and other user details.
 
-   . Assign the following roles to the **metricbeat_reader** user:
+   c. Assign the following roles to the **metricbeat_reader** user:
 +
 [cols="1,1"]
 |===
@@ -614,7 +593,7 @@ See {metricbeat-ref}/configuration-ssl.html[Configure SSL for {metricbeat}].
 ./metricbeat setup -e
 ----
 
-. Start {es}, and then start {metricbeat}.
+. Start {es}, and then start Metricbeat.
 +
 [source,shell]
 ----
@@ -624,6 +603,6 @@ See {metricbeat-ref}/configuration-ssl.html[Configure SSL for {metricbeat}].
 `-e` is optional and sends output to standard error instead of the configured
 log output.
 
-. Log in to {kib}, open the main menu, and click **Stack Monitoring**.
+. Log in to Kibana, open the main menu, and click **Stack Monitoring**.
 +
 You’ll see cluster alerts that require your attention and a summary of the available monitoring metrics for {es}. Click any of the header links on the available cards to view additional information.

@@ -346,10 +346,6 @@ Total time spent throttling operations.
 (integer)
 Total time in milliseconds
 spent throttling operations.
-
-`write_load`::
-(double)
-Average number of write threads used while indexing documents.
 =======
 
 `get`::
@@ -2751,4 +2747,3 @@ For example, the following request only returns ingest pipeline statistics.
 --------------------------------------------------
 GET /_nodes/stats?metric=ingest&filter_path=nodes.*.ingest.pipelines
 --------------------------------------------------
-// TESTRESPONSE[skip:"AwaitsFix https://github.com/elastic/elasticsearch/issues/91081"]

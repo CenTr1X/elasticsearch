@@ -325,14 +325,13 @@ public class RegressionTests extends AbstractBWCSerializationTestCase<Regression
 
         Map<String, Object> params = regression.getParams(null);
 
-        assertThat(params.size(), equalTo(7));
+        assertThat(params.size(), equalTo(6));
         assertThat(params.get("dependent_variable"), equalTo("foo"));
         assertThat(params.get("prediction_field_name"), equalTo("foo_prediction"));
         assertThat(params.get("max_trees"), equalTo(maxTrees));
         assertThat(params.get("training_percent"), equalTo(100.0));
         assertThat(params.get("loss_function"), equalTo("mse"));
         assertThat(params.get("early_stopping_enabled"), equalTo(true));
-        assertThat(params.get("randomize_seed"), equalTo(0L));
     }
 
     public void testGetParams_GivenRandomWithoutBoostedTreeParams() {
@@ -340,7 +339,7 @@ public class RegressionTests extends AbstractBWCSerializationTestCase<Regression
 
         Map<String, Object> params = regression.getParams(null);
 
-        int expectedParamsCount = 6 + (regression.getLossFunctionParameter() == null ? 0 : 1) + (regression.getFeatureProcessors().isEmpty()
+        int expectedParamsCount = 5 + (regression.getLossFunctionParameter() == null ? 0 : 1) + (regression.getFeatureProcessors().isEmpty()
             ? 0
             : 1);
         assertThat(params.size(), equalTo(expectedParamsCount));
@@ -354,7 +353,6 @@ public class RegressionTests extends AbstractBWCSerializationTestCase<Regression
             assertThat(params.get("loss_function_parameter"), equalTo(regression.getLossFunctionParameter()));
         }
         assertThat(params.get("early_stopping_enabled"), equalTo(regression.getEarlyStoppingEnabled()));
-        assertThat(params.get("randomize_seed"), equalTo(regression.getRandomizeSeed()));
     }
 
     public void testRequiredFieldsIsNonEmpty() {

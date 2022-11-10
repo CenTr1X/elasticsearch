@@ -665,7 +665,7 @@ public class SnapshotLifecycleRestIT extends ESRestTestCase {
     @SuppressWarnings("unchecked")
     private void assertHistoryIsPresent(String policyName, boolean success, String repository, String operation) throws IOException {
         final Request historySearchRequest = new Request("GET", ".slm-history*/_search");
-        historySearchRequest.setJsonEntity(formatted("""
+        historySearchRequest.setJsonEntity("""
             {
               "query": {
                 "bool": {
@@ -693,7 +693,7 @@ public class SnapshotLifecycleRestIT extends ESRestTestCase {
                   ]
                 }
               }
-            }""", policyName, success, repository, operation));
+            }""".formatted(policyName, success, repository, operation));
         Response historyResponse;
         try {
             historyResponse = client().performRequest(historySearchRequest);
@@ -726,9 +726,9 @@ public class SnapshotLifecycleRestIT extends ESRestTestCase {
         assertEquals(1, indices.size());
 
         Step.StepKey stepKey = getStepKeyForIndex(client(), indices.get(0).get("index_name"));
-        assertEquals("hot", stepKey.phase());
-        assertEquals(RolloverAction.NAME, stepKey.action());
-        assertEquals(WaitForRolloverReadyStep.NAME, stepKey.name());
+        assertEquals("hot", stepKey.getPhase());
+        assertEquals(RolloverAction.NAME, stepKey.getAction());
+        assertEquals(WaitForRolloverReadyStep.NAME, stepKey.getName());
     }
 
     private void createSnapshotPolicy(

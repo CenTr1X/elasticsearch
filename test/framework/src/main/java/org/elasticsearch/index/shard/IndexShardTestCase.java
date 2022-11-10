@@ -93,7 +93,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
-import java.util.function.LongSupplier;
 import java.util.stream.Collectors;
 
 import static org.elasticsearch.cluster.routing.TestShardRouting.newShardRouting;
@@ -414,46 +413,6 @@ public abstract class IndexShardTestCase extends ESTestCase {
         IndexEventListener indexEventListener,
         IndexingOperationListener... listeners
     ) throws IOException {
-        return newShard(
-            routing,
-            shardPath,
-            indexMetadata,
-            storeProvider,
-            indexReaderWrapper,
-            engineFactory,
-            globalCheckpointSyncer,
-            retentionLeaseSyncer,
-            indexEventListener,
-            System::nanoTime,
-            listeners
-        );
-    }
-
-    /**
-     * creates a new initializing shard.
-     * @param routing                       shard routing to use
-     * @param shardPath                     path to use for shard data
-     * @param indexMetadata                 indexMetadata for the shard, including any mapping
-     * @param storeProvider                 an optional custom store provider to use. If null a default file based store will be created
-     * @param indexReaderWrapper            an optional wrapper to be used during search
-     * @param globalCheckpointSyncer        callback for syncing global checkpoints
-     * @param indexEventListener            index event listener
-     * @param relativeTimeSupplier          the clock used to measure relative time
-     * @param listeners                     an optional set of listeners to add to the shard
-     */
-    protected IndexShard newShard(
-        ShardRouting routing,
-        ShardPath shardPath,
-        IndexMetadata indexMetadata,
-        @Nullable CheckedFunction<IndexSettings, Store, IOException> storeProvider,
-        @Nullable CheckedFunction<DirectoryReader, DirectoryReader, IOException> indexReaderWrapper,
-        @Nullable EngineFactory engineFactory,
-        Runnable globalCheckpointSyncer,
-        RetentionLeaseSyncer retentionLeaseSyncer,
-        IndexEventListener indexEventListener,
-        LongSupplier relativeTimeSupplier,
-        IndexingOperationListener... listeners
-    ) throws IOException {
         final Settings nodeSettings = Settings.builder().put("node.name", routing.currentNodeId()).build();
         final IndexSettings indexSettings = new IndexSettings(indexMetadata, nodeSettings);
         final IndexShard indexShard;
@@ -502,8 +461,7 @@ public abstract class IndexShardTestCase extends ESTestCase {
                 globalCheckpointSyncer,
                 retentionLeaseSyncer,
                 breakerService,
-                IndexModule.DEFAULT_SNAPSHOT_COMMIT_SUPPLIER,
-                relativeTimeSupplier
+                IndexModule.DEFAULT_SNAPSHOT_COMMIT_SUPPLIER
             );
             indexShard.addShardFailureCallback(DEFAULT_SHARD_FAILURE_HANDLER);
             success = true;

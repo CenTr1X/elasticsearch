@@ -1313,7 +1313,8 @@ public class RollupResponseTranslationTests extends AggregatorTestCase {
         IndexReader indexReader = DirectoryReader.open(directory);
         IndexSearcher indexSearcher = newIndexSearcher(indexReader);
 
-        try (Aggregator aggregator = createAggregator(aggBuilder, indexSearcher, fieldType)) {
+        Aggregator aggregator = createAggregator(aggBuilder, indexSearcher, fieldType);
+        try {
             aggregator.preCollection();
             indexSearcher.search(query, aggregator.asCollector());
             aggregator.postCollection();

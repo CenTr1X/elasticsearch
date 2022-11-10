@@ -7,12 +7,12 @@
 package org.elasticsearch.xpack.core.ml.inference.results;
 
 import org.elasticsearch.common.io.stream.Writeable;
-import org.elasticsearch.test.AbstractXContentSerializingTestCase;
+import org.elasticsearch.test.AbstractSerializingTestCase;
 import org.elasticsearch.xcontent.XContentParser;
 
 import java.io.IOException;
 
-public class RegressionFeatureImportanceTests extends AbstractXContentSerializingTestCase<RegressionFeatureImportance> {
+public class RegressionFeatureImportanceTests extends AbstractSerializingTestCase<RegressionFeatureImportance> {
 
     @Override
     protected RegressionFeatureImportance doParseInstance(XContentParser parser) throws IOException {

@@ -428,9 +428,9 @@ public abstract class FieldExtractorTestCase extends BaseRestSqlTestCase {
             actualValue = "\"foo\"";
         }
         createIndexWithFieldTypeAndProperties("geo_shape", fieldProps, getIndexProps());
-        index(String.format(java.util.Locale.ROOT, """
+        index("""
             {"geo_shape_field":{"type":"point","coordinates":%s}}
-            """, actualValue));
+            """.formatted(actualValue));
 
         Map<String, Object> expected = new HashMap<>();
         expected.put("columns", asList(columnInfo("plain", "geo_shape_field", "geo_shape", JDBCType.VARCHAR, Integer.MAX_VALUE)));

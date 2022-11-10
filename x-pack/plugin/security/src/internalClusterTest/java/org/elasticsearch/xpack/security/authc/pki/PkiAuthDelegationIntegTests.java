@@ -9,6 +9,7 @@ package org.elasticsearch.xpack.security.authc.pki;
 
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.ResponseException;
+import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.common.settings.SecureString;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.rest.RestStatus;
@@ -45,6 +46,7 @@ import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 
+@SuppressWarnings("removal")
 public class PkiAuthDelegationIntegTests extends SecurityIntegTestCase {
 
     private static final ParseField AUTHENTICATION_FIELD = new ParseField("authentication");
@@ -105,7 +107,7 @@ public class PkiAuthDelegationIntegTests extends SecurityIntegTestCase {
 
     @Override
     protected String configRoles() {
-        return formatted("""
+        return """
             %s
             role_manage:
               cluster: [ manage ]
@@ -118,19 +120,19 @@ public class PkiAuthDelegationIntegTests extends SecurityIntegTestCase {
 
             role_all:
               cluster: [ all ]
-            """, super.configRoles());
+            """.formatted(super.configRoles());
     }
 
     @Override
     protected String configUsersRoles() {
-        return formatted("""
+        return """
             %s
             role_manage:user_manage
             role_manage_security:user_manage_security
             role_delegate_pki:user_delegate_pki
             role_all:user_all
             kibana_system:my_kibana_system
-            """, super.configUsersRoles());
+            """.formatted(super.configUsersRoles());
     }
 
     @Override
@@ -337,29 +339,31 @@ public class PkiAuthDelegationIntegTests extends SecurityIntegTestCase {
             """;
         securityClient.putRoleMapping("role_by_delegated_realm", roleMapping);
 
-        // delegate
-        var delegatePkiResponse = getSecurityClient(testUserOptions).delegatePkiAuthentication(certificateChain);
-        // authenticate
-        TestSecurityClient accessTokenClient = getSecurityClient(
-            RequestOptions.DEFAULT.toBuilder().addHeader("Authorization", "Bearer " + delegatePkiResponse.v1()).build()
-        );
-        final Map<String, Object> authenticateResponse = accessTokenClient.authenticate();
-        assertThat(authenticateResponse, hasEntry(Fields.USERNAME.getPreferredName(), "Elasticsearch Test Client"));
+        try (RestHighLevelClient restClient = new TestRestHighLevelClient()) {
+            // delegate
+            var delegatePkiResponse = getSecurityClient(testUserOptions).delegatePkiAuthentication(certificateChain);
+            // authenticate
+            TestSecurityClient accessTokenClient = getSecurityClient(
+                RequestOptions.DEFAULT.toBuilder().addHeader("Authorization", "Bearer " + delegatePkiResponse.v1()).build()
+            );
+            final Map<String, Object> authenticateResponse = accessTokenClient.authenticate();
+            assertThat(authenticateResponse, hasEntry(Fields.USERNAME.getPreferredName(), "Elasticsearch Test Client"));
 
-        final Map<String, Object> metadata = assertMap(authenticateResponse, Fields.METADATA);
-        assertThat(metadata, hasEntry("pki_dn", "O=org, OU=Elasticsearch, CN=Elasticsearch Test Client"));
-        assertThat(metadata, hasEntry("pki_delegated_by_user", "test_user"));
-        assertThat(metadata, hasEntry("pki_delegated_by_realm", "file"));
+            final Map<String, Object> metadata = assertMap(authenticateResponse, Fields.METADATA);
+            assertThat(metadata, hasEntry("pki_dn", "O=org, OU=Elasticsearch, CN=Elasticsearch Test Client"));
+            assertThat(metadata, hasEntry("pki_delegated_by_user", "test_user"));
+            assertThat(metadata, hasEntry("pki_delegated_by_realm", "file"));
 
-        // assert roles
-        List<?> roles = assertList(authenticateResponse, Fields.ROLES);
-        assertThat(roles, containsInAnyOrder("role_by_delegated_user", "role_by_delegated_realm"));
+            // assert roles
+            List<?> roles = assertList(authenticateResponse, Fields.ROLES);
+            assertThat(roles, containsInAnyOrder("role_by_delegated_user", "role_by_delegated_realm"));
 
-        Map<String, Object> realm = assertMap(authenticateResponse, Fields.AUTHENTICATION_REALM);
-        assertThat(realm, hasEntry(Fields.REALM_NAME.getPreferredName(), "pki3"));
-        assertThat(realm, hasEntry(Fields.REALM_TYPE.getPreferredName(), "pki"));
+            Map<String, Object> realm = assertMap(authenticateResponse, Fields.AUTHENTICATION_REALM);
+            assertThat(realm, hasEntry(Fields.REALM_NAME.getPreferredName(), "pki3"));
+            assertThat(realm, hasEntry(Fields.REALM_TYPE.getPreferredName(), "pki"));
 
-        assertThat(authenticateResponse, hasEntry(Fields.AUTHENTICATION_TYPE.getPreferredName(), "token"));
+            assertThat(authenticateResponse, hasEntry(Fields.AUTHENTICATION_TYPE.getPreferredName(), "token"));
+        }
 
         // delete role mappings for delegated PKI
         securityClient.deleteRoleMapping("role_by_delegated_user");
@@ -378,36 +382,38 @@ public class PkiAuthDelegationIntegTests extends SecurityIntegTestCase {
                 new SecureString(SecuritySettingsSourceField.TEST_PASSWORD.toCharArray())
             )
         );
-        // incomplete cert chain
-        final List<X509Certificate> certificateChain1 = List.of(clientCertificate);
-        ResponseException e1 = expectThrows(
-            ResponseException.class,
-            () -> getSecurityClient(optionsBuilder.build()).delegatePkiAuthentication(certificateChain1)
-        );
-        assertThat(
-            e1,
-            throwableWithMessage(
-                containsString(
-                    "unable to authenticate user [O=org, OU=Elasticsearch, CN=Elasticsearch Test Client]"
-                        + " for action [cluster:admin/xpack/security/delegate_pki]"
+        try (RestHighLevelClient restClient = new TestRestHighLevelClient()) {
+            // incomplete cert chain
+            final List<X509Certificate> certificateChain1 = List.of(clientCertificate);
+            ResponseException e1 = expectThrows(
+                ResponseException.class,
+                () -> getSecurityClient(optionsBuilder.build()).delegatePkiAuthentication(certificateChain1)
+            );
+            assertThat(
+                e1,
+                throwableWithMessage(
+                    containsString(
+                        "unable to authenticate user [O=org, OU=Elasticsearch, CN=Elasticsearch Test Client]"
+                            + " for action [cluster:admin/xpack/security/delegate_pki]"
+                    )
                 )
-            )
-        );
-        // swapped order
-        final List<X509Certificate> certificateChain2 = Arrays.asList(intermediateCA, clientCertificate);
-        ResponseException e2 = expectThrows(
-            ResponseException.class,
-            () -> getSecurityClient(optionsBuilder.build()).delegatePkiAuthentication(certificateChain2)
-        );
-        assertThat(e2, throwableWithMessage(containsString("Validation Failed: 1: certificates chain must be an ordered chain;")));
-        // bogus certificate
-        final List<X509Certificate> certificateChain3 = Arrays.asList(bogusCertificate);
-        ResponseException e3 = expectThrows(
-            ResponseException.class,
-            () -> getSecurityClient(optionsBuilder.build()).delegatePkiAuthentication(certificateChain3)
-        );
-        assertThat(e3, throwableWithMessage(containsString("security_exception")));
-        assertThat(e3, throwableWithMessage(containsString("unable to authenticate user")));
+            );
+            // swapped order
+            final List<X509Certificate> certificateChain2 = Arrays.asList(intermediateCA, clientCertificate);
+            ResponseException e2 = expectThrows(
+                ResponseException.class,
+                () -> getSecurityClient(optionsBuilder.build()).delegatePkiAuthentication(certificateChain2)
+            );
+            assertThat(e2, throwableWithMessage(containsString("Validation Failed: 1: certificates chain must be an ordered chain;")));
+            // bogus certificate
+            final List<X509Certificate> certificateChain3 = Arrays.asList(bogusCertificate);
+            ResponseException e3 = expectThrows(
+                ResponseException.class,
+                () -> getSecurityClient(optionsBuilder.build()).delegatePkiAuthentication(certificateChain3)
+            );
+            assertThat(e3, throwableWithMessage(containsString("security_exception")));
+            assertThat(e3, throwableWithMessage(containsString("unable to authenticate user")));
+        }
     }
 
     private X509Certificate readCertForPkiDelegation(String certName) throws Exception {

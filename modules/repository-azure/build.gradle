@@ -27,7 +27,7 @@ versions << [
   'azureCommon': '12.15.1',
   'azureCore': '1.27.0',
   'azureCoreHttpNetty': '1.11.9',
-  'azureJackson': '2.13.2',
+  'azureJackson': '2.13.3',
   'azureJacksonDatabind': '2.13.2.2',
 
   'jakartaActivation': '1.2.1',
@@ -183,12 +183,6 @@ tasks.named("thirdPartyAudit").configure {
     'org.bouncycastle.cert.X509v3CertificateBuilder',
     'org.bouncycastle.cert.jcajce.JcaX509CertificateConverter',
     'org.bouncycastle.operator.jcajce.JcaContentSignerBuilder',
-    'org.bouncycastle.openssl.PEMEncryptedKeyPair',
-    'org.bouncycastle.openssl.PEMParser',
-    'org.bouncycastle.openssl.jcajce.JcaPEMKeyConverter',
-    'org.bouncycastle.openssl.jcajce.JceOpenSSLPKCS8DecryptorProviderBuilder',
-    'org.bouncycastle.openssl.jcajce.JcePEMDecryptorProviderBuilder',
-    'org.bouncycastle.pkcs.PKCS8EncryptedPrivateKeyInfo',
 
     // from io.netty.handler.ssl.JettyNpnSslEngine (netty)
     'org.eclipse.jetty.npn.NextProtoNego$ClientProvider',

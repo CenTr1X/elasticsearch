@@ -79,8 +79,8 @@ public class IndicesPermissionTests extends ESTestCase {
         assertTrue(permissions.getIndexPermissions("_index").getFieldPermissions().grantsAccessTo("_field"));
         assertTrue(permissions.getIndexPermissions("_index").getFieldPermissions().hasFieldLevelSecurity());
         assertThat(permissions.getIndexPermissions("_index").getDocumentPermissions().hasDocumentLevelPermissions(), is(true));
-        assertThat(permissions.getIndexPermissions("_index").getDocumentPermissions().getSingleSetOfQueries(), hasSize(1));
-        assertThat(permissions.getIndexPermissions("_index").getDocumentPermissions().getSingleSetOfQueries(), equalTo(query));
+        assertThat(permissions.getIndexPermissions("_index").getDocumentPermissions().getQueries(), hasSize(1));
+        assertThat(permissions.getIndexPermissions("_index").getDocumentPermissions().getQueries(), equalTo(query));
 
         // no document level security:
         role = Role.builder(RESTRICTED_INDICES, "_role")
@@ -91,18 +91,18 @@ public class IndicesPermissionTests extends ESTestCase {
         assertTrue(permissions.getIndexPermissions("_index").getFieldPermissions().grantsAccessTo("_field"));
         assertTrue(permissions.getIndexPermissions("_index").getFieldPermissions().hasFieldLevelSecurity());
         assertThat(permissions.getIndexPermissions("_index").getDocumentPermissions().hasDocumentLevelPermissions(), is(false));
-        assertThat(permissions.getIndexPermissions("_index").getDocumentPermissions().getListOfQueries(), nullValue());
+        assertThat(permissions.getIndexPermissions("_index").getDocumentPermissions().getQueries(), nullValue());
 
         // no field level security:
         role = Role.builder(RESTRICTED_INDICES, "_role")
-            .add(FieldPermissions.DEFAULT, query, IndexPrivilege.ALL, randomBoolean(), "_index")
+            .add(new FieldPermissions(), query, IndexPrivilege.ALL, randomBoolean(), "_index")
             .build();
         permissions = role.authorize(SearchAction.NAME, Sets.newHashSet("_index"), lookup, fieldPermissionsCache);
         assertThat(permissions.getIndexPermissions("_index"), notNullValue());
         assertFalse(permissions.getIndexPermissions("_index").getFieldPermissions().hasFieldLevelSecurity());
         assertThat(permissions.getIndexPermissions("_index").getDocumentPermissions().hasDocumentLevelPermissions(), is(true));
-        assertThat(permissions.getIndexPermissions("_index").getDocumentPermissions().getSingleSetOfQueries(), hasSize(1));
-        assertThat(permissions.getIndexPermissions("_index").getDocumentPermissions().getSingleSetOfQueries(), equalTo(query));
+        assertThat(permissions.getIndexPermissions("_index").getDocumentPermissions().getQueries(), hasSize(1));
+        assertThat(permissions.getIndexPermissions("_index").getDocumentPermissions().getQueries(), equalTo(query));
 
         // index group associated with an alias:
         role = Role.builder(RESTRICTED_INDICES, "_role")
@@ -113,15 +113,15 @@ public class IndicesPermissionTests extends ESTestCase {
         assertTrue(permissions.getIndexPermissions("_index").getFieldPermissions().grantsAccessTo("_field"));
         assertTrue(permissions.getIndexPermissions("_index").getFieldPermissions().hasFieldLevelSecurity());
         assertThat(permissions.getIndexPermissions("_index").getDocumentPermissions().hasDocumentLevelPermissions(), is(true));
-        assertThat(permissions.getIndexPermissions("_index").getDocumentPermissions().getSingleSetOfQueries(), hasSize(1));
-        assertThat(permissions.getIndexPermissions("_index").getDocumentPermissions().getSingleSetOfQueries(), equalTo(query));
+        assertThat(permissions.getIndexPermissions("_index").getDocumentPermissions().getQueries(), hasSize(1));
+        assertThat(permissions.getIndexPermissions("_index").getDocumentPermissions().getQueries(), equalTo(query));
 
         assertThat(permissions.getIndexPermissions("_alias"), notNullValue());
         assertTrue(permissions.getIndexPermissions("_alias").getFieldPermissions().grantsAccessTo("_field"));
         assertTrue(permissions.getIndexPermissions("_alias").getFieldPermissions().hasFieldLevelSecurity());
         assertThat(permissions.getIndexPermissions("_alias").getDocumentPermissions().hasDocumentLevelPermissions(), is(true));
-        assertThat(permissions.getIndexPermissions("_alias").getDocumentPermissions().getSingleSetOfQueries(), hasSize(1));
-        assertThat(permissions.getIndexPermissions("_alias").getDocumentPermissions().getSingleSetOfQueries(), equalTo(query));
+        assertThat(permissions.getIndexPermissions("_alias").getDocumentPermissions().getQueries(), hasSize(1));
+        assertThat(permissions.getIndexPermissions("_alias").getDocumentPermissions().getQueries(), equalTo(query));
 
         // match all fields
         String[] allFields = randomFrom(
@@ -136,14 +136,14 @@ public class IndicesPermissionTests extends ESTestCase {
         assertThat(permissions.getIndexPermissions("_index"), notNullValue());
         assertFalse(permissions.getIndexPermissions("_index").getFieldPermissions().hasFieldLevelSecurity());
         assertThat(permissions.getIndexPermissions("_index").getDocumentPermissions().hasDocumentLevelPermissions(), is(true));
-        assertThat(permissions.getIndexPermissions("_index").getDocumentPermissions().getSingleSetOfQueries(), hasSize(1));
-        assertThat(permissions.getIndexPermissions("_index").getDocumentPermissions().getSingleSetOfQueries(), equalTo(query));
+        assertThat(permissions.getIndexPermissions("_index").getDocumentPermissions().getQueries(), hasSize(1));
+        assertThat(permissions.getIndexPermissions("_index").getDocumentPermissions().getQueries(), equalTo(query));
 
         assertThat(permissions.getIndexPermissions("_alias"), notNullValue());
         assertFalse(permissions.getIndexPermissions("_alias").getFieldPermissions().hasFieldLevelSecurity());
         assertThat(permissions.getIndexPermissions("_alias").getDocumentPermissions().hasDocumentLevelPermissions(), is(true));
-        assertThat(permissions.getIndexPermissions("_alias").getDocumentPermissions().getSingleSetOfQueries(), hasSize(1));
-        assertThat(permissions.getIndexPermissions("_alias").getDocumentPermissions().getSingleSetOfQueries(), equalTo(query));
+        assertThat(permissions.getIndexPermissions("_alias").getDocumentPermissions().getQueries(), hasSize(1));
+        assertThat(permissions.getIndexPermissions("_alias").getDocumentPermissions().getQueries(), equalTo(query));
 
         IndexMetadata.Builder imbBuilder1 = IndexMetadata.builder("_index_1")
             .settings(
@@ -168,20 +168,20 @@ public class IndicesPermissionTests extends ESTestCase {
         assertThat(permissions.getIndexPermissions("_index"), notNullValue());
         assertFalse(permissions.getIndexPermissions("_index").getFieldPermissions().hasFieldLevelSecurity());
         assertThat(permissions.getIndexPermissions("_index").getDocumentPermissions().hasDocumentLevelPermissions(), is(true));
-        assertThat(permissions.getIndexPermissions("_index").getDocumentPermissions().getSingleSetOfQueries(), hasSize(2));
-        assertThat(permissions.getIndexPermissions("_index").getDocumentPermissions().getSingleSetOfQueries(), equalTo(bothQueries));
+        assertThat(permissions.getIndexPermissions("_index").getDocumentPermissions().getQueries(), hasSize(2));
+        assertThat(permissions.getIndexPermissions("_index").getDocumentPermissions().getQueries(), equalTo(bothQueries));
 
         assertThat(permissions.getIndexPermissions("_index_1"), notNullValue());
         assertFalse(permissions.getIndexPermissions("_index_1").getFieldPermissions().hasFieldLevelSecurity());
         assertThat(permissions.getIndexPermissions("_index_1").getDocumentPermissions().hasDocumentLevelPermissions(), is(true));
-        assertThat(permissions.getIndexPermissions("_index_1").getDocumentPermissions().getSingleSetOfQueries(), hasSize(2));
-        assertThat(permissions.getIndexPermissions("_index_1").getDocumentPermissions().getSingleSetOfQueries(), equalTo(bothQueries));
+        assertThat(permissions.getIndexPermissions("_index_1").getDocumentPermissions().getQueries(), hasSize(2));
+        assertThat(permissions.getIndexPermissions("_index_1").getDocumentPermissions().getQueries(), equalTo(bothQueries));
 
         assertThat(permissions.getIndexPermissions("_alias"), notNullValue());
         assertFalse(permissions.getIndexPermissions("_alias").getFieldPermissions().hasFieldLevelSecurity());
         assertThat(permissions.getIndexPermissions("_alias").getDocumentPermissions().hasDocumentLevelPermissions(), is(true));
-        assertThat(permissions.getIndexPermissions("_alias").getDocumentPermissions().getSingleSetOfQueries(), hasSize(2));
-        assertThat(permissions.getIndexPermissions("_alias").getDocumentPermissions().getSingleSetOfQueries(), equalTo(bothQueries));
+        assertThat(permissions.getIndexPermissions("_alias").getDocumentPermissions().getQueries(), hasSize(2));
+        assertThat(permissions.getIndexPermissions("_alias").getDocumentPermissions().getQueries(), equalTo(bothQueries));
 
     }
 
@@ -258,7 +258,7 @@ public class IndicesPermissionTests extends ESTestCase {
         FieldPermissionsCache fieldPermissionsCache = new FieldPermissionsCache(Settings.EMPTY);
         IndicesPermission core = new IndicesPermission.Builder(RESTRICTED_INDICES).addGroup(
             IndexPrivilege.ALL,
-            FieldPermissions.DEFAULT,
+            new FieldPermissions(),
             null,
             randomBoolean(),
             "a1"
@@ -275,7 +275,7 @@ public class IndicesPermissionTests extends ESTestCase {
         assertTrue(iac.getIndexPermissions("a1").getFieldPermissions().grantsAccessTo("denied_field"));
         assertTrue(iac.getIndexPermissions("a1").getFieldPermissions().grantsAccessTo(randomAlphaOfLength(5)));
         // did not define anything for ba so we allow all
-        assertFalse(iac.hasIndexPermissions("ba"));
+        assertFalse(iac.getIndexPermissions("ba").getFieldPermissions().hasFieldLevelSecurity());
 
         assertTrue(core.check(SearchAction.NAME));
         assertTrue(core.check(PutMappingAction.NAME));
@@ -285,7 +285,7 @@ public class IndicesPermissionTests extends ESTestCase {
         // test with two indices
         core = new IndicesPermission.Builder(RESTRICTED_INDICES).addGroup(
             IndexPrivilege.ALL,
-            FieldPermissions.DEFAULT,
+            new FieldPermissions(),
             null,
             randomBoolean(),
             "a1"
@@ -337,7 +337,7 @@ public class IndicesPermissionTests extends ESTestCase {
             ElasticsearchSecurityException.class,
             () -> new IndicesPermission.Group(
                 IndexPrivilege.ALL,
-                FieldPermissions.DEFAULT,
+                new FieldPermissions(),
                 null,
                 randomBoolean(),
                 RESTRICTED_INDICES,
@@ -368,7 +368,7 @@ public class IndicesPermissionTests extends ESTestCase {
         // allow_restricted_indices: false
         IndicesPermission indicesPermission = new IndicesPermission.Builder(RESTRICTED_INDICES).addGroup(
             IndexPrivilege.ALL,
-            FieldPermissions.DEFAULT,
+            new FieldPermissions(),
             null,
             false,
             "*"
@@ -379,16 +379,13 @@ public class IndicesPermissionTests extends ESTestCase {
             lookup,
             fieldPermissionsCache
         );
-        assertThat(iac.isGranted(), is(false));
-        assertThat(iac.hasIndexPermissions(internalSecurityIndex), is(false));
-        assertThat(iac.getIndexPermissions(internalSecurityIndex), is(nullValue()));
-        assertThat(iac.hasIndexPermissions(SecuritySystemIndices.SECURITY_MAIN_ALIAS), is(false));
-        assertThat(iac.getIndexPermissions(SecuritySystemIndices.SECURITY_MAIN_ALIAS), is(nullValue()));
+        assertThat(iac.getIndexPermissions(internalSecurityIndex).isGranted(), is(false));
+        assertThat(iac.getIndexPermissions(SecuritySystemIndices.SECURITY_MAIN_ALIAS).isGranted(), is(false));
 
         // allow_restricted_indices: true
         indicesPermission = new IndicesPermission.Builder(RESTRICTED_INDICES).addGroup(
             IndexPrivilege.ALL,
-            FieldPermissions.DEFAULT,
+            new FieldPermissions(),
             null,
             true,
             "*"
@@ -399,11 +396,8 @@ public class IndicesPermissionTests extends ESTestCase {
             lookup,
             fieldPermissionsCache
         );
-        assertThat(iac.isGranted(), is(true));
-        assertThat(iac.hasIndexPermissions(internalSecurityIndex), is(true));
-        assertThat(iac.getIndexPermissions(internalSecurityIndex), is(notNullValue()));
-        assertThat(iac.hasIndexPermissions(SecuritySystemIndices.SECURITY_MAIN_ALIAS), is(true));
-        assertThat(iac.getIndexPermissions(SecuritySystemIndices.SECURITY_MAIN_ALIAS), is(notNullValue()));
+        assertThat(iac.getIndexPermissions(internalSecurityIndex).isGranted(), is(true));
+        assertThat(iac.getIndexPermissions(SecuritySystemIndices.SECURITY_MAIN_ALIAS).isGranted(), is(true));
     }
 
     public void testAsyncSearchIndicesPermissions() {
@@ -419,7 +413,7 @@ public class IndicesPermissionTests extends ESTestCase {
         // allow_restricted_indices: false
         IndicesPermission indicesPermission = new IndicesPermission.Builder(RESTRICTED_INDICES).addGroup(
             IndexPrivilege.ALL,
-            FieldPermissions.DEFAULT,
+            new FieldPermissions(),
             null,
             false,
             "*"
@@ -430,22 +424,18 @@ public class IndicesPermissionTests extends ESTestCase {
             lookup,
             fieldPermissionsCache
         );
-        assertThat(iac.isGranted(), is(false));
-        assertThat(iac.hasIndexPermissions(asyncSearchIndex), is(false));
-        assertThat(iac.getIndexPermissions(asyncSearchIndex), is(nullValue()));
+        assertThat(iac.getIndexPermissions(asyncSearchIndex).isGranted(), is(false));
 
         // allow_restricted_indices: true
         indicesPermission = new IndicesPermission.Builder(RESTRICTED_INDICES).addGroup(
             IndexPrivilege.ALL,
-            FieldPermissions.DEFAULT,
+            new FieldPermissions(),
             null,
             true,
             "*"
         ).build();
         iac = indicesPermission.authorize(SearchAction.NAME, Sets.newHashSet(asyncSearchIndex), lookup, fieldPermissionsCache);
-        assertThat(iac.isGranted(), is(true));
-        assertThat(iac.hasIndexPermissions(asyncSearchIndex), is(true));
-        assertThat(iac.getIndexPermissions(asyncSearchIndex), is(notNullValue()));
+        assertThat(iac.getIndexPermissions(asyncSearchIndex).isGranted(), is(true));
     }
 
     public void testAuthorizationForBackingIndices() {
@@ -470,7 +460,7 @@ public class IndicesPermissionTests extends ESTestCase {
         SortedMap<String, IndexAbstraction> lookup = metadata.getIndicesLookup();
         IndicesPermission indicesPermission = new IndicesPermission.Builder(RESTRICTED_INDICES).addGroup(
             IndexPrivilege.READ,
-            FieldPermissions.DEFAULT,
+            new FieldPermissions(),
             null,
             false,
             dataStreamName
@@ -482,15 +472,13 @@ public class IndicesPermissionTests extends ESTestCase {
             fieldPermissionsCache
         );
 
-        assertThat(iac.isGranted(), is(true));
         for (IndexMetadata im : backingIndices) {
-            assertThat(iac.getIndexPermissions(im.getIndex().getName()), is(notNullValue()));
-            assertThat(iac.hasIndexPermissions(im.getIndex().getName()), is(true));
+            assertThat(iac.getIndexPermissions(im.getIndex().getName()).isGranted(), is(true));
         }
 
         indicesPermission = new IndicesPermission.Builder(RESTRICTED_INDICES).addGroup(
             IndexPrivilege.CREATE_DOC,
-            FieldPermissions.DEFAULT,
+            new FieldPermissions(),
             null,
             false,
             dataStreamName
@@ -502,10 +490,8 @@ public class IndicesPermissionTests extends ESTestCase {
             fieldPermissionsCache
         );
 
-        assertThat(iac.isGranted(), is(false));
         for (IndexMetadata im : backingIndices) {
-            assertThat(iac.getIndexPermissions(im.getIndex().getName()), is(nullValue()));
-            assertThat(iac.hasIndexPermissions(im.getIndex().getName()), is(false));
+            assertThat(iac.getIndexPermissions(im.getIndex().getName()).isGranted(), is(false));
         }
     }
 
@@ -535,7 +521,7 @@ public class IndicesPermissionTests extends ESTestCase {
         FieldPermissionsCache fieldPermissionsCache = new FieldPermissionsCache(Settings.EMPTY);
         IndicesPermission core = new IndicesPermission.Builder(RESTRICTED_INDICES).addGroup(
             IndexPrivilege.INDEX,
-            FieldPermissions.DEFAULT,
+            new FieldPermissions(),
             null,
             randomBoolean(),
             "test*"
@@ -554,11 +540,8 @@ public class IndicesPermissionTests extends ESTestCase {
             lookup,
             fieldPermissionsCache
         );
-        assertThat(iac.isGranted(), is(true));
-        assertThat(iac.getIndexPermissions("test1"), is(notNullValue()));
-        assertThat(iac.hasIndexPermissions("test1"), is(true));
-        assertThat(iac.getIndexPermissions("test_write1"), is(notNullValue()));
-        assertThat(iac.hasIndexPermissions("test_write1"), is(true));
+        assertThat(iac.getIndexPermissions("test1").isGranted(), is(true));
+        assertThat(iac.getIndexPermissions("test_write1").isGranted(), is(true));
         assertWarnings(
             "the index privilege [index] allowed the update mapping action ["
                 + PutMappingAction.NAME
@@ -577,11 +560,8 @@ public class IndicesPermissionTests extends ESTestCase {
                 + "users who require access to update mappings must be granted explicit privileges"
         );
         iac = core.authorize(AutoPutMappingAction.NAME, Sets.newHashSet("test1", "test_write1"), lookup, fieldPermissionsCache);
-        assertThat(iac.isGranted(), is(true));
-        assertThat(iac.getIndexPermissions("test1"), is(notNullValue()));
-        assertThat(iac.hasIndexPermissions("test1"), is(true));
-        assertThat(iac.getIndexPermissions("test_write1"), is(notNullValue()));
-        assertThat(iac.hasIndexPermissions("test_write1"), is(true));
+        assertThat(iac.getIndexPermissions("test1").isGranted(), is(true));
+        assertThat(iac.getIndexPermissions("test_write1").isGranted(), is(true));
         assertWarnings(
             "the index privilege [index] allowed the update mapping action ["
                 + AutoPutMappingAction.NAME
@@ -591,22 +571,17 @@ public class IndicesPermissionTests extends ESTestCase {
         );
 
         iac = core.authorize(AutoPutMappingAction.NAME, Sets.newHashSet("test_write2"), lookup, fieldPermissionsCache);
-        assertThat(iac.isGranted(), is(true));
-        assertThat(iac.getIndexPermissions("test_write2"), is(notNullValue()));
-        assertThat(iac.hasIndexPermissions("test_write2"), is(true));
+        assertThat(iac.getIndexPermissions("test_write2").isGranted(), is(true));
         iac = core.authorize(PutMappingAction.NAME, Sets.newHashSet("test_write2"), lookup, fieldPermissionsCache);
-        assertThat(iac.getIndexPermissions("test_write2"), is(nullValue()));
-        assertThat(iac.hasIndexPermissions("test_write2"), is(false));
+        assertThat(iac.getIndexPermissions("test_write2").isGranted(), is(false));
         iac = core.authorize(
             AutoPutMappingAction.NAME,
             Sets.newHashSet(backingIndices.stream().map(im -> im.getIndex().getName()).collect(Collectors.toList())),
             lookup,
             fieldPermissionsCache
         );
-        assertThat(iac.isGranted(), is(true));
         for (IndexMetadata im : backingIndices) {
-            assertThat(iac.getIndexPermissions(im.getIndex().getName()), is(notNullValue()));
-            assertThat(iac.hasIndexPermissions(im.getIndex().getName()), is(true));
+            assertThat(iac.getIndexPermissions(im.getIndex().getName()).isGranted(), is(true));
         }
         iac = core.authorize(
             PutMappingAction.NAME,
@@ -614,10 +589,8 @@ public class IndicesPermissionTests extends ESTestCase {
             lookup,
             fieldPermissionsCache
         );
-        assertThat(iac.isGranted(), is(false));
         for (IndexMetadata im : backingIndices) {
-            assertThat(iac.getIndexPermissions(im.getIndex().getName()), is(nullValue()));
-            assertThat(iac.hasIndexPermissions(im.getIndex().getName()), is(false));
+            assertThat(iac.getIndexPermissions(im.getIndex().getName()).isGranted(), is(false));
         }
     }
 

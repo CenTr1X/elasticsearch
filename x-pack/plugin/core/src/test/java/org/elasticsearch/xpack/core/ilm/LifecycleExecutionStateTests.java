@@ -88,9 +88,9 @@ public class LifecycleExecutionStateTests extends ESTestCase {
         lifecycleState2.setStep(step);
         stepKey = Step.getCurrentStepKey(lifecycleState2.build());
         assertNotNull(stepKey);
-        assertEquals(phase, stepKey.phase());
-        assertEquals(action, stepKey.action());
-        assertEquals(step, stepKey.name());
+        assertEquals(phase, stepKey.getPhase());
+        assertEquals(action, stepKey.getAction());
+        assertEquals(step, stepKey.getName());
 
         phase = randomAlphaOfLength(20);
         action = randomAlphaOfLength(20);

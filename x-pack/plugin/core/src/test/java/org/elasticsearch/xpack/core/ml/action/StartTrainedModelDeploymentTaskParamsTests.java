@@ -9,14 +9,13 @@ package org.elasticsearch.xpack.core.ml.action;
 
 import org.elasticsearch.common.io.stream.Writeable;
 import org.elasticsearch.common.unit.ByteSizeValue;
-import org.elasticsearch.test.AbstractXContentSerializingTestCase;
+import org.elasticsearch.test.AbstractSerializingTestCase;
 import org.elasticsearch.xcontent.XContentParser;
 import org.elasticsearch.xpack.core.ml.action.StartTrainedModelDeploymentAction.TaskParams;
-import org.elasticsearch.xpack.core.ml.inference.assignment.Priority;
 
 import java.io.IOException;
 
-public class StartTrainedModelDeploymentTaskParamsTests extends AbstractXContentSerializingTestCase<TaskParams> {
+public class StartTrainedModelDeploymentTaskParamsTests extends AbstractSerializingTestCase<TaskParams> {
 
     @Override
     protected TaskParams doParseInstance(XContentParser parser) throws IOException {
@@ -40,8 +39,7 @@ public class StartTrainedModelDeploymentTaskParamsTests extends AbstractXContent
             randomIntBetween(1, 8),
             randomIntBetween(1, 8),
             randomIntBetween(1, 10000),
-            randomBoolean() ? null : ByteSizeValue.ofBytes(randomNonNegativeLong()),
-            randomFrom(Priority.values())
+            randomBoolean() ? null : ByteSizeValue.ofBytes(randomNonNegativeLong())
         );
     }
 }

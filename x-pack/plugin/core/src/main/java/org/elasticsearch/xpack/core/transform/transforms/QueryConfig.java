@@ -110,7 +110,7 @@ public class QueryConfig implements SimpleDiffable<QueryConfig>, Writeable, ToXC
         XContentBuilder xContentBuilder = XContentFactory.jsonBuilder().map(source);
         XContentParser sourceParser = XContentType.JSON.xContent()
             .createParser(namedXContentRegistry, deprecationHandler, BytesReference.bytes(xContentBuilder).streamInput());
-        query = AbstractQueryBuilder.parseTopLevelQuery(sourceParser);
+        query = AbstractQueryBuilder.parseInnerQueryBuilder(sourceParser);
 
         return query;
     }

@@ -33,7 +33,6 @@ import org.elasticsearch.common.settings.SecureString;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.core.TimeValue;
 import org.elasticsearch.index.IndexModule;
-import org.elasticsearch.index.mapper.extras.MapperExtrasPlugin;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.indices.IndicesRequestCache;
@@ -101,8 +100,7 @@ public class FieldLevelSecurityTests extends SecurityIntegTestCase {
             ParentJoinPlugin.class,
             InternalSettingsPlugin.class,
             PercolatorPlugin.class,
-            SpatialPlugin.class,
-            MapperExtrasPlugin.class
+            SpatialPlugin.class
         );
     }
 

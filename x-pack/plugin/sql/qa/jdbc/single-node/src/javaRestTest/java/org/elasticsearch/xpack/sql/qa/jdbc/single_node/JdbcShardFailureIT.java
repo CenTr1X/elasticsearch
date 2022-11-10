@@ -63,10 +63,10 @@ public class JdbcShardFailureIT extends JdbcIntegrationTestCase {
         request.addParameter("refresh", "true");
         StringBuilder bulk = new StringBuilder();
         for (int i = 0; i < 20; i++) {
-            bulk.append(formatted("""
+            bulk.append("""
                 {"index":{}}
                 {"test_field":%s}
-                """, i));
+                """.formatted(i));
         }
         request.setJsonEntity(bulk.toString());
         client().performRequest(request);

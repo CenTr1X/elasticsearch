@@ -7,6 +7,7 @@
 
 package org.elasticsearch.xpack.core.transform.transforms;
 
+import org.elasticsearch.Version;
 import org.elasticsearch.common.Strings;
 import org.elasticsearch.common.io.stream.StreamInput;
 import org.elasticsearch.common.io.stream.StreamOutput;
@@ -22,6 +23,8 @@ import java.util.Objects;
 import static org.elasticsearch.xcontent.ConstructingObjectParser.optionalConstructorArg;
 
 public class TransformIndexerStats extends IndexerJobStats {
+
+    private static final String DEFAULT_TRANSFORM_ID = "_all";  // TODO remove when no longer needed for wire BWC
 
     public static final String NAME = "data_frame_indexer_transform_stats";
     public static ParseField NUM_PAGES = new ParseField("pages_processed");
@@ -171,21 +174,35 @@ public class TransformIndexerStats extends IndexerJobStats {
 
     public TransformIndexerStats(StreamInput in) throws IOException {
         super(in);
-        this.expAvgCheckpointDurationMs = in.readDouble();
-        this.expAvgDocumentsIndexed = in.readDouble();
-        this.expAvgDocumentsProcessed = in.readDouble();
-        this.numDeletedDocuments = in.readVLong();
-        this.deleteTime = in.readVLong();
+        if (in.getVersion().before(Version.V_7_4_0)) {
+            in.readString(); // was transformId
+        }
+        if (in.getVersion().onOrAfter(Version.V_7_4_0)) {
+            this.expAvgCheckpointDurationMs = in.readDouble();
+            this.expAvgDocumentsIndexed = in.readDouble();
+            this.expAvgDocumentsProcessed = in.readDouble();
+        }
+        if (in.getVersion().onOrAfter(Version.V_7_12_0)) {
+            this.numDeletedDocuments = in.readVLong();
+            this.deleteTime = in.readVLong();
+        }
     }
 
     @Override
     public void writeTo(StreamOutput out) throws IOException {
         super.writeTo(out);
-        out.writeDouble(this.expAvgCheckpointDurationMs);
-        out.writeDouble(this.expAvgDocumentsIndexed);
-        out.writeDouble(this.expAvgDocumentsProcessed);
-        out.writeVLong(numDeletedDocuments);
-        out.writeVLong(deleteTime);
+        if (out.getVersion().before(Version.V_7_4_0)) {
+            out.writeString(DEFAULT_TRANSFORM_ID);
+        }
+        if (out.getVersion().onOrAfter(Version.V_7_4_0)) {
+            out.writeDouble(this.expAvgCheckpointDurationMs);
+            out.writeDouble(this.expAvgDocumentsIndexed);
+            out.writeDouble(this.expAvgDocumentsProcessed);
+        }
+        if (out.getVersion().onOrAfter(Version.V_7_12_0)) {
+            out.writeVLong(numDeletedDocuments);
+            out.writeVLong(deleteTime);
+        }
     }
 
     @Override

@@ -7,10 +7,23 @@
  */
 
 import org.elasticsearch.gradle.internal.info.BuildParams
-
+plugins {
+    id 'java'
+}
+/*
+repositories {
+mavenLocal()
+    flatDir {
+        dirs '/home/centrix/Desktop/starlight/starlight/starlight-api/pom.xml'
+    }
+}*/
 apply plugin: 'elasticsearch.build'
 apply plugin: 'elasticsearch.publish'
 apply plugin: 'elasticsearch.internal-cluster-test'
+
+//apply plugin: 'com.baidu.cloud.starlight.api.rpc'
+
+
 
 publishing {
   publications {
@@ -21,9 +34,24 @@ publishing {
 }
 
 archivesBaseName = 'elasticsearch'
-
+FileTree tree = fileTree('libs')
+println (tree.getFiles())
+println files("/home/centrix/elasticsearch/server/dependency/starlight-api-2022.2.0-SNAPSHOT.jar")
 dependencies {
-
+  api 'com.baidu.cloud:starlight-all:2022.2.0-SNAPSHOT'
+  //implementation 'com.baidu.cloud:starlight-all:2022.2.0-SNAPSHOT-source'
+  //implementation 'ch.qos.logback:logback-classic:1.2.9'
+  //implementation 'ch.qos.logback:logback-core:1.2.9'
+  implementation 'com.google.protobuf:protobuf-java:3.21.1'
+  implementation 'com.baidu.cloud:spring-cloud-baidu-thirdparty-commons:2022.2.0-SNAPSHOT'
+  implementation 'com.baidu.cloud:spring-cloud-baidu-thirdparty:2022.2.0-SNAPSHOT'
+  //api 'com.baidu.cloud:starlight-core:2022.2.0-SNAPSHOT'
+  implementation 'org.slf4j:slf4j-api:1.6.2'
+  implementation 'com.baidu:brpc-spring-boot-starter:3.0.5'
+  //implementation "com.fasterxml.jackson.core:jackson-core:${versions.jackson}"
+  //implementation "com.fasterxml.jackson.core:jackson-annotations:${versions.jackson}"
+   //implementation "com.fasterxml.jackson.core:jackson-databind:2.13.2.2"
+  
   api project(':libs:elasticsearch-core')
   api project(':libs:elasticsearch-logging')
   api project(':libs:elasticsearch-secure-sm')
@@ -57,7 +85,11 @@ dependencies {
   api 'com.tdunning:t-digest:3.2'
   // precentil ranks aggregation
   api 'org.hdrhistogram:HdrHistogram:2.1.9'
-
+  //api file("abc")
+  //implementation tree
+  println "1"
+  //api files("/home/centrix/elasticsearch/server/dependency/starlight-api-2022.2.0-SNAPSHOT.jar")
+  println "2"
   // logging
   api "org.apache.logging.log4j:log4j-api:${versions.log4j}"
   api "org.apache.logging.log4j:log4j-core:${versions.log4j}"
@@ -66,7 +98,7 @@ dependencies {
 
   api "co.elastic.logging:log4j2-ecs-layout:${versions.ecsLogging}"
   api "co.elastic.logging:ecs-logging-core:${versions.ecsLogging}"
-
+  println "3"
   testImplementation(project(":test:framework")) {
     // tests use the locally compiled version of server
     exclude group: 'org.elasticsearch', module: 'server'
@@ -74,8 +106,14 @@ dependencies {
   internalClusterTestImplementation(project(":test:framework")) {
     exclude group: 'org.elasticsearch', module: 'server'
   }
-
+  println "4"
+  //implementation fileTree('libs')
 }
+
+println "testtest"
+println project.configurations.runtimeClasspath
+println project.configurations.runtimeClasspath
+
 
 tasks.named("forbiddenPatterns").configure {
     exclude '**/*.json'
@@ -84,20 +122,20 @@ tasks.named("forbiddenPatterns").configure {
     exclude '**/*.binary'
     exclude '**/*.st'
 }
-
+println "5"
 tasks.named('forbiddenApisMain').configure {
   addSignatureFiles 'hppc-signatures'
 }
 tasks.named('forbiddenApisTest').configure {
   addSignatureFiles 'hppc-signatures'
 }
-
+println "6"
 tasks.named('internalClusterTestTestingConventions').configure {
     baseClass "org.elasticsearch.test.AbstractMultiClustersTestCase"
     baseClass "org.elasticsearch.test.ESIntegTestCase"
     baseClass "org.elasticsearch.test.ESSingleNodeTestCase"
 }
-
+println "7"
 File generatedResourcesDir = new File(buildDir, 'generated-resources')
 def generateModulesList = tasks.register("generateModulesList") {
     List<String> modules = project(':modules').subprojects.collect { it.name }
@@ -110,7 +148,7 @@ def generateModulesList = tasks.register("generateModulesList") {
         modulesFile.setText(modules.join('\n'), 'UTF-8')
     }
 }
-
+println "8"
 def generatePluginsList = tasks.register("generatePluginsList") {
     Set<String> plugins = new TreeSet<>(project(':plugins').childProjects.keySet())
     plugins.remove('example')
@@ -123,7 +161,7 @@ def generatePluginsList = tasks.register("generatePluginsList") {
         pluginsFile.setText(plugins.join('\n'), 'UTF-8')
     }
 }
-
+println "9"
 sourceSets.main.output.dir(generatedResourcesDir)
 sourceSets.main.compiledBy(generateModulesList, generatePluginsList)
 
@@ -135,7 +173,7 @@ if (BuildParams.isSnapshotBuild() == false) {
         systemProperty 'es.index_mode_feature_flag_registered', 'true'
     }
 }
-
+println "10"
 tasks.named("thirdPartyAudit").configure {
     ignoreMissingClasses(
             // from com.fasterxml.jackson.dataformat.yaml.YAMLMapper (jackson-dataformat-yaml)
@@ -230,7 +268,7 @@ tasks.named("thirdPartyAudit").configure {
     )
     ignoreMissingClasses 'javax.xml.bind.DatatypeConverter'
 }
-
+println "11"
 tasks.named("dependencyLicenses").configure {
     mapping from: /lucene-.*/, to: 'lucene'
     dependencies = project.configurations.runtimeClasspath.fileCollection {
@@ -240,7 +278,7 @@ tasks.named("dependencyLicenses").configure {
                         it.name == 'securesm')
     }
 }
-
+println "12"
 tasks.named("licenseHeaders").configure {
     // Ignore our vendored version of Google Guice
     excludes << 'org/elasticsearch/common/inject/**/*'
@@ -248,5 +286,6 @@ tasks.named("licenseHeaders").configure {
     excludes << 'org/apache/lucene/search/RegExp87*'
     excludes << 'org/apache/lucene/search/RegexpQuery87*'
 }
-
+println "13"
 tasks.withType(Checkstyle.class).configureEach { t -> t.getMaxHeapSize().set("2g") }
+println "14"

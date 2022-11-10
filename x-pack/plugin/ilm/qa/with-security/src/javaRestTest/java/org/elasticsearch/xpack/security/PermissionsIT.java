@@ -55,6 +55,7 @@ import static org.elasticsearch.xcontent.XContentFactory.jsonBuilder;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 
+@SuppressWarnings("removal")
 public class PermissionsIT extends ESRestTestCase {
 
     private static final String jsonDoc = """
@@ -339,10 +340,10 @@ public class PermissionsIT extends ESRestTestCase {
 
     private void createIndexAsAdmin(String name, Settings settings, String mapping) throws IOException {
         Request request = new Request("PUT", "/" + name);
-        request.setJsonEntity(formatted("""
+        request.setJsonEntity("""
             {
              "settings": %s, "mappings" : {%s}
-            }""", Strings.toString(settings), mapping));
+            }""".formatted(Strings.toString(settings), mapping));
         assertOK(adminClient().performRequest(request));
     }
 
@@ -354,7 +355,7 @@ public class PermissionsIT extends ESRestTestCase {
 
     private void createIndexTemplate(String name, String pattern, String alias, String policy) throws IOException {
         Request request = new Request("PUT", "/_template/" + name);
-        request.setJsonEntity(formatted("""
+        request.setJsonEntity("""
             {
               "index_patterns": [
                 "%s"
@@ -365,7 +366,7 @@ public class PermissionsIT extends ESRestTestCase {
                 "index.lifecycle.name": "%s",
                 "index.lifecycle.rollover_alias": "%s"
               }
-            }""", pattern, policy, alias));
+            }""".formatted(pattern, policy, alias));
         request.setOptions(expectWarnings(RestPutIndexTemplateAction.DEPRECATION_WARNING));
         assertOK(adminClient().performRequest(request));
     }

@@ -78,7 +78,7 @@ public class HttpExportBulkResponseListenerTests extends ESTestCase {
         final String[] expectedErrors = new String[] { randomAlphaOfLengthBetween(4, 10), randomAlphaOfLengthBetween(5, 9) };
         final AtomicInteger counter = new AtomicInteger(0);
         final Response response = mock(Response.class);
-        final StringEntity entity = new StringEntity(formatted("""
+        final StringEntity entity = new StringEntity("""
             {
               "took": 4,
               "errors": true,
@@ -114,7 +114,7 @@ public class HttpExportBulkResponseListenerTests extends ESTestCase {
                   }
                 }
               ]
-            }""", expectedErrors[0], expectedErrors[1]), ContentType.APPLICATION_JSON);
+            }""".formatted(expectedErrors[0], expectedErrors[1]), ContentType.APPLICATION_JSON);
 
         when(response.getEntity()).thenReturn(entity);
 

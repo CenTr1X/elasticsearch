@@ -22,7 +22,7 @@ public class PutTrainedModelActionResponseTests extends AbstractWireSerializingT
         String modelId = randomAlphaOfLength(10);
         return new Response(
             TrainedModelConfigTests.createTestInstance(modelId, randomBoolean())
-                .setParsedDefinition(TrainedModelDefinitionTests.createSmallRandomBuilder())
+                .setParsedDefinition(TrainedModelDefinitionTests.createRandomBuilder())
                 .build()
         );
     }

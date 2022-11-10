@@ -8,15 +8,14 @@
 package org.elasticsearch.xpack.core.ml.action;
 
 import org.elasticsearch.common.io.stream.Writeable;
-import org.elasticsearch.test.AbstractXContentSerializingTestCase;
+import org.elasticsearch.test.AbstractSerializingTestCase;
 import org.elasticsearch.xcontent.XContentParser;
 
 import java.io.IOException;
 
 import static org.elasticsearch.test.VersionUtils.randomVersion;
 
-public class StartDataFrameAnalyticsActionTaskParamsTests extends AbstractXContentSerializingTestCase<
-    StartDataFrameAnalyticsAction.TaskParams> {
+public class StartDataFrameAnalyticsActionTaskParamsTests extends AbstractSerializingTestCase<StartDataFrameAnalyticsAction.TaskParams> {
 
     @Override
     protected StartDataFrameAnalyticsAction.TaskParams doParseInstance(XContentParser parser) throws IOException {

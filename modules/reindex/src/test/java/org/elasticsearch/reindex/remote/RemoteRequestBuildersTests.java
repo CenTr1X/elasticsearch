@@ -228,14 +228,14 @@ public class RemoteRequestBuildersTests extends ESTestCase {
         searchRequest.source().fetchSource(new String[] { "in1", "in2" }, new String[] { "out" });
         entity = initialSearch(searchRequest, new BytesArray(query), remoteVersion).getEntity();
         assertEquals(ContentType.APPLICATION_JSON.toString(), entity.getContentType().getValue());
-        assertEquals(XContentHelper.stripWhitespace(formatted("""
+        assertEquals(XContentHelper.stripWhitespace("""
             {
               "query": %s,
               "_source": {
                 "includes": [ "in1", "in2" ],
                 "excludes": [ "out" ]
               }
-            }""", query)), Streams.copyToString(new InputStreamReader(entity.getContent(), StandardCharsets.UTF_8)));
+            }""".formatted(query)), Streams.copyToString(new InputStreamReader(entity.getContent(), StandardCharsets.UTF_8)));
 
         // Invalid XContent fails
         RuntimeException e = expectThrows(

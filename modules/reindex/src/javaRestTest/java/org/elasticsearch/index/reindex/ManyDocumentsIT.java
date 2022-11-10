@@ -63,7 +63,7 @@ public class ManyDocumentsIT extends ESRestTestCase {
         String remote = "http://" + http.get("publish_address");
         Request request = new Request("POST", "/_reindex");
         if (randomBoolean()) {
-            request.setJsonEntity(String.format(java.util.Locale.ROOT, """
+            request.setJsonEntity("""
                 {
                    "source": {
                      "index": "test",
@@ -74,10 +74,10 @@ public class ManyDocumentsIT extends ESRestTestCase {
                    "dest": {
                      "index": "des"
                    }
-                }""", remote));
+                }""".formatted(remote));
         } else {
             // Test with external version_type
-            request.setJsonEntity(String.format(java.util.Locale.ROOT, """
+            request.setJsonEntity("""
                 {
                   "source": {
                     "index": "test",
@@ -89,7 +89,7 @@ public class ManyDocumentsIT extends ESRestTestCase {
                     "index": "des",
                     "version_type": "external"
                   }
-                }""", remote));
+                }""".formatted(remote));
         }
         Map<String, Object> response = entityAsMap(client().performRequest(request));
         assertThat(response, hasEntry("total", count));

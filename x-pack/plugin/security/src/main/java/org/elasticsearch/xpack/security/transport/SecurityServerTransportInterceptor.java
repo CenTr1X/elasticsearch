@@ -54,7 +54,6 @@ public class SecurityServerTransportInterceptor implements TransportInterceptor 
     private final ThreadPool threadPool;
     private final Settings settings;
     private final SecurityContext securityContext;
-    private final RemoteClusterAuthorizationResolver remoteClusterAuthorizationResolver;
 
     public SecurityServerTransportInterceptor(
         Settings settings,
@@ -63,8 +62,7 @@ public class SecurityServerTransportInterceptor implements TransportInterceptor 
         AuthorizationService authzService,
         SSLService sslService,
         SecurityContext securityContext,
-        DestructiveOperations destructiveOperations,
-        RemoteClusterAuthorizationResolver remoteClusterAuthorizationResolver
+        DestructiveOperations destructiveOperations
     ) {
         this.settings = settings;
         this.threadPool = threadPool;
@@ -73,7 +71,6 @@ public class SecurityServerTransportInterceptor implements TransportInterceptor 
         this.sslService = sslService;
         this.securityContext = securityContext;
         this.profileFilters = initializeProfileFilters(destructiveOperations);
-        this.remoteClusterAuthorizationResolver = remoteClusterAuthorizationResolver;
     }
 
     @Override
@@ -120,7 +117,7 @@ public class SecurityServerTransportInterceptor implements TransportInterceptor 
                         )
                     );
                 } else if (securityContext.getAuthentication() != null
-                    && securityContext.getAuthentication().getEffectiveSubject().getVersion().equals(minVersion) == false) {
+                    && securityContext.getAuthentication().getVersion().equals(minVersion) == false) {
                         // re-write the authentication since we want the authentication version to match the version of the connection
                         securityContext.executeAfterRewritingAuthentication(
                             original -> sendWithUser(

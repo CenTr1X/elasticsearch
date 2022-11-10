@@ -285,8 +285,7 @@ public class PolicyUtilTests extends ESTestCase {
         "java.io.FilePermission /foo/bar write",
         "java.lang.RuntimePermission createClassLoader",
         "java.lang.RuntimePermission getFileStoreAttributes",
-        "java.lang.RuntimePermission accessUserInformation",
-        "org.elasticsearch.secure_sm.ThreadPermission modifyArbitraryThreadGroup"
+        "java.lang.RuntimePermission accessUserInformation"
     );
 
     public void testModulePolicyAllowedPermissions() throws Exception {

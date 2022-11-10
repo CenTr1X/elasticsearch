@@ -30,7 +30,6 @@ import org.elasticsearch.xpack.core.ml.inference.assignment.AssignmentState;
 import org.elasticsearch.xpack.core.ml.inference.assignment.TrainedModelAssignment;
 import org.elasticsearch.xpack.core.ml.utils.ExceptionsHelper;
 import org.elasticsearch.xpack.ml.inference.assignment.TrainedModelAssignmentMetadata;
-import org.elasticsearch.xpack.ml.inference.deployment.NlpInferenceInput;
 import org.elasticsearch.xpack.ml.inference.deployment.TrainedModelDeploymentTask;
 import org.elasticsearch.xpack.ml.inference.persistence.TrainedModelProvider;
 
@@ -75,14 +74,14 @@ public class TransportInferTrainedModelDeploymentAction extends TransportTasksAc
         ActionListener<InferTrainedModelDeploymentAction.Response> listener
     ) {
         TaskId taskId = new TaskId(clusterService.localNode().getId(), task.getId());
-        final String modelId = request.getModelId();
+        final String deploymentId = request.getDeploymentId();
         // We need to check whether there is at least an assigned task here, otherwise we cannot redirect to the
         // node running the job task.
-        TrainedModelAssignment assignment = TrainedModelAssignmentMetadata.assignmentForModelId(clusterService.state(), modelId)
+        TrainedModelAssignment assignment = TrainedModelAssignmentMetadata.assignmentForModelId(clusterService.state(), deploymentId)
             .orElse(null);
         if (assignment == null) {
             // If there is no assignment, verify the model even exists so that we can provide a nicer error message
-            provider.getTrainedModel(modelId, GetTrainedModelsAction.Includes.empty(), taskId, ActionListener.wrap(config -> {
+            provider.getTrainedModel(deploymentId, GetTrainedModelsAction.Includes.empty(), taskId, ActionListener.wrap(config -> {
                 if (config.getModelType() != TrainedModelType.PYTORCH) {
                     listener.onFailure(
                         ExceptionsHelper.badRequestException(
@@ -93,13 +92,13 @@ public class TransportInferTrainedModelDeploymentAction extends TransportTasksAc
                     );
                     return;
                 }
-                String message = "Trained model [" + modelId + "] is not deployed";
+                String message = "Trained model [" + deploymentId + "] is not deployed";
                 listener.onFailure(ExceptionsHelper.conflictStatusException(message));
             }, listener::onFailure));
             return;
         }
         if (assignment.getAssignmentState() == AssignmentState.STOPPING) {
-            String message = "Trained model [" + modelId + "] is STOPPING";
+            String message = "Trained model [" + deploymentId + "] is STOPPING";
             listener.onFailure(ExceptionsHelper.conflictStatusException(message));
             return;
         }
@@ -107,14 +106,12 @@ public class TransportInferTrainedModelDeploymentAction extends TransportTasksAc
         assignment.selectRandomStartedNodeWeighedOnAllocations().ifPresentOrElse(node -> {
             logger.trace(() -> format("[%s] selected node [%s]", assignment.getModelId(), node));
             request.setNodes(node);
-            long start = System.currentTimeMillis();
-            super.doExecute(task, request, ActionListener.wrap(r -> {
-                r.setTookMillis(System.currentTimeMillis() - start);
-                listener.onResponse(r);
-            }, listener::onFailure));
+            super.doExecute(task, request, listener);
         }, () -> {
             logger.trace(() -> format("[%s] model not allocated to any node [%s]", assignment.getModelId()));
-            listener.onFailure(ExceptionsHelper.conflictStatusException("Trained model [" + modelId + "] is not allocated to any nodes"));
+            listener.onFailure(
+                ExceptionsHelper.conflictStatusException("Trained model [" + deploymentId + "] is not allocated to any nodes")
+            );
         });
     }
 
@@ -131,9 +128,9 @@ public class TransportInferTrainedModelDeploymentAction extends TransportTasksAc
             throw org.elasticsearch.ExceptionsHelper.convertToElastic(failedNodeExceptions.get(0));
         } else if (tasks.isEmpty()) {
             throw new ElasticsearchStatusException(
-                "Unable to find deployment task for model [{}] please stop and start the deployment or try again momentarily",
+                "[{}] unable to find deployment task for inference please stop and start the deployment or try again momentarily",
                 RestStatus.NOT_FOUND,
-                request.getModelId()
+                request.getDeploymentId()
             );
         } else {
             return tasks.get(0);
@@ -148,22 +145,14 @@ public class TransportInferTrainedModelDeploymentAction extends TransportTasksAc
         ActionListener<InferTrainedModelDeploymentAction.Response> listener
     ) {
         assert actionTask instanceof CancellableTask : "task [" + actionTask + "] not cancellable";
-
-        NlpInferenceInput input;
-        if (request.getTextInput() != null) {
-            input = NlpInferenceInput.fromText(request.getTextInput());
-        } else {
-            input = NlpInferenceInput.fromDoc(request.getDocs().get(0));
-        }
-
         task.infer(
-            input,
+            request.getDocs().get(0),
             request.getUpdate(),
             request.isSkipQueue(),
             request.getInferenceTimeout(),
             actionTask,
             ActionListener.wrap(
-                pyTorchResult -> listener.onResponse(new InferTrainedModelDeploymentAction.Response(pyTorchResult, 0)),
+                pyTorchResult -> listener.onResponse(new InferTrainedModelDeploymentAction.Response(pyTorchResult)),
                 listener::onFailure
             )
         );

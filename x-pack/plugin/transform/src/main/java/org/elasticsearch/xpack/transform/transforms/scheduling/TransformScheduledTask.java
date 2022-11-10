@@ -64,7 +64,9 @@ final class TransformScheduledTask {
             frequency,
             lastTriggeredTimeMillis,
             failureCount,
-            calculateNextScheduledTime(lastTriggeredTimeMillis, frequency, failureCount),
+            failureCount == 0
+                ? lastTriggeredTimeMillis + frequency.millis()
+                : calculateNextScheduledTimeAfterFailure(lastTriggeredTimeMillis, failureCount),
             listener
         );
     }
@@ -72,24 +74,17 @@ final class TransformScheduledTask {
     // Visible for testing
 
     /**
-     * Calculates the appropriate next scheduled time taking number of failures into account.
+     * Calculates the appropriate next scheduled time after a number of failures.
      * This method implements exponential backoff approach.
      *
      * @param lastTriggeredTimeMillis the last time (in millis) the task was triggered
-     * @param frequency               the frequency of the transform
      * @param failureCount            the number of failures that happened since the task was triggered
      * @return next scheduled time for a task
      */
-    static long calculateNextScheduledTime(Long lastTriggeredTimeMillis, TimeValue frequency, int failureCount) {
-        final long baseTime = lastTriggeredTimeMillis != null ? lastTriggeredTimeMillis : System.currentTimeMillis();
-
-        if (failureCount == 0) {
-            return baseTime + (frequency != null ? frequency : Transform.DEFAULT_TRANSFORM_FREQUENCY).millis();
-        }
-
+    static long calculateNextScheduledTimeAfterFailure(long lastTriggeredTimeMillis, int failureCount) {
         // Math.min(failureCount, 32) is applied in order to avoid overflow.
         long delayMillis = Math.min(Math.max((1L << Math.min(failureCount, 32)) * 1000, MIN_DELAY_MILLIS), MAX_DELAY_MILLIS);
-        return baseTime + delayMillis;
+        return lastTriggeredTimeMillis + delayMillis;
     }
 
     String getTransformId() {

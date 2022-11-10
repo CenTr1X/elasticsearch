@@ -329,7 +329,6 @@ public class Classification implements DataFrameAnalysis {
             );
         }
         params.put(EARLY_STOPPING_ENABLED.getPreferredName(), earlyStoppingEnabled);
-        params.put(RANDOMIZE_SEED.getPreferredName(), randomizeSeed);
         return params;
     }
 

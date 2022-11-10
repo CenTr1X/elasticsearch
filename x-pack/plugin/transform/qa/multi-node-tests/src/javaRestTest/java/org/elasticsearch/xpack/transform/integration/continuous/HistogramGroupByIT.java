@@ -70,7 +70,7 @@ public class HistogramGroupByIT extends ContinuousTestCase {
     @Override
     @SuppressWarnings("unchecked")
     public void testIteration(int iteration, Set<String> modifiedEvents) throws IOException {
-        String querySource = formatted("""
+        String querySource = """
             {
               "aggs": {
                 "metric": {
@@ -82,7 +82,7 @@ public class HistogramGroupByIT extends ContinuousTestCase {
                 }
               }
             }
-            """, metricField);
+            """.formatted(metricField);
 
         Response searchResponseSource = search(
             CONTINUOUS_EVENTS_SOURCE_INDEX,

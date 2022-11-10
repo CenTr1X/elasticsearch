@@ -39,7 +39,7 @@ public class ReadActionsTests extends SecurityIntegTestCase {
 
     @Override
     protected String configRoles() {
-        return formatted("""
+        return """
             %s:
               cluster: [ ALL ]
               indices:
@@ -47,7 +47,7 @@ public class ReadActionsTests extends SecurityIntegTestCase {
                   privileges: [ manage, write ]
                 - names: ['/test.*/', '/-alias.*/']
                   privileges: [ read ]
-            """, SecuritySettingsSource.TEST_ROLE);
+            """.formatted(SecuritySettingsSource.TEST_ROLE);
     }
 
     public void testSearchForAll() {
@@ -213,8 +213,7 @@ public class ReadActionsTests extends SecurityIntegTestCase {
     }
 
     public void testMissingDateMath() {
-        expectThrows(ElasticsearchSecurityException.class, () -> trySearch("<unauthorized-datemath-{now/M}>"));
-        expectThrows(IndexNotFoundException.class, () -> trySearch("<test-datemath-{now/M}>"));
+        expectThrows(IndexNotFoundException.class, () -> trySearch("<logstash-{now/M}>"));
     }
 
     public void testMultiSearchUnauthorizedIndex() {

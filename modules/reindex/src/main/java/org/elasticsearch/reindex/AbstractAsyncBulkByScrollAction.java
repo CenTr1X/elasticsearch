@@ -430,7 +430,7 @@ public abstract class AbstractAsyncBulkByScrollAction<
                 "[{}]: sending [{}] entry, [{}] bulk request",
                 task.getId(),
                 requestSize,
-                ByteSizeValue.ofBytes(request.estimatedSizeInBytes())
+                new ByteSizeValue(request.estimatedSizeInBytes())
             );
         }
         if (task.isCancelled()) {

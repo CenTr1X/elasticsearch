@@ -334,7 +334,6 @@ import org.elasticsearch.xpack.security.rest.action.user.RestSetEnabledAction;
 import org.elasticsearch.xpack.security.support.CacheInvalidatorRegistry;
 import org.elasticsearch.xpack.security.support.ExtensionComponents;
 import org.elasticsearch.xpack.security.support.SecuritySystemIndices;
-import org.elasticsearch.xpack.security.transport.RemoteClusterAuthorizationResolver;
 import org.elasticsearch.xpack.security.transport.SecurityHttpSettings;
 import org.elasticsearch.xpack.security.transport.SecurityServerTransportInterceptor;
 import org.elasticsearch.xpack.security.transport.filter.IPFilter;
@@ -719,8 +718,7 @@ public class Security extends Plugin
             settings,
             client,
             getLicenseState(),
-            systemIndices.getMainIndexManager(),
-            clusterService
+            systemIndices.getMainIndexManager()
         );
         final ReservedRolesStore reservedRolesStore = new ReservedRolesStore();
 
@@ -898,12 +896,6 @@ public class Security extends Plugin
 
         ipFilter.set(new IPFilter(settings, auditTrailService, clusterService.getClusterSettings(), getLicenseState()));
         components.add(ipFilter.get());
-
-        final RemoteClusterAuthorizationResolver remoteClusterAuthorizationResolver = new RemoteClusterAuthorizationResolver(
-            settings,
-            clusterService.getClusterSettings()
-        );
-
         DestructiveOperations destructiveOperations = new DestructiveOperations(settings, clusterService.getClusterSettings());
         securityInterceptor.set(
             new SecurityServerTransportInterceptor(
@@ -913,8 +905,7 @@ public class Security extends Plugin
                 authzService,
                 getSslService(),
                 securityContext.get(),
-                destructiveOperations,
-                remoteClusterAuthorizationResolver
+                destructiveOperations
             )
         );
 
@@ -1632,10 +1623,12 @@ public class Security extends Plugin
                 if (indicesAccessControl == null) {
                     return MapperPlugin.NOOP_FIELD_PREDICATE;
                 }
-                assert indicesAccessControl.isGranted();
                 IndicesAccessControl.IndexAccessControl indexPermissions = indicesAccessControl.getIndexPermissions(index);
                 if (indexPermissions == null) {
                     return MapperPlugin.NOOP_FIELD_PREDICATE;
+                }
+                if (indexPermissions.isGranted() == false) {
+                    throw new IllegalStateException("unexpected call to getFieldFilter for index [" + index + "] which is not granted");
                 }
                 FieldPermissions fieldPermissions = indexPermissions.getFieldPermissions();
                 if (fieldPermissions.hasFieldLevelSecurity() == false) {

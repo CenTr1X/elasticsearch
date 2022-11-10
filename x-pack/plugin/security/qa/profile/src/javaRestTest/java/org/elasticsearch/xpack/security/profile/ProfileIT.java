@@ -24,7 +24,6 @@ import java.io.IOException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.IntStream;
@@ -102,7 +101,7 @@ public class ProfileIT extends ESRestTestCase {
         final Map<String, Object> activateProfileMap = doActivateProfile();
         final String profileUid = (String) activateProfileMap.get("uid");
         final Request profileHasPrivilegesRequest = new Request("POST", "_security/profile/_has_privileges");
-        profileHasPrivilegesRequest.setJsonEntity(formatted("""
+        profileHasPrivilegesRequest.setJsonEntity("""
             {
               "uids": ["some_missing_profile", "%s"],
               "privileges": {
@@ -116,7 +115,7 @@ public class ProfileIT extends ESRestTestCase {
                   "cluster:monitor/health"
                 ]
               }
-            }""", profileUid));
+            }""".formatted(profileUid));
 
         final Response profileHasPrivilegesResponse = adminClient().performRequest(profileHasPrivilegesRequest);
         assertOK(profileHasPrivilegesResponse);
@@ -152,7 +151,7 @@ public class ProfileIT extends ESRestTestCase {
 
         // Create the profile documents
         for (String uid : uids) {
-            final String source = String.format(Locale.ROOT, SAMPLE_PROFILE_DOCUMENT_TEMPLATE, uid, uid, Instant.now().toEpochMilli());
+            final String source = SAMPLE_PROFILE_DOCUMENT_TEMPLATE.formatted(uid, uid, Instant.now().toEpochMilli());
             final Request indexRequest = new Request("PUT", ".security-profile/_doc/profile_" + uid);
             indexRequest.setJsonEntity(source);
             indexRequest.addParameter("refresh", "wait_for");
@@ -264,17 +263,17 @@ public class ProfileIT extends ESRestTestCase {
         final String payload;
         switch (randomIntBetween(0, 2)) {
             case 0 -> {
-                payload = formatted("""
+                payload = """
                     {
                       "name": "rac",
                       "hint": {
                         "uids": ["%s"]
                       }
                     }
-                    """, "not-" + uid);
+                    """.formatted("not-" + uid);
             }
             case 1 -> {
-                payload = formatted("""
+                payload = """
                     {
                       "name": "rac",
                       "hint": {
@@ -283,10 +282,10 @@ public class ProfileIT extends ESRestTestCase {
                         }
                       }
                     }
-                    """, randomBoolean() ? "\"demo\"" : "[\"demo\"]");
+                    """.formatted(randomBoolean() ? "\"demo\"" : "[\"demo\"]");
             }
             default -> {
-                payload = String.format(Locale.ROOT, """
+                payload = """
                     {
                       "name": "rac",
                       "hint": {
@@ -295,7 +294,7 @@ public class ProfileIT extends ESRestTestCase {
                           "kibana.spaces": %s
                         }
                       }
-                    }""", "not-" + uid, randomBoolean() ? "\"demo\"" : "[\"demo\"]");
+                    }""".formatted("not-" + uid, randomBoolean() ? "\"demo\"" : "[\"demo\"]");
             }
         }
         suggestProfilesRequest1.setJsonEntity(payload);
@@ -341,13 +340,7 @@ public class ProfileIT extends ESRestTestCase {
     public void testXpackUsageOutput() throws IOException {
         // Profile 1 that has not activated for more than 30 days
         final String uid = randomAlphaOfLength(20);
-        final String source = String.format(
-            Locale.ROOT,
-            SAMPLE_PROFILE_DOCUMENT_TEMPLATE,
-            uid,
-            uid,
-            Instant.now().minus(31, ChronoUnit.DAYS).toEpochMilli()
-        );
+        final String source = SAMPLE_PROFILE_DOCUMENT_TEMPLATE.formatted(uid, uid, Instant.now().minus(31, ChronoUnit.DAYS).toEpochMilli());
         final Request indexRequest = new Request("PUT", ".security-profile/_doc/profile_" + uid);
         indexRequest.setJsonEntity(source);
         indexRequest.addParameter("refresh", "wait_for");
@@ -463,12 +456,12 @@ public class ProfileIT extends ESRestTestCase {
 
     private Map<String, Object> doActivateProfile(String username, String password) throws IOException {
         final Request activateProfileRequest = new Request("POST", "_security/profile/_activate");
-        activateProfileRequest.setJsonEntity(String.format(Locale.ROOT, """
+        activateProfileRequest.setJsonEntity("""
             {
               "grant_type": "password",
               "username": "%s",
               "password": "%s"
-            }""", username, password));
+            }""".formatted(username, password));
 
         final Response activateProfileResponse = adminClient().performRequest(activateProfileRequest);
         assertOK(activateProfileResponse);

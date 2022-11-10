@@ -62,11 +62,6 @@ public class VersionStringFieldMapperTests extends MapperTestCase {
         return false;
     }
 
-    @Override
-    protected boolean supportsIgnoreMalformed() {
-        return false;
-    }
-
     public void testDefaults() throws Exception {
         XContentBuilder mapping = fieldMapping(this::minimalMapping);
         DocumentMapper mapper = createDocumentMapper(mapping);
@@ -180,8 +175,7 @@ public class VersionStringFieldMapperTests extends MapperTestCase {
     }
 
     @Override
-    protected SyntheticSourceSupport syntheticSourceSupport(boolean ignoreMalformed) {
-        assertFalse("version string fields don't support ignore_malformed", ignoreMalformed);
+    protected SyntheticSourceSupport syntheticSourceSupport() {
         return new VersionStringSyntheticSourceSupport();
     }
 

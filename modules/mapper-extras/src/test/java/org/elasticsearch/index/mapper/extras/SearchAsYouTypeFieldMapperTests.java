@@ -796,12 +796,7 @@ public class SearchAsYouTypeFieldMapperTests extends MapperTestCase {
     }
 
     @Override
-    protected boolean supportsIgnoreMalformed() {
-        return false;
-    }
-
-    @Override
-    protected SyntheticSourceSupport syntheticSourceSupport(boolean syntheticSource) {
+    protected SyntheticSourceSupport syntheticSourceSupport() {
         throw new AssumptionViolatedException("not supported");
     }
 

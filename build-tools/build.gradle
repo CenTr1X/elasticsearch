@@ -37,10 +37,6 @@ gradlePlugin {
             id = 'elasticsearch.esplugin'
             implementationClass = 'org.elasticsearch.gradle.plugin.PluginBuildPlugin'
         }
-        stableEsPlugin {
-          id = 'elasticsearch.stable-esplugin'
-          implementationClass = 'org.elasticsearch.gradle.plugin.StablePluginBuildPlugin'
-        }
         javaRestTest {
             id = 'elasticsearch.java-rest-test'
             implementationClass = 'org.elasticsearch.gradle.test.JavaRestTestPlugin'
@@ -123,8 +119,6 @@ dependencies {
     api buildLibs.commmons.io
     implementation buildLibs.asm.tree
     implementation buildLibs.asm
-    implementation buildLibs.jackson.core
-    implementation buildLibs.jackson.databind
 
     testFixturesApi gradleApi()
     testFixturesApi gradleTestKit()
@@ -134,9 +128,7 @@ dependencies {
     testFixturesApi(buildLibs.spock.core) {
         exclude module: "groovy"
     }
-    testFixturesApi(buildLibs.bytebuddy) {
-      because 'Generating dynamic plugin apis'
-    }
+
     testImplementation(buildLibs.spock.junit4) {
         because 'required as we rely on junit4 rules'
     }
@@ -152,7 +144,6 @@ dependencies {
     testRuntimeOnly(buildLibs.junit5.platform.launcher) {
         because 'allows tests to run from IDEs that bundle older version of launcher'
     }
-
 }
 
 tasks.named('test').configure {

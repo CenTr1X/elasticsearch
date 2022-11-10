@@ -91,7 +91,7 @@ public class ShardChangesAction extends ActionType<ShardChangesAction.Response> 
             shardId = new ShardId(in);
             expectedHistoryUUID = in.readString();
             pollTimeout = in.readTimeValue();
-            maxBatchSize = ByteSizeValue.readFrom(in);
+            maxBatchSize = new ByteSizeValue(in);
 
             // Starting the clock in order to know how much time is spent on fetching operations:
             relativeStartNanos = System.nanoTime();

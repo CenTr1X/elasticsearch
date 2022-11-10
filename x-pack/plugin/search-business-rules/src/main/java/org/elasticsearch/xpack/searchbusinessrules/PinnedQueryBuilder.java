@@ -30,6 +30,7 @@ import org.elasticsearch.xcontent.ConstructingObjectParser;
 import org.elasticsearch.xcontent.ParseField;
 import org.elasticsearch.xcontent.ToXContentObject;
 import org.elasticsearch.xcontent.XContentBuilder;
+import org.elasticsearch.xcontent.XContentFactory;
 import org.elasticsearch.xcontent.XContentParser;
 
 import java.io.IOException;
@@ -136,7 +137,14 @@ public class PinnedQueryBuilder extends AbstractQueryBuilder<PinnedQueryBuilder>
 
         @Override
         public String toString() {
-            return Strings.toString(this, true, true);
+            try {
+                XContentBuilder builder = XContentFactory.jsonBuilder();
+                builder.prettyPrint();
+                toXContent(builder, EMPTY_PARAMS);
+                return Strings.toString(builder);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
         }
 
         @Override

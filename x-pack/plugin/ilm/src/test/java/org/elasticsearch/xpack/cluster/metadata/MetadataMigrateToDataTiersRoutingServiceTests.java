@@ -1551,7 +1551,7 @@ public class MetadataMigrateToDataTiersRoutingServiceTests extends ESTestCase {
     }
 
     private String getWarmPhaseDef() {
-        return formatted("""
+        return """
             {
               "policy": "%s",
               "phase_definition": {
@@ -1573,11 +1573,11 @@ public class MetadataMigrateToDataTiersRoutingServiceTests extends ESTestCase {
               },
               "version": 1,
               "modified_date_in_millis": 1578521007076
-            }""", lifecycleName);
+            }""".formatted(lifecycleName);
     }
 
     private String getColdPhaseDefinitionWithTotalShardsPerNode() {
-        return formatted("""
+        return """
             {
               "policy": "%s",
               "phase_definition": {
@@ -1593,11 +1593,11 @@ public class MetadataMigrateToDataTiersRoutingServiceTests extends ESTestCase {
               },
               "version": 1,
               "modified_date_in_millis": 1578521007076
-            }""", lifecycleName);
+            }""".formatted(lifecycleName);
     }
 
     private String getColdPhaseDefinition() {
-        return formatted("""
+        return """
             {
               "policy": "%s",
               "phase_definition": {
@@ -1613,7 +1613,7 @@ public class MetadataMigrateToDataTiersRoutingServiceTests extends ESTestCase {
               },
               "version": 1,
               "modified_date_in_millis": 1578521007076
-            }""", lifecycleName);
+            }""".formatted(lifecycleName);
     }
 
     @SuppressWarnings("unchecked")

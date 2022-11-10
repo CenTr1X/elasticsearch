@@ -697,8 +697,8 @@ public class RepositoryAnalyzeAction extends ActionType<RepositoryAnalyzeAction.
             readNodeCount = in.readVInt();
             earlyReadNodeCount = in.readVInt();
             timeout = in.readTimeValue();
-            maxBlobSize = ByteSizeValue.readFrom(in);
-            maxTotalDataSize = ByteSizeValue.readFrom(in);
+            maxBlobSize = new ByteSizeValue(in);
+            maxTotalDataSize = new ByteSizeValue(in);
             detailed = in.readBoolean();
             reroutedFrom = in.readOptionalWriteable(DiscoveryNode::new);
             if (in.getVersion().onOrAfter(Version.V_7_14_0)) {
@@ -973,8 +973,8 @@ public class RepositoryAnalyzeAction extends ActionType<RepositoryAnalyzeAction.
             concurrency = in.readVInt();
             readNodeCount = in.readVInt();
             earlyReadNodeCount = in.readVInt();
-            maxBlobSize = ByteSizeValue.readFrom(in);
-            maxTotalDataSize = ByteSizeValue.readFrom(in);
+            maxBlobSize = new ByteSizeValue(in);
+            maxTotalDataSize = new ByteSizeValue(in);
             seed = in.readLong();
             rareActionProbability = in.readDouble();
             blobPath = in.readString();

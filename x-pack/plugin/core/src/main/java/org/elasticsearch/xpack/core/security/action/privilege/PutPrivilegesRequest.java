@@ -34,7 +34,7 @@ public final class PutPrivilegesRequest extends ActionRequest implements Applica
 
     public PutPrivilegesRequest(StreamInput in) throws IOException {
         super(in);
-        privileges = in.readImmutableList(ApplicationPrivilegeDescriptor::new);
+        privileges = Collections.unmodifiableList(in.readList(ApplicationPrivilegeDescriptor::new));
         refreshPolicy = RefreshPolicy.readFrom(in);
     }
 

@@ -13,8 +13,6 @@ setup:
                 type: integer
               time:
                 type: date
-              kind:
-                type: keyword
 
   - do:
       headers:
@@ -38,101 +36,53 @@ setup:
         refresh: true
         body: |
           {"index":{}}
-          {"cost":200,"time":1587501233000,"kind":"changed"}
+          {"cost":200,"time":1587501233000}
           {"index":{}}
-          {"cost":200,"time":1587501243000,"kind":"changed"}
+          {"cost":200,"time":1587501243000}
           {"index":{}}
-          {"cost":200,"time":1587501253000,"kind":"changed"}
+          {"cost":200,"time":1587501253000}
           {"index":{}}
-          {"cost":250,"time":1587501263000,"kind":"changed"}
+          {"cost":250,"time":1587501263000}
           {"index":{}}
-          {"cost":250,"time":1587501273000,"kind":"changed"}
+          {"cost":250,"time":1587501273000}
           {"index":{}}
-          {"cost":580,"time":1587501283000,"kind":"changed"}
+          {"cost":580,"time":1587501283000}
           {"index":{}}
-          {"cost":600,"time":1587501293000,"kind":"changed"}
+          {"cost":600,"time":1587501293000}
           {"index":{}}
-          {"cost":600,"time":1587501303000,"kind":"changed"}
+          {"cost":600,"time":1587501303000}
           {"index":{}}
-          {"cost":600,"time":1587501313000,"kind":"changed"}
+          {"cost":600,"time":1587501313000}
           {"index":{}}
-          {"cost":600,"time":1587501313000,"kind":"changed"}
+          {"cost":600,"time":1587501313000}
           {"index":{}}
-          {"cost":600,"time":1587501323000,"kind":"changed"}
+          {"cost":600,"time":1587501323000}
           {"index":{}}
-          {"cost":600,"time":1587501333000,"kind":"changed"}
+          {"cost":600,"time":1587501333000}
           {"index":{}}
-          {"cost":600,"time":1587501343000,"kind":"changed"}
+          {"cost":600,"time":1587501343000}
           {"index":{}}
-          {"cost":600,"time":1587501353000,"kind":"changed"}
+          {"cost":600,"time":1587501353000}
           {"index":{}}
-          {"cost":600,"time":1587501363000,"kind":"changed"}
+          {"cost":600,"time":1587501363000}
           {"index":{}}
-          {"cost":600,"time":1587501373000,"kind":"changed"}
+          {"cost":600,"time":1587501373000}
           {"index":{}}
-          {"cost":600,"time":1587501383000,"kind":"changed"}
+          {"cost":600,"time":1587501383000}
           {"index":{}}
-          {"cost":600,"time":1587501393000,"kind":"changed"}
+          {"cost":600,"time":1587501393000}
           {"index":{}}
-          {"cost":600,"time":1587501403000,"kind":"changed"}
+          {"cost":600,"time":1587501403000}
           {"index":{}}
-          {"cost":600,"time":1587501413000,"kind":"changed"}
+          {"cost":600,"time":1587501413000}
           {"index":{}}
-          {"cost":600,"time":1587501423000,"kind":"changed"}
+          {"cost":600,"time":1587501423000}
           {"index":{}}
-          {"cost":600,"time":1587501433000,"kind":"changed"}
+          {"cost":600,"time":1587501433000}
           {"index":{}}
-          {"cost":600,"time":1587501443000,"kind":"changed"}
+          {"cost":600,"time":1587501443000}
           {"index":{}}
-          {"cost":600,"time":1587501453000,"kind":"changed"}
-          {"index":{}}
-          {"cost":600,"time":1587501233000,"kind":"unchanged"}
-          {"index":{}}
-          {"cost":600,"time":1587501243000,"kind":"unchanged"}
-          {"index":{}}
-          {"cost":600,"time":1587501253000,"kind":"unchanged"}
-          {"index":{}}
-          {"cost":600,"time":1587501263000,"kind":"unchanged"}
-          {"index":{}}
-          {"cost":600,"time":1587501273000,"kind":"unchanged"}
-          {"index":{}}
-          {"cost":600,"time":1587501283000,"kind":"unchanged"}
-          {"index":{}}
-          {"cost":600,"time":1587501293000,"kind":"unchanged"}
-          {"index":{}}
-          {"cost":600,"time":1587501303000,"kind":"unchanged"}
-          {"index":{}}
-          {"cost":600,"time":1587501313000,"kind":"unchanged"}
-          {"index":{}}
-          {"cost":600,"time":1587501313000,"kind":"unchanged"}
-          {"index":{}}
-          {"cost":600,"time":1587501323000,"kind":"unchanged"}
-          {"index":{}}
-          {"cost":600,"time":1587501333000,"kind":"unchanged"}
-          {"index":{}}
-          {"cost":600,"time":1587501343000,"kind":"unchanged"}
-          {"index":{}}
-          {"cost":600,"time":1587501353000,"kind":"unchanged"}
-          {"index":{}}
-          {"cost":600,"time":1587501363000,"kind":"unchanged"}
-          {"index":{}}
-          {"cost":600,"time":1587501373000,"kind":"unchanged"}
-          {"index":{}}
-          {"cost":600,"time":1587501383000,"kind":"unchanged"}
-          {"index":{}}
-          {"cost":600,"time":1587501393000,"kind":"unchanged"}
-          {"index":{}}
-          {"cost":600,"time":1587501403000,"kind":"unchanged"}
-          {"index":{}}
-          {"cost":600,"time":1587501413000,"kind":"unchanged"}
-          {"index":{}}
-          {"cost":600,"time":1587501423000,"kind":"unchanged"}
-          {"index":{}}
-          {"cost":600,"time":1587501433000,"kind":"unchanged"}
-          {"index":{}}
-          {"cost":600,"time":1587501443000,"kind":"unchanged"}
-          {"index":{}}
-          {"cost":600,"time":1587501453000,"kind":"unchanged"}
+          {"cost":600,"time":1587501453000}
 
 ---
 "Test change_point agg simple":
@@ -150,8 +100,8 @@ setup:
                   "fixed_interval": "1s"
                 },
                 "aggs": {
-                  "min": {
-                    "min": {
+                  "avg": {
+                    "avg": {
                       "field": "cost"
                     }
                   }
@@ -159,7 +109,7 @@ setup:
               },
               "change_point": {
                 "change_point": {
-                  "buckets_path": "date>min"
+                  "buckets_path": "date>avg"
                 }
               }
             }
@@ -246,8 +196,8 @@ setup:
                   "fixed_interval": "1s"
                 },
                 "aggs": {
-                  "min": {
-                    "min": {
+                  "avg": {
+                    "avg": {
                       "field": "cost"
                     }
                   }
@@ -261,137 +211,3 @@ setup:
             }
           }
   - is_true: aggregations.change_point.type.indeterminable
----
-"Test change_point with terms":
-  - do:
-      search:
-        index: store
-        size: 0
-        body: >
-          {
-            "aggs": {
-              "terms": {
-                 "terms": {
-                   "field": "kind"
-                 },
-                 "aggs": {
-                    "date": {
-                      "date_histogram": {
-                        "field": "time",
-                        "fixed_interval": "1s"
-                      },
-                      "aggs": {
-                        "min": {
-                          "min": {
-                            "field": "cost"
-                          }
-                        }
-                      }
-                    },
-                    "change_point": {
-                      "change_point": {
-                        "buckets_path": "date>min"
-                      }
-                    }
-                 }
-              }
-            }
-          }
-  - is_true: aggregations.terms.buckets.0.change_point.type.trend_change
-  - is_true: aggregations.terms.buckets.0.change_point.type.trend_change.p_value
-  - is_true: aggregations.terms.buckets.0.change_point.type.trend_change.r_value
-  - is_false: aggregations.terms.buckets.1.change_point.type.trend_change
-  - is_false: aggregations.terms.buckets.1.change_point.type.trend_change.p_value
-  - is_false: aggregations.terms.buckets.1.change_point.type.trend_change.r_value
-
-  - do:
-      search:
-        index: store
-        size: 0
-        body: >
-          {
-            "aggs": {
-              "terms": {
-                 "terms": {
-                   "field": "kind"
-                 },
-                 "aggs": {
-                    "date": {
-                      "date_histogram": {
-                        "field": "time",
-                        "fixed_interval": "1s"
-                      },
-                      "aggs": {
-                        "min": {
-                          "min": {
-                            "field": "cost"
-                          }
-                        }
-                      }
-                    },
-                    "change_point": {
-                      "change_point": {
-                        "buckets_path": "date>min"
-                      }
-                    },
-                    "select": {
-                      "bucket_selector": {
-                        "buckets_path": {"p_value": "change_point.p_value"},
-                        "script": "params.p_value < 0.5"
-                      }
-                    }
-                 }
-              }
-            }
-          }
-  - length: {aggregations.terms.buckets: 1}
-  - is_true: aggregations.terms.buckets.0.change_point.type.trend_change
-  - is_true: aggregations.terms.buckets.0.change_point.type.trend_change.p_value
-  - is_true: aggregations.terms.buckets.0.change_point.type.trend_change.r_value
-
-  - do:
-      search:
-        index: store
-        size: 0
-        body: >
-          {
-            "aggs": {
-              "terms": {
-                 "terms": {
-                   "field": "kind"
-                 },
-                 "aggs": {
-                    "date": {
-                      "date_histogram": {
-                        "field": "time",
-                        "fixed_interval": "1s"
-                      },
-                      "aggs": {
-                        "min": {
-                          "min": {
-                            "field": "cost"
-                          }
-                        }
-                      }
-                    },
-                    "change_point": {
-                      "change_point": {
-                        "buckets_path": "date>min"
-                      }
-                    },
-                    "sort": {
-                      "bucket_sort": {
-                        "sort": [{"change_point.p_value": {"order": "desc"}}]
-                      }
-                    }
-                 }
-              }
-            }
-          }
-  - length: {aggregations.terms.buckets: 2}
-  - is_false: aggregations.terms.buckets.0.change_point.type.trend_change
-  - is_false: aggregations.terms.buckets.0.change_point.type.trend_change.p_value
-  - is_false: aggregations.terms.buckets.0.change_point.type.trend_change.r_value
-  - is_true: aggregations.terms.buckets.1.change_point.type.trend_change
-  - is_true: aggregations.terms.buckets.1.change_point.type.trend_change.p_value
-  - is_true: aggregations.terms.buckets.1.change_point.type.trend_change.r_value

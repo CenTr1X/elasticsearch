@@ -34,7 +34,6 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Objects;
@@ -434,7 +433,7 @@ public final class EmbeddedImplClassLoader extends SecureClassLoader {
         String providerPrefix = IMPL_PREFIX + providerName;
         InputStream in = parent.getResourceAsStream(providerPrefix + JAR_LISTING_FILE);
         if (in == null) {
-            throw new IllegalStateException(String.format(Locale.ROOT, "missing %s provider jars list", providerName));
+            throw new IllegalStateException("missing %s provider jars list".formatted(providerName));
         }
         try (
             in;

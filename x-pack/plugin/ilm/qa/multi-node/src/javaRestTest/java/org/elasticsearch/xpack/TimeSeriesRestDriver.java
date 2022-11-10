@@ -329,13 +329,13 @@ public final class TimeSeriesRestDriver {
         if (useWriteIndex) {
             writeIndexSnippet = "\"is_write_index\": true";
         }
-        String m = mapping != null ? String.format(Locale.ROOT, "\"mappings\": %s, ", mapping) : "";
-        request.setJsonEntity(String.format(Locale.ROOT, """
+        String m = mapping != null ? "\"mappings\": %s, ".formatted(mapping) : "";
+        request.setJsonEntity("""
             {
              "settings": %s,
              %s
              "aliases" : { "%s": { %s } }
-            }""", Strings.toString(settings.build()), m, alias, writeIndexSnippet));
+            }""".formatted(Strings.toString(settings.build()), m, alias, writeIndexSnippet));
         client.performRequest(request);
         // wait for the shards to initialize
         ensureGreen(index);
@@ -343,10 +343,10 @@ public final class TimeSeriesRestDriver {
 
     public static void createIndexWithSettings(RestClient client, String index, Settings.Builder settings) throws IOException {
         Request request = new Request("PUT", "/" + index);
-        request.setJsonEntity(String.format(Locale.ROOT, """
+        request.setJsonEntity("""
             {
              "settings": %s
-            }""", Strings.toString(settings.build())));
+            }""".formatted(Strings.toString(settings.build())));
         client.performRequest(request);
         // wait for the shards to initialize
         ensureGreen(index);

@@ -7,6 +7,7 @@
 
 package org.elasticsearch.xpack.core.transform.transforms;
 
+import org.elasticsearch.Version;
 import org.elasticsearch.action.ActionRequestValidationException;
 import org.elasticsearch.common.Strings;
 import org.elasticsearch.common.io.stream.StreamInput;
@@ -99,7 +100,11 @@ public class SourceConfig implements Writeable, ToXContentObject {
     public SourceConfig(final StreamInput in) throws IOException {
         index = in.readStringArray();
         queryConfig = new QueryConfig(in);
-        runtimeMappings = in.readMap();
+        if (in.getVersion().onOrAfter(Version.V_7_12_0)) {
+            runtimeMappings = in.readMap();
+        } else {
+            runtimeMappings = Collections.emptyMap();
+        }
     }
 
     public String[] getIndex() {
@@ -137,7 +142,9 @@ public class SourceConfig implements Writeable, ToXContentObject {
     public void writeTo(StreamOutput out) throws IOException {
         out.writeStringArray(index);
         queryConfig.writeTo(out);
-        out.writeGenericMap(runtimeMappings);
+        if (out.getVersion().onOrAfter(Version.V_7_12_0)) {
+            out.writeGenericMap(runtimeMappings);
+        }
     }
 
     @Override

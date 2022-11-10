@@ -27,7 +27,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
@@ -178,14 +177,14 @@ public class AzureHttpHandler implements HttpHandler {
                             continue;
                         }
                     }
-                    list.append(String.format(Locale.ROOT, """
+                    list.append("""
                         <Blob>
                            <Name>%s</Name>
                            <Properties>
                              <Content-Length>%s</Content-Length>
                              <BlobType>BlockBlob</BlobType>
                            </Properties>
-                        </Blob>""", blobPath, blob.getValue().length()));
+                        </Blob>""".formatted(blobPath, blob.getValue().length()));
                 }
                 if (blobPrefixes.isEmpty() == false) {
                     blobPrefixes.forEach(p -> list.append("<BlobPrefix><Name>").append(p).append("</Name></BlobPrefix>"));
@@ -230,12 +229,12 @@ public class AzureHttpHandler implements HttpHandler {
         if ("HEAD".equals(exchange.getRequestMethod())) {
             exchange.sendResponseHeaders(status.getStatus(), -1L);
         } else {
-            final byte[] response = (String.format(Locale.ROOT, """
+            final byte[] response = ("""
                 <?xml version="1.0" encoding="UTF-8"?>
                 <Error>
                     <Code>%s</Code>
                     <Message>%s</Message>
-                </Error>""", errorCode, status)).getBytes(StandardCharsets.UTF_8);
+                </Error>""".formatted(errorCode, status)).getBytes(StandardCharsets.UTF_8);
             exchange.sendResponseHeaders(status.getStatus(), response.length);
             exchange.getResponseBody().write(response);
         }

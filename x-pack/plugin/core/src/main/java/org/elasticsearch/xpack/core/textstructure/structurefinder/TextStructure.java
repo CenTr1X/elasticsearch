@@ -218,7 +218,7 @@ public class TextStructure implements ToXContentObject, Writeable {
         format = in.readEnum(Format.class);
         multilineStartPattern = in.readOptionalString();
         excludeLinesPattern = in.readOptionalString();
-        columnNames = in.readBoolean() ? in.readImmutableList(StreamInput::readString) : null;
+        columnNames = in.readBoolean() ? Collections.unmodifiableList(in.readStringList()) : null;
         hasHeaderRow = in.readOptionalBoolean();
         delimiter = in.readBoolean() ? (char) in.readVInt() : null;
         quote = in.readBoolean() ? (char) in.readVInt() : null;
@@ -229,14 +229,14 @@ public class TextStructure implements ToXContentObject, Writeable {
         } else {
             ecsCompatibility = getNonNullEcsCompatibilityString(null);
         }
-        jodaTimestampFormats = in.readBoolean() ? in.readImmutableList(StreamInput::readString) : null;
-        javaTimestampFormats = in.readBoolean() ? in.readImmutableList(StreamInput::readString) : null;
+        jodaTimestampFormats = in.readBoolean() ? Collections.unmodifiableList(in.readStringList()) : null;
+        javaTimestampFormats = in.readBoolean() ? Collections.unmodifiableList(in.readStringList()) : null;
         timestampField = in.readOptionalString();
         needClientTimezone = in.readBoolean();
         mappings = Collections.unmodifiableSortedMap(new TreeMap<>(in.readMap()));
         ingestPipeline = in.readBoolean() ? Collections.unmodifiableMap(in.readMap()) : null;
         fieldStats = Collections.unmodifiableSortedMap(new TreeMap<>(in.readMap(StreamInput::readString, FieldStats::new)));
-        explanation = in.readImmutableList(StreamInput::readString);
+        explanation = Collections.unmodifiableList(in.readStringList());
     }
 
     @Override

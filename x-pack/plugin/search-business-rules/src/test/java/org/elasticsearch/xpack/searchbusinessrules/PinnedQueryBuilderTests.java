@@ -40,7 +40,7 @@ public class PinnedQueryBuilderTests extends AbstractQueryTestCase<PinnedQueryBu
         }
     }
 
-    private static QueryBuilder createRandomQuery() {
+    private QueryBuilder createRandomQuery() {
         if (randomBoolean()) {
             return new MatchAllQueryBuilder();
         } else {
@@ -48,7 +48,7 @@ public class PinnedQueryBuilderTests extends AbstractQueryTestCase<PinnedQueryBu
         }
     }
 
-    private static QueryBuilder createTestTermQueryBuilder() {
+    private QueryBuilder createTestTermQueryBuilder() {
         String fieldName = null;
         Object value;
         switch (randomIntBetween(0, 3)) {
@@ -91,7 +91,7 @@ public class PinnedQueryBuilderTests extends AbstractQueryTestCase<PinnedQueryBu
         return new TermQueryBuilder(fieldName, value);
     }
 
-    private static Item[] generateRandomItems() {
+    private Item[] generateRandomItems() {
         return randomArray(1, 100, Item[]::new, () -> new Item(randomAlphaOfLength(64), randomAlphaOfLength(256)));
     }
 
@@ -103,11 +103,6 @@ public class PinnedQueryBuilderTests extends AbstractQueryTestCase<PinnedQueryBu
             // Have IDs/docs and an organic query - uses DisMax
             assertThat(query, instanceOf(DisjunctionMaxQuery.class));
         }
-    }
-
-    @Override
-    protected PinnedQueryBuilder createQueryWithInnerQuery(QueryBuilder queryBuilder) {
-        return new PinnedQueryBuilder(queryBuilder, "id");
     }
 
     @Override

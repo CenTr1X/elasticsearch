@@ -12,7 +12,6 @@ import junit.framework.AssertionFailedError;
 
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.painless.antlr.Walker;
-import org.elasticsearch.painless.spi.PainlessTestScript;
 import org.elasticsearch.painless.spi.Whitelist;
 import org.elasticsearch.painless.spi.WhitelistLoader;
 import org.elasticsearch.script.ScriptContext;
@@ -26,6 +25,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static org.elasticsearch.painless.action.PainlessExecuteAction.PainlessTestScript;
 import static org.hamcrest.Matchers.hasSize;
 
 /**

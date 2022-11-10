@@ -45,10 +45,10 @@ public class ChangePasswordRequestBuilderTests extends ESTestCase {
     public void testWithHashedPassword() throws IOException {
         final Hasher hasher = getFastStoredHashAlgoForTests();
         final char[] hash = hasher.hash(new SecureString("superlongpassword".toCharArray()));
-        final String json = formatted("""
+        final String json = """
             {
                 "password_hash": "%s"
-            }""", new String(hash));
+            }""".formatted(new String(hash));
         ChangePasswordRequestBuilder builder = new ChangePasswordRequestBuilder(mock(Client.class));
         ChangePasswordRequest request = builder.source(new BytesArray(json.getBytes(StandardCharsets.UTF_8)), XContentType.JSON, hasher)
             .request();
@@ -62,9 +62,9 @@ public class ChangePasswordRequestBuilderTests extends ESTestCase {
             userHasher = getFastStoredHashAlgoForTests();
         }
         final char[] hash = userHasher.hash(new SecureString("superlongpassword".toCharArray()));
-        final String json = formatted("""
+        final String json = """
             {"password_hash": "%s"}
-            """, new String(hash));
+            """.formatted(new String(hash));
         ChangePasswordRequestBuilder builder = new ChangePasswordRequestBuilder(mock(Client.class));
         final IllegalArgumentException e = expectThrows(
             IllegalArgumentException.class,
@@ -77,10 +77,10 @@ public class ChangePasswordRequestBuilderTests extends ESTestCase {
     public void testWithHashedPasswordNotHash() {
         final Hasher systemHasher = getFastStoredHashAlgoForTests();
         final char[] hash = randomAlphaOfLength(20).toCharArray();
-        final String json = formatted("""
+        final String json = """
             {
                 "password_hash": "%s"
-            }""", new String(hash));
+            }""".formatted(new String(hash));
         ChangePasswordRequestBuilder builder = new ChangePasswordRequestBuilder(mock(Client.class));
         final IllegalArgumentException e = expectThrows(
             IllegalArgumentException.class,

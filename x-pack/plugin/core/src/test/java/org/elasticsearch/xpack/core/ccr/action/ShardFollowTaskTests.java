@@ -7,16 +7,17 @@
 package org.elasticsearch.xpack.core.ccr.action;
 
 import org.elasticsearch.common.io.stream.Writeable;
+import org.elasticsearch.common.unit.ByteSizeUnit;
 import org.elasticsearch.common.unit.ByteSizeValue;
 import org.elasticsearch.core.TimeValue;
 import org.elasticsearch.index.shard.ShardId;
-import org.elasticsearch.test.AbstractXContentSerializingTestCase;
+import org.elasticsearch.test.AbstractSerializingTestCase;
 import org.elasticsearch.xcontent.XContentParser;
 
 import java.io.IOException;
 import java.util.Collections;
 
-public class ShardFollowTaskTests extends AbstractXContentSerializingTestCase<ShardFollowTask> {
+public class ShardFollowTaskTests extends AbstractSerializingTestCase<ShardFollowTask> {
 
     @Override
     protected ShardFollowTask doParseInstance(XContentParser parser) throws IOException {
@@ -33,10 +34,10 @@ public class ShardFollowTaskTests extends AbstractXContentSerializingTestCase<Sh
             randomIntBetween(1, Integer.MAX_VALUE),
             randomIntBetween(1, Integer.MAX_VALUE),
             randomIntBetween(1, Integer.MAX_VALUE),
-            ByteSizeValue.ofBytes(randomNonNegativeLong()),
-            ByteSizeValue.ofBytes(randomNonNegativeLong()),
+            new ByteSizeValue(randomNonNegativeLong(), ByteSizeUnit.BYTES),
+            new ByteSizeValue(randomNonNegativeLong(), ByteSizeUnit.BYTES),
             randomIntBetween(1, Integer.MAX_VALUE),
-            ByteSizeValue.ofBytes(randomNonNegativeLong()),
+            new ByteSizeValue(randomNonNegativeLong(), ByteSizeUnit.BYTES),
             TimeValue.parseTimeValue(randomTimeValue(), ""),
             TimeValue.parseTimeValue(randomTimeValue(), ""),
             randomBoolean() ? null : Collections.singletonMap("key", "value")

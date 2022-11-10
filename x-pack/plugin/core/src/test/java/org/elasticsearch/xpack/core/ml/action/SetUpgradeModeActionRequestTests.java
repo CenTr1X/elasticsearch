@@ -7,11 +7,11 @@
 package org.elasticsearch.xpack.core.ml.action;
 
 import org.elasticsearch.common.io.stream.Writeable;
-import org.elasticsearch.test.AbstractXContentSerializingTestCase;
+import org.elasticsearch.test.AbstractSerializingTestCase;
 import org.elasticsearch.xcontent.XContentParser;
 import org.elasticsearch.xpack.core.ml.action.SetUpgradeModeAction.Request;
 
-public class SetUpgradeModeActionRequestTests extends AbstractXContentSerializingTestCase<Request> {
+public class SetUpgradeModeActionRequestTests extends AbstractSerializingTestCase<Request> {
 
     @Override
     protected Request createTestInstance() {

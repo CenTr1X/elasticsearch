@@ -224,7 +224,7 @@ public class SourceOnlySnapshotIT extends AbstractSnapshotIntegTestCase {
         String nested = useNested ? """
             ,"incorrect":{"type":"object"},"nested":{"type":"nested","properties":{"value":{"type":"long"}}}""" : "";
         if (requireRouting) {
-            assertEquals(XContentHelper.stripWhitespace(String.format(java.util.Locale.ROOT, """
+            assertEquals(XContentHelper.stripWhitespace("""
                 {
                   "_doc": {
                     "enabled": false,
@@ -248,9 +248,9 @@ public class SourceOnlySnapshotIT extends AbstractSnapshotIntegTestCase {
                       }
                     }
                   }
-                }""", nested)), mapping.source().string());
+                }""".formatted(nested)), mapping.source().string());
         } else {
-            assertEquals(XContentHelper.stripWhitespace(String.format(java.util.Locale.ROOT, """
+            assertEquals(XContentHelper.stripWhitespace("""
                 {
                   "_doc": {
                     "enabled": false,
@@ -271,7 +271,7 @@ public class SourceOnlySnapshotIT extends AbstractSnapshotIntegTestCase {
                       }
                     }
                   }
-                }""", nested)), mapping.source().string());
+                }""".formatted(nested)), mapping.source().string());
         }
     }
 

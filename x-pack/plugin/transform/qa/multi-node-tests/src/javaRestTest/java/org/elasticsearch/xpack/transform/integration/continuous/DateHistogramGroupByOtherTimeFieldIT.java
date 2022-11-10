@@ -100,11 +100,11 @@ public class DateHistogramGroupByOtherTimeFieldIT extends ContinuousTestCase {
 
     @Override
     public void testIteration(int iteration, Set<String> modifiedEvents) throws IOException {
-        String eventAgg = formatted("""
+        String eventAgg = """
             , "aggs" : {"event": {"terms": {"field": "%s", "size": 1000, "order": {"_key": "asc"}}}}
-            """, termsField);
+            """.formatted(termsField);
 
-        String querySource = formatted("""
+        String querySource = """
             {
               "aggs": {
                 "second": {
@@ -116,7 +116,7 @@ public class DateHistogramGroupByOtherTimeFieldIT extends ContinuousTestCase {
                 }
               }
             }
-            """, metricTimestampField, addGroupByTerms ? eventAgg : "");
+            """.formatted(metricTimestampField, addGroupByTerms ? eventAgg : "");
 
         Response searchResponseSource = search(
             CONTINUOUS_EVENTS_SOURCE_INDEX,

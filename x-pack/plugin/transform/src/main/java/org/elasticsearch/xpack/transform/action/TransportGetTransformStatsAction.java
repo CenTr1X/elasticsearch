@@ -34,14 +34,12 @@ import org.elasticsearch.xpack.core.transform.action.GetTransformStatsAction.Req
 import org.elasticsearch.xpack.core.transform.action.GetTransformStatsAction.Response;
 import org.elasticsearch.xpack.core.transform.transforms.NodeAttributes;
 import org.elasticsearch.xpack.core.transform.transforms.TransformCheckpointingInfo;
-import org.elasticsearch.xpack.core.transform.transforms.TransformHealth;
 import org.elasticsearch.xpack.core.transform.transforms.TransformState;
 import org.elasticsearch.xpack.core.transform.transforms.TransformStats;
 import org.elasticsearch.xpack.core.transform.transforms.TransformStoredDoc;
 import org.elasticsearch.xpack.transform.TransformServices;
 import org.elasticsearch.xpack.transform.checkpoint.TransformCheckpointService;
 import org.elasticsearch.xpack.transform.persistence.TransformConfigManager;
-import org.elasticsearch.xpack.transform.transforms.TransformHealthChecker;
 import org.elasticsearch.xpack.transform.transforms.TransformNodeAssignments;
 import org.elasticsearch.xpack.transform.transforms.TransformNodes;
 import org.elasticsearch.xpack.transform.transforms.TransformTask;
@@ -240,8 +238,7 @@ public class TransportGetTransformStatsAction extends TransportTasksAction<Trans
             reason,
             null,
             task.getStats(),
-            checkpointingInfo == null ? TransformCheckpointingInfo.EMPTY : checkpointingInfo,
-            TransformHealthChecker.checkTransform(task)
+            checkpointingInfo == null ? TransformCheckpointingInfo.EMPTY : checkpointingInfo
         );
     }
 
@@ -344,8 +341,7 @@ public class TransportGetTransformStatsAction extends TransportTasksAction<Trans
                             assignment.getExplanation(),
                             null,
                             stat.getTransformStats(),
-                            checkpointingInfo,
-                            TransformHealthChecker.checkUnassignedTransform(stat.getId(), clusterState)
+                            checkpointingInfo
                         )
                     );
                 } else {
@@ -356,8 +352,7 @@ public class TransportGetTransformStatsAction extends TransportTasksAction<Trans
                             null,
                             null,
                             stat.getTransformStats(),
-                            checkpointingInfo,
-                            TransformHealth.GREEN
+                            checkpointingInfo
                         )
                     );
                 }

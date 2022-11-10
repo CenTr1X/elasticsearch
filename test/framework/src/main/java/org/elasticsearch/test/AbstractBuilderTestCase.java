@@ -465,7 +465,7 @@ public abstract class AbstractBuilderTestCase extends ESTestCase {
                     MapperService.MergeReason.MAPPING_UPDATE
                 );
                 // also add mappings for two inner field in the object field
-                mapperService.merge("_doc", new CompressedXContent(formatted("""
+                mapperService.merge("_doc", new CompressedXContent("""
                     {
                       "properties": {
                         "%s": {
@@ -480,7 +480,7 @@ public abstract class AbstractBuilderTestCase extends ESTestCase {
                           }
                         }
                       }
-                    }""", OBJECT_FIELD_NAME, DATE_FIELD_NAME, INT_FIELD_NAME)), MapperService.MergeReason.MAPPING_UPDATE);
+                    }""".formatted(OBJECT_FIELD_NAME, DATE_FIELD_NAME, INT_FIELD_NAME)), MapperService.MergeReason.MAPPING_UPDATE);
                 testCase.initializeAdditionalMappings(mapperService);
             }
         }

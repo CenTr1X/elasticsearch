@@ -18,7 +18,6 @@ import org.elasticsearch.core.TimeValue;
 import org.elasticsearch.index.seqno.LocalCheckpointTracker;
 import org.elasticsearch.index.shard.ShardId;
 import org.elasticsearch.index.translog.Translog;
-import org.elasticsearch.index.translog.TranslogOperationsUtils;
 import org.elasticsearch.test.ESTestCase;
 import org.elasticsearch.threadpool.Scheduler;
 import org.elasticsearch.threadpool.TestThreadPool;
@@ -28,6 +27,7 @@ import org.elasticsearch.xpack.ccr.action.bulk.BulkShardOperationsResponse;
 import org.elasticsearch.xpack.core.ccr.ShardFollowNodeTaskStatus;
 import org.elasticsearch.xpack.core.ccr.action.ShardFollowTask;
 
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -314,7 +314,8 @@ public class ShardFollowNodeTaskRandomTests extends ESTestCase {
                 List<Translog.Operation> ops = new ArrayList<>();
                 for (long seqNo = prevGlobalCheckpoint; seqNo <= nextGlobalCheckPoint; seqNo++) {
                     String id = UUIDs.randomBase64UUID();
-                    ops.add(TranslogOperationsUtils.indexOp(id, seqNo, 0));
+                    byte[] source = "{}".getBytes(StandardCharsets.UTF_8);
+                    ops.add(new Translog.Index(id, seqNo, 0, source));
                 }
                 item.add(
                     new TestResponse(
@@ -368,7 +369,8 @@ public class ShardFollowNodeTaskRandomTests extends ESTestCase {
                     List<Translog.Operation> ops = new ArrayList<>();
                     for (long seqNo = fromSeqNo; seqNo <= toSeqNo; seqNo++) {
                         String id = UUIDs.randomBase64UUID();
-                        ops.add(TranslogOperationsUtils.indexOp(id, seqNo, 0));
+                        byte[] source = "{}".getBytes(StandardCharsets.UTF_8);
+                        ops.add(new Translog.Index(id, seqNo, 0, source));
                     }
                     // Report toSeqNo to simulate maxBatchSizeInBytes limit being met or last op to simulate a shard lagging behind:
                     long localLeaderGCP = randomBoolean() ? ops.get(ops.size() - 1).seqNo() : toSeqNo;

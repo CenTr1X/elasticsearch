@@ -8,9 +8,12 @@
 package org.elasticsearch.xpack.core.transform.transforms;
 
 import org.elasticsearch.common.io.stream.Writeable.Reader;
-import org.elasticsearch.test.AbstractWireSerializingTestCase;
+import org.elasticsearch.xcontent.XContentParser;
+import org.elasticsearch.xpack.core.transform.AbstractSerializingTransformTestCase;
 
-public class TransformCheckpointStatsTests extends AbstractWireSerializingTestCase<TransformCheckpointStats> {
+import java.io.IOException;
+
+public class TransformCheckpointStatsTests extends AbstractSerializingTransformTestCase<TransformCheckpointStats> {
     public static TransformCheckpointStats randomTransformCheckpointStats() {
         return new TransformCheckpointStats(
             randomLongBetween(1, 1_000_000),
@@ -19,6 +22,11 @@ public class TransformCheckpointStatsTests extends AbstractWireSerializingTestCa
             randomLongBetween(1, 1_000_000),
             randomLongBetween(0, 1_000_000)
         );
+    }
+
+    @Override
+    protected TransformCheckpointStats doParseInstance(XContentParser parser) throws IOException {
+        return TransformCheckpointStats.fromXContent(parser);
     }
 
     @Override

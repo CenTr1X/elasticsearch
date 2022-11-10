@@ -293,7 +293,6 @@ public class GeoShapeWithDocValuesFieldMapper extends AbstractShapeGeometryField
 
     @Override
     protected void index(DocumentParserContext context, Geometry geometry) throws IOException {
-        // TODO: Make common with the index method ShapeFieldMapper
         if (geometry == null) {
             return;
         }
@@ -359,7 +358,7 @@ public class GeoShapeWithDocValuesFieldMapper extends AbstractShapeGeometryField
         // maintain bwc by making bounding box and centroid available to GeoShapeValues (ScriptDocValues)
         private final GeoPoint centroid = new GeoPoint();
         private final GeoBoundingBox boundingBox = new GeoBoundingBox(new GeoPoint(), new GeoPoint());
-        private ScriptDocValues<GeoShapeValues.GeoShapeValue> geoShapeScriptValues;
+        private AbstractAtomicGeoShapeShapeFieldData.GeoShapeScriptValues geoShapeScriptValues;
 
         public GeoShapeDocValuesField(GeoShapeValues in, String name) {
             this.in = in;

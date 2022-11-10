@@ -290,7 +290,7 @@ public class InferenceIngestIT extends ESRestTestCase {
         String regressionModelId = "test_regression_simulate";
         putModel(regressionModelId, REGRESSION_CONFIG);
 
-        String source = formatted("""
+        String source = """
             {
               "pipeline": {
                 "processors": [
@@ -341,7 +341,7 @@ public class InferenceIngestIT extends ESRestTestCase {
                 }
               ]
             }
-            """, classificationModelId, regressionModelId);
+            """.formatted(classificationModelId, regressionModelId);
 
         Response response = client().performRequest(simulateRequest(source));
         String responseString = EntityUtils.toString(response.getEntity());
@@ -390,7 +390,7 @@ public class InferenceIngestIT extends ESRestTestCase {
     public void testSimulateWithDefaultMappedField() throws IOException {
         String classificationModelId = "test_classification_default_mapped_field";
         putModel(classificationModelId, CLASSIFICATION_CONFIG);
-        String source = formatted("""
+        String source = """
             {
               "pipeline": {
                 "processors": [
@@ -420,7 +420,7 @@ public class InferenceIngestIT extends ESRestTestCase {
                   }
                 }
               ]
-            }""", classificationModelId);
+            }""".formatted(classificationModelId);
 
         Response response = client().performRequest(simulateRequest(source));
         String responseString = EntityUtils.toString(response.getEntity());
@@ -674,7 +674,7 @@ public class InferenceIngestIT extends ESRestTestCase {
           }
         }""";
 
-    private static final String REGRESSION_CONFIG = formatted("""
+    private static final String REGRESSION_CONFIG = """
         {
             "input": {
                 "field_names": [
@@ -689,14 +689,14 @@ public class InferenceIngestIT extends ESRestTestCase {
                 "regression": {}
             },
             "definition": %s
-        }""", REGRESSION_DEFINITION);
+        }""".formatted(REGRESSION_DEFINITION);
 
     @Override
     protected NamedXContentRegistry xContentRegistry() {
         return new NamedXContentRegistry(new MlInferenceNamedXContentProvider().getNamedXContentParsers());
     }
 
-    private static final String CLASSIFICATION_CONFIG = formatted("""
+    private static final String CLASSIFICATION_CONFIG = """
         {
           "input": {
             "field_names": [ "col1", "col2", "col3", "col4" ]
@@ -709,10 +709,10 @@ public class InferenceIngestIT extends ESRestTestCase {
             "classification": {}
           },
           "definition": %s
-        }""", InferenceDefinitionTests.getClassificationDefinition(false));
+        }""".formatted(InferenceDefinitionTests.getClassificationDefinition(false));
 
     private static String pipelineDefinition(String modelId, String inferenceConfig) {
-        return formatted("""
+        return """
             {
               "processors": [
                 {
@@ -731,7 +731,7 @@ public class InferenceIngestIT extends ESRestTestCase {
                   }
                 }
               ]
-            }""", modelId, inferenceConfig, inferenceConfig);
+            }""".formatted(modelId, inferenceConfig, inferenceConfig);
     }
 
     private void putModel(String modelId, String modelConfiguration) throws IOException {

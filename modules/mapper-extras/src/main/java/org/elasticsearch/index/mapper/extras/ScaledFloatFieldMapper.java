@@ -45,7 +45,7 @@ import org.elasticsearch.script.field.DocValuesScriptFieldFactory;
 import org.elasticsearch.script.field.ScaledFloatDocValuesField;
 import org.elasticsearch.script.field.ToScriptFieldFactory;
 import org.elasticsearch.search.DocValueFormat;
-import org.elasticsearch.search.aggregations.support.TimeSeriesValuesSourceType;
+import org.elasticsearch.search.aggregations.support.CoreValuesSourceType;
 import org.elasticsearch.search.aggregations.support.ValuesSourceType;
 import org.elasticsearch.search.lookup.SearchLookup;
 import org.elasticsearch.xcontent.XContentBuilder;
@@ -287,15 +287,11 @@ public class ScaledFloatFieldMapper extends FieldMapper {
                 failIfNoDocValues();
             }
 
-            ValuesSourceType valuesSourceType = metricType == TimeSeriesParams.MetricType.counter
-                ? TimeSeriesValuesSourceType.COUNTER
-                : IndexNumericFieldData.NumericType.LONG.getValuesSourceType();
             if ((operation == FielddataOperation.SEARCH || operation == FielddataOperation.SCRIPT) && hasDocValues()) {
                 return (cache, breakerService) -> {
                     final IndexNumericFieldData scaledValues = new SortedNumericIndexFieldData.Builder(
                         name(),
                         IndexNumericFieldData.NumericType.LONG,
-                        valuesSourceType,
                         (dv, n) -> { throw new UnsupportedOperationException(); }
                     ).build(cache, breakerService);
                     return new ScaledFloatIndexFieldData(scaledValues, scalingFactor, ScaledFloatDocValuesField::new);
@@ -308,7 +304,7 @@ public class ScaledFloatFieldMapper extends FieldMapper {
 
                 return new SourceValueFetcherSortedDoubleIndexFieldData.Builder(
                     name(),
-                    valuesSourceType,
+                    CoreValuesSourceType.NUMERIC,
                     sourceValueFetcher(sourcePaths),
                     searchLookup.source(),
                     ScaledFloatDocValuesField::new
@@ -435,8 +431,7 @@ public class ScaledFloatFieldMapper extends FieldMapper {
         return coerce.value();
     }
 
-    @Override
-    public boolean ignoreMalformed() {
+    boolean ignoreMalformed() {
         return ignoreMalformed.value();
     }
 
@@ -469,7 +464,6 @@ public class ScaledFloatFieldMapper extends FieldMapper {
                 numericValue = parse(parser, coerce.value());
             } catch (IllegalArgumentException e) {
                 if (ignoreMalformed.value()) {
-                    context.addIgnoredField(mappedFieldType.name());
                     return;
                 } else {
                     throw e;
@@ -493,7 +487,6 @@ public class ScaledFloatFieldMapper extends FieldMapper {
         double doubleValue = numericValue.doubleValue();
         if (Double.isFinite(doubleValue) == false) {
             if (ignoreMalformed.value()) {
-                context.addIgnoredField(mappedFieldType.name());
                 return;
             } else {
                 // since we encode to a long, we have no way to carry NaNs and infinities
@@ -713,7 +706,7 @@ public class ScaledFloatFieldMapper extends FieldMapper {
                 "field [" + name() + "] of type [" + typeName() + "] doesn't support synthetic source because it declares copy_to"
             );
         }
-        return new SortedNumericDocValuesSyntheticFieldLoader(name(), simpleName(), ignoreMalformed.value()) {
+        return new SortedNumericDocValuesSyntheticFieldLoader(name(), simpleName()) {
             @Override
             protected void writeValue(XContentBuilder b, long value) throws IOException {
                 b.value(decodeForSyntheticSource(value, scalingFactor));

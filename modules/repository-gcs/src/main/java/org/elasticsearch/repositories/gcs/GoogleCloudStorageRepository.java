@@ -34,7 +34,7 @@ class GoogleCloudStorageRepository extends MeteredBlobStoreRepository {
     private static final Logger logger = LogManager.getLogger(GoogleCloudStorageRepository.class);
 
     // package private for testing
-    static final ByteSizeValue MIN_CHUNK_SIZE = ByteSizeValue.ONE;
+    static final ByteSizeValue MIN_CHUNK_SIZE = new ByteSizeValue(1, ByteSizeUnit.BYTES);
 
     /**
      * Maximum allowed object size in GCS.

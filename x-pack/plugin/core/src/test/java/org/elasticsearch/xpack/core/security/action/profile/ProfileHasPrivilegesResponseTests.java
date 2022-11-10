@@ -81,19 +81,19 @@ public class ProfileHasPrivilegesResponseTests extends AbstractWireSerializingTe
                 final String errorString;
                 final Exception e = response.errors().get(k);
                 if (e instanceof IllegalArgumentException illegalArgumentException) {
-                    errorString = formatted("""
+                    errorString = """
                         {
                           "type": "illegal_argument_exception",
                           "reason": "%s"
-                        }""", illegalArgumentException.getMessage());
+                        }""".formatted(illegalArgumentException.getMessage());
                 } else if (e instanceof ResourceNotFoundException resourceNotFoundException) {
-                    errorString = formatted("""
+                    errorString = """
                         {
                           "type": "resource_not_found_exception",
                           "reason": "%s"
-                        }""", resourceNotFoundException.getMessage());
+                        }""".formatted(resourceNotFoundException.getMessage());
                 } else if (e instanceof ElasticsearchException elasticsearchException) {
-                    errorString = formatted("""
+                    errorString = """
                         {
                           "type": "exception",
                           "reason": "%s",
@@ -101,7 +101,7 @@ public class ProfileHasPrivilegesResponseTests extends AbstractWireSerializingTe
                             "type": "illegal_argument_exception",
                             "reason": "%s"
                           }
-                        }""", elasticsearchException.getMessage(), elasticsearchException.getCause().getMessage());
+                        }""".formatted(elasticsearchException.getMessage(), elasticsearchException.getCause().getMessage());
                 } else {
                     throw new IllegalArgumentException("unknown exception type: " + e);
                 }

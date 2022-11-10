@@ -125,9 +125,9 @@ public abstract class C2IdOpTestCase extends ESRestTestCase {
             final BasicHttpContext context = new BasicHttpContext();
             // Initiate the authentication process
             HttpPost httpPost = new HttpPost(C2ID_LOGIN_API + "initAuthRequest");
-            String initJson = formatted("""
+            String initJson = """
                 {"qs":"%s"}
-                """, opAuthUri.getRawQuery());
+                """.formatted(opAuthUri.getRawQuery());
             configureJsonRequest(httpPost, initJson);
             JSONObject initResponse = execute(httpClient, httpPost, context, response -> {
                 assertHttpOk(response.getStatusLine());

@@ -150,7 +150,7 @@ public final class DataStreamTestHelper {
     }
 
     public static String generateMapping(String timestampFieldName) {
-        return String.format(Locale.ROOT, """
+        return """
             {
               "_doc":{
                 "properties": {
@@ -159,7 +159,7 @@ public final class DataStreamTestHelper {
                   }
                 }
               }
-            }""", timestampFieldName);
+            }""".formatted(timestampFieldName);
     }
 
     public static String generateTsdbMapping() {

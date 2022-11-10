@@ -35,7 +35,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Locale;
 
 /**
  * Rest test for _mvt end point. The tests only check that the structure of the vector tiles is sound in
@@ -92,10 +91,10 @@ public class VectorTileRestIT extends ESRestTestCase {
         for (int i = 0; i < 30; i += 10) {
             for (int j = 0; j <= i; j++) {
                 final Request putRequest = new Request(HttpPost.METHOD_NAME, INDEX_POINTS + "/_doc/");
-                putRequest.setJsonEntity(String.format(Locale.ROOT, """
+                putRequest.setJsonEntity("""
                     {
                       "location": "POINT(%s %s)", "name": "point%s", "value1": %s, "value2": %s
-                    }""", x, y, i, i, i + 1));
+                    }""".formatted(x, y, i, i, i + 1));
                 response = client().performRequest(putRequest);
                 assertThat(response.getStatusLine().getStatusCode(), Matchers.equalTo(HttpStatus.SC_CREATED));
             }
@@ -135,10 +134,10 @@ public class VectorTileRestIT extends ESRestTestCase {
         assertThat(response.getStatusLine().getStatusCode(), Matchers.equalTo(HttpStatus.SC_OK));
 
         final Request putRequest = new Request(HttpPost.METHOD_NAME, indexName + "/_doc/" + id);
-        putRequest.setJsonEntity(String.format(Locale.ROOT, """
+        putRequest.setJsonEntity("""
             {
               "location": "%s", "name": "geometry", "value1": %s, "value2": %s, "nullField" : null, "ignore_value" : ""
-            }""", WellKnownText.toWKT(geometry), 1, 2));
+            }""".formatted(WellKnownText.toWKT(geometry), 1, 2));
         response = client().performRequest(putRequest);
         assertThat(response.getStatusLine().getStatusCode(), Matchers.equalTo(HttpStatus.SC_CREATED));
 
@@ -192,10 +191,10 @@ public class VectorTileRestIT extends ESRestTestCase {
             + " "
             + y
             + "))";
-        putRequest.setJsonEntity(String.format(Locale.ROOT, """
+        putRequest.setJsonEntity("""
             {
               "location": "%s", "name": "collection", "value1": %s, "value2": %s
-            }""", collection, 1, 2));
+            }""".formatted(collection, 1, 2));
         response = client().performRequest(putRequest);
         assertThat(response.getStatusLine().getStatusCode(), Matchers.equalTo(HttpStatus.SC_CREATED));
 
@@ -678,7 +677,7 @@ public class VectorTileRestIT extends ESRestTestCase {
         {
             // desc order, polygon should be the first hit
             final Request mvtRequest = new Request(getHttpMethod(), INDEX_POINTS_SHAPES + "/_mvt/location/" + z + "/" + x + "/" + y);
-            mvtRequest.setJsonEntity(formatted("""
+            mvtRequest.setJsonEntity("""
                 {
                   "size" : 100,
                   "grid_precision" : 0,
@@ -689,7 +688,7 @@ public class VectorTileRestIT extends ESRestTestCase {
                       }
                     }
                 ]}
-                """, runtimeMapping));
+                """.formatted(runtimeMapping));
 
             final VectorTile.Tile tile = execute(mvtRequest);
             assertThat(tile.getLayersCount(), Matchers.equalTo(2));
@@ -701,7 +700,7 @@ public class VectorTileRestIT extends ESRestTestCase {
         {
             // asc order, polygon should be the last hit
             final Request mvtRequest = new Request(getHttpMethod(), INDEX_POINTS_SHAPES + "/_mvt/location/" + z + "/" + x + "/" + y);
-            mvtRequest.setJsonEntity(formatted("""
+            mvtRequest.setJsonEntity("""
                 {
                   "size" : 100,
                   "grid_precision" : 0,
@@ -713,7 +712,7 @@ public class VectorTileRestIT extends ESRestTestCase {
                       }
                     }
                   ]}
-                """, runtimeMapping));
+                """.formatted(runtimeMapping));
 
             final VectorTile.Tile tile = execute(mvtRequest);
             assertThat(tile.getLayersCount(), Matchers.equalTo(2));

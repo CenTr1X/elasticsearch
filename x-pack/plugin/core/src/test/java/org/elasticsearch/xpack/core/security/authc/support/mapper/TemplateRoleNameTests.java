@@ -72,9 +72,9 @@ public class TemplateRoleNameTests extends ESTestCase {
     }
 
     public void testToXContent() throws Exception {
-        final String json = formatted("""
+        final String json = """
             {"template":"{\\"source\\":\\"%s\\"}","format":"%s"}\
-            """, randomAlphaOfLengthBetween(8, 24), randomFrom(Format.values()).formatName());
+            """.formatted(randomAlphaOfLengthBetween(8, 24), randomFrom(Format.values()).formatName());
         assertThat(Strings.toString(parse(json)), equalTo(json));
     }
 

@@ -13,16 +13,17 @@ import org.elasticsearch.action.support.master.AcknowledgedRequest;
 import org.elasticsearch.action.support.master.AcknowledgedResponse;
 import org.elasticsearch.common.io.stream.StreamInput;
 import org.elasticsearch.common.io.stream.StreamOutput;
+import org.elasticsearch.xcontent.ToXContentObject;
 
 import java.io.IOException;
 import java.util.Objects;
 
-public class DeleteSnapshotLifecycleAction extends ActionType<AcknowledgedResponse> {
+public class DeleteSnapshotLifecycleAction extends ActionType<DeleteSnapshotLifecycleAction.Response> {
     public static final DeleteSnapshotLifecycleAction INSTANCE = new DeleteSnapshotLifecycleAction();
     public static final String NAME = "cluster:admin/slm/delete";
 
     protected DeleteSnapshotLifecycleAction() {
-        super(NAME, AcknowledgedResponse::readFrom);
+        super(NAME, DeleteSnapshotLifecycleAction.Response::new);
     }
 
     public static class Request extends AcknowledgedRequest<Request> {
@@ -70,6 +71,17 @@ public class DeleteSnapshotLifecycleAction extends ActionType<AcknowledgedRespon
             }
             Request other = (Request) obj;
             return Objects.equals(lifecycleId, other.lifecycleId);
+        }
+    }
+
+    public static class Response extends AcknowledgedResponse implements ToXContentObject {
+
+        public Response(boolean acknowledged) {
+            super(acknowledged);
+        }
+
+        public Response(StreamInput streamInput) throws IOException {
+            this(streamInput.readBoolean());
         }
     }
 }

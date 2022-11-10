@@ -208,13 +208,6 @@ abstract class TransactionStore implements Writeable, Releasable, Accountable {
      */
     abstract long getTotalTransactionCount();
 
-    /**
-     * Get the number of filtered transactions
-     *
-     * @return count of filtered transactions
-     */
-    abstract long getFilteredTransactionCount();
-
     abstract BytesRefArray getItems();
 
     abstract LongArray getItemCounts();

@@ -68,7 +68,7 @@ public class MlAutoscalingDeciderService implements AutoscalingDeciderService, L
             nodeLoadDetector,
             scaleTimer
         );
-        this.processorDecider = new MlProcessorAutoscalingDecider(scaleTimer);
+        this.processorDecider = new MlProcessorAutoscalingDecider(scaleTimer, nodeAvailabilityZoneMapper);
         clusterService.addLocalNodeMasterListener(this);
     }
 

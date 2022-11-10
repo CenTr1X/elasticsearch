@@ -11,11 +11,8 @@ package org.elasticsearch.gradle.internal.conventions.precommit;
 import com.diffplug.gradle.spotless.SpotlessExtension;
 import com.diffplug.gradle.spotless.SpotlessPlugin;
 
-import org.elasticsearch.gradle.internal.conventions.util.Util;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
-
-import java.io.File;
 
 /**
  * This plugin configures formatting for Java source using Spotless
@@ -52,18 +49,23 @@ public class FormattingPrecommitPlugin implements Plugin<Project> {
             project.getRepositories().mavenCentral();
 
             project.getExtensions().getByType(SpotlessExtension.class).java(java -> {
-                File elasticsearchWorkspace = Util.locateElasticsearchWorkspace(project.getGradle());
                 String importOrderPath = "build-conventions/elastic.importorder";
                 String formatterConfigPath = "build-conventions/formatterConfig.xml";
+
+                // When applied to e.g. `:build-tools`, we need to modify the path to our config files
+                if (project.getRootProject().file(importOrderPath).exists() == false) {
+                    importOrderPath = "../" + importOrderPath;
+                    formatterConfigPath = "../" + formatterConfigPath;
+                }
 
                 java.target("src/**/*.java");
                 java.removeUnusedImports();
 
                 // We enforce a standard order for imports
-                java.importOrderFile(new File(elasticsearchWorkspace, importOrderPath));
+                java.importOrderFile(project.getRootProject().file(importOrderPath));
 
                 // Most formatting is done through the Eclipse formatter
-                java.eclipse().configFile(new File(elasticsearchWorkspace, formatterConfigPath));
+                java.eclipse().configFile(project.getRootProject().file(formatterConfigPath));
 
                 // Ensure blank lines are actually empty. Since formatters are applied in
                 // order, apply this one last, otherwise non-empty blank lines can creep

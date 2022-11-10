@@ -14,6 +14,7 @@ import org.elasticsearch.search.aggregations.AggregationExecutionException;
 import org.elasticsearch.xpack.spatial.index.fielddata.GeoShapeValues;
 import org.elasticsearch.xpack.spatial.index.fielddata.IndexShapeFieldData;
 
+import java.io.IOException;
 import java.util.function.Function;
 
 public abstract class GeoShapeValuesSource extends ShapeValuesSource<GeoShapeValues> {
@@ -26,7 +27,7 @@ public abstract class GeoShapeValuesSource extends ShapeValuesSource<GeoShapeVal
     };
 
     @Override
-    protected Function<Rounding, Rounding.Prepared> roundingPreparer() {
+    protected Function<Rounding, Rounding.Prepared> roundingPreparer() throws IOException {
         throw new AggregationExecutionException("can't round a [geo_shape]");
     }
 

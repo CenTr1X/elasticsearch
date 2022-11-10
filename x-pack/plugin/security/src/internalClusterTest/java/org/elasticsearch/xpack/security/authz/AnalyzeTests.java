@@ -35,7 +35,7 @@ public class AnalyzeTests extends SecurityIntegTestCase {
     @Override
     protected String configRoles() {
         // role that has analyze indices privileges only
-        return formatted("""
+        return """
             %s
             analyze_indices:
               indices:
@@ -44,7 +44,7 @@ public class AnalyzeTests extends SecurityIntegTestCase {
             analyze_cluster:
               cluster:
                 - cluster:admin/analyze
-            """, super.configRoles());
+            """.formatted(super.configRoles());
     }
 
     public void testAnalyzeWithIndices() {

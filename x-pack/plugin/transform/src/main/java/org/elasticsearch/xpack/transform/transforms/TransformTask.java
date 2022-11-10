@@ -549,6 +549,10 @@ public class TransformTask extends AllocatedPersistentTask implements TransformS
         return threadPool;
     }
 
+    TransformTaskState getTaskState() {
+        return context.getTaskState();
+    }
+
     public static PersistentTask<?> getTransformTask(String transformId, ClusterState clusterState) {
         Collection<PersistentTask<?>> transformTasks = findTransformTasks(t -> t.getId().equals(transformId), clusterState);
         if (transformTasks.isEmpty()) {
@@ -582,11 +586,6 @@ public class TransformTask extends AllocatedPersistentTask implements TransformS
                 return Regex.simpleMatch(transformIdPattern, transformParams.getId());
             };
         return findTransformTasks(taskMatcher, clusterState);
-    }
-
-    // used for {@link TransformHealthChecker}
-    public TransformContext getContext() {
-        return context;
     }
 
     private static Collection<PersistentTask<?>> findTransformTasks(Predicate<PersistentTask<?>> predicate, ClusterState clusterState) {

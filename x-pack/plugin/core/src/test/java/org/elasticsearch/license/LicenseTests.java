@@ -252,7 +252,7 @@ public class LicenseTests extends ESTestCase {
 
     public void testMalformedSignatureFromXContent() throws Exception {
 
-        String licenseString = formatted("""
+        String licenseString = """
             {
               "license": {
                 "uid": "4056779d-b823-4c12-a9cb-efa4a8d8c422",
@@ -264,7 +264,7 @@ public class LicenseTests extends ESTestCase {
                 "issuer": "elasticsearch",
                 "signature": "%s"
               }
-            }""", randomAlphaOfLength(10));
+            }""".formatted(randomAlphaOfLength(10));
         ElasticsearchException exception = expectThrows(
             ElasticsearchException.class,
             () -> { License.fromSource(new BytesArray(licenseString.getBytes(StandardCharsets.UTF_8)), XContentType.JSON); }

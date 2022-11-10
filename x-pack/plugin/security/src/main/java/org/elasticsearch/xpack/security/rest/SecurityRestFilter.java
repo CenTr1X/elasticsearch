@@ -109,23 +109,19 @@ public class SecurityRestFilter implements RestHandler {
                     }
                     RemoteHostHeader.process(request, threadContext);
                     try {
-                        threadContext.sanitizeHeaders();
                         restHandler.handleRequest(request, channel, client);
                     } catch (Exception e) {
-                        handleException(ActionType.RequestHandling, request, channel, e, threadContext);
+                        handleException(ActionType.RequestHandling, request, channel, e);
                     }
-                }, e -> handleException(ActionType.SecondaryAuthentication, request, channel, e, threadContext)));
-            }, e -> handleException(ActionType.Authentication, request, channel, e, threadContext)));
+                }, e -> handleException(ActionType.SecondaryAuthentication, request, channel, e)));
+            }, e -> handleException(ActionType.Authentication, request, channel, e)));
         } else {
-            threadContext.sanitizeHeaders();
             restHandler.handleRequest(request, channel, client);
         }
-
     }
 
-    protected static void handleException(ActionType actionType, RestRequest request, RestChannel channel, Exception e, ThreadContext tc) {
+    protected static void handleException(ActionType actionType, RestRequest request, RestChannel channel, Exception e) {
         logger.debug(() -> format("%s failed for REST request [%s]", actionType, request.uri()), e);
-        tc.sanitizeHeaders();
         final RestStatus restStatus = ExceptionsHelper.status(e);
         try {
             channel.sendResponse(new RestResponse(channel, restStatus, e) {

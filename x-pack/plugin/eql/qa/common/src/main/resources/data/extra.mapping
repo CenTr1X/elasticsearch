@@ -30,9 +30,6 @@
     },
     "version": {
         "type": "version"
-    },
-    "date_tags": {
-        "type": "date"
     }
   }
 }

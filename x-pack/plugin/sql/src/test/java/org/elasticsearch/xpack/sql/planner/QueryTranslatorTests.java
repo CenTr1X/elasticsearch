@@ -770,7 +770,7 @@ public class QueryTranslatorTests extends ESTestCase {
                 + randomFunction.name()
                 + "(date + INTERVAL 1 YEAR)"
         );
-        assertESQuery(p, containsString(formatted("""
+        assertESQuery(p, containsString("""
             {
               "terms": {
                 "script": {
@@ -791,7 +791,7 @@ public class QueryTranslatorTests extends ESTestCase {
                 "order": "asc"
               }
             }}]}}}}
-            """, randomFunction.name()).replaceAll("\\s", "")));
+            """.formatted(randomFunction.name()).replaceAll("\\s", "")));
     }
 
     public void testDateTimeFunctionsWithMathIntervalAndGroupBy() {
@@ -803,7 +803,7 @@ public class QueryTranslatorTests extends ESTestCase {
         );
         assertEquals(EsQueryExec.class, p.getClass());
         EsQueryExec eqe = (EsQueryExec) p;
-        assertThat(eqe.queryContainer().toString().replaceAll("\\s+", ""), containsString(formatted("""
+        assertThat(eqe.queryContainer().toString().replaceAll("\\s+", ""), containsString("""
             {
               "terms": {
                 "script": {
@@ -818,7 +818,7 @@ public class QueryTranslatorTests extends ESTestCase {
                     "v3": "Z"
                   }
                 },
-                "missing_bucket": true,""", scriptMethods[pos]).replaceAll("\\s", "")));
+                "missing_bucket": true,""".formatted(scriptMethods[pos]).replaceAll("\\s", "")));
     }
 
     // Like/RLike/StartsWith
@@ -1131,42 +1131,41 @@ public class QueryTranslatorTests extends ESTestCase {
         assertThat(
             ee.queryContainer().aggs().asAggBuilder().toString().replaceAll("\\s+", ""),
             endsWith(
-                formatted(
-                    """
-                        {
-                          "buckets_path": {
-                            "a0": "%s",
-                            "a1": "%s._count",
-                            "a2": "%s",
-                            "a3": "%s._count",
-                            "a4": "_count",
-                            "a5": "%s"
-                          },
-                          "script": {
-                            "source": "InternalQlScriptUtils.nullSafeFilter(InternalQlScriptUtils.and(\
-                        InternalQlScriptUtils.nullSafeFilter(InternalQlScriptUtils.and(\
-                        InternalQlScriptUtils.nullSafeFilter(InternalQlScriptUtils.and(\
-                        InternalQlScriptUtils.nullSafeFilter(InternalQlScriptUtils.and(\
-                        InternalQlScriptUtils.nullSafeFilter(InternalQlScriptUtils.and(\
-                        InternalQlScriptUtils.nullSafeFilter(InternalQlScriptUtils.gt(params.a0,params.v0)),\
-                        InternalQlScriptUtils.nullSafeFilter(InternalQlScriptUtils.gt(params.a1,params.v1)))),\
-                        InternalQlScriptUtils.nullSafeFilter(InternalQlScriptUtils.gt(params.a2,params.v2)))),\
-                        InternalQlScriptUtils.nullSafeFilter(InternalQlScriptUtils.gt(params.a3,params.v3)))),\
-                        InternalQlScriptUtils.nullSafeFilter(InternalQlScriptUtils.gt(params.a4,params.v4)))),\
-                        InternalQlScriptUtils.nullSafeFilter(InternalQlScriptUtils.gt(params.a5,params.v5))))",
-                            "lang": "painless",
-                            "params": {
-                              "v0": 3,
-                              "v1": 32,
-                              "v2": 1,
-                              "v3": 2,
-                              "v4": 5,
-                              "v5": 50000
-                            }
-                          },
-                          "gap_policy": "skip"
-                        }}}}}
-                        """,
+                """
+                    {
+                      "buckets_path": {
+                        "a0": "%s",
+                        "a1": "%s._count",
+                        "a2": "%s",
+                        "a3": "%s._count",
+                        "a4": "_count",
+                        "a5": "%s"
+                      },
+                      "script": {
+                        "source": "InternalQlScriptUtils.nullSafeFilter(InternalQlScriptUtils.and(\
+                    InternalQlScriptUtils.nullSafeFilter(InternalQlScriptUtils.and(\
+                    InternalQlScriptUtils.nullSafeFilter(InternalQlScriptUtils.and(\
+                    InternalQlScriptUtils.nullSafeFilter(InternalQlScriptUtils.and(\
+                    InternalQlScriptUtils.nullSafeFilter(InternalQlScriptUtils.and(\
+                    InternalQlScriptUtils.nullSafeFilter(InternalQlScriptUtils.gt(params.a0,params.v0)),\
+                    InternalQlScriptUtils.nullSafeFilter(InternalQlScriptUtils.gt(params.a1,params.v1)))),\
+                    InternalQlScriptUtils.nullSafeFilter(InternalQlScriptUtils.gt(params.a2,params.v2)))),\
+                    InternalQlScriptUtils.nullSafeFilter(InternalQlScriptUtils.gt(params.a3,params.v3)))),\
+                    InternalQlScriptUtils.nullSafeFilter(InternalQlScriptUtils.gt(params.a4,params.v4)))),\
+                    InternalQlScriptUtils.nullSafeFilter(InternalQlScriptUtils.gt(params.a5,params.v5))))",
+                        "lang": "painless",
+                        "params": {
+                          "v0": 3,
+                          "v1": 32,
+                          "v2": 1,
+                          "v3": 2,
+                          "v4": 5,
+                          "v5": 50000
+                        }
+                      },
+                      "gap_policy": "skip"
+                    }}}}}
+                    """.formatted(
                     cardinalityKeyword.getName(),
                     existsKeyword.getName(),
                     cardinalityDottedField.getName(),
@@ -1204,9 +1203,9 @@ public class QueryTranslatorTests extends ESTestCase {
             assertEquals(((MetricAggRef) fe).property(), metricToAgg.get(funcName));
 
             String aggName = eqe.queryContainer().aggs().asAggBuilder().getSubAggregations().iterator().next().getName();
-            assertESQuery(p, endsWith(formatted("""
+            assertESQuery(p, endsWith("""
                 "aggregations":{"%s":{"extended_stats":{"field":"int","sigma":2.0}}}}}}\
-                """, aggName)));
+                """.formatted(aggName)));
         }
 
     }

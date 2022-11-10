@@ -18,6 +18,7 @@ import org.elasticsearch.test.ESTestCase;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.NoSuchFileException;
+import java.util.Locale;
 
 import static org.hamcrest.core.IsEqual.equalTo;
 
@@ -57,7 +58,7 @@ public abstract class AbstractURLBlobStoreTests extends ESTestCase {
             ignored.read();
             fail("Should have thrown NoSuchFileException exception");
         } catch (NoSuchFileException e) {
-            assertEquals(formatted("blob object [%s] not found", incorrectBlobName), e.getMessage());
+            assertEquals(String.format(Locale.ROOT, "blob object [%s] not found", incorrectBlobName), e.getMessage());
         }
     }
 }

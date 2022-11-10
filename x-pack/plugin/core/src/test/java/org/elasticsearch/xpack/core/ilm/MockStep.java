@@ -41,15 +41,15 @@ public class MockStep extends Step implements Writeable {
 
     @Override
     public void writeTo(StreamOutput out) throws IOException {
-        out.writeString(getKey().phase());
-        out.writeString(getKey().action());
-        out.writeString(getKey().name());
+        out.writeString(getKey().getPhase());
+        out.writeString(getKey().getAction());
+        out.writeString(getKey().getName());
         boolean hasNextStep = getNextStepKey() != null;
         out.writeBoolean(hasNextStep);
         if (hasNextStep) {
-            out.writeString(getNextStepKey().phase());
-            out.writeString(getNextStepKey().action());
-            out.writeString(getNextStepKey().name());
+            out.writeString(getNextStepKey().getPhase());
+            out.writeString(getNextStepKey().getAction());
+            out.writeString(getNextStepKey().getName());
         }
     }
 }

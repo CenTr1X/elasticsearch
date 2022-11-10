@@ -277,7 +277,7 @@ public class DataStreamGetWriteIndexTests extends ESTestCase {
             );
         }
 
-        createDataStreamService = new MetadataCreateDataStreamService(clusterService, createIndexService);
+        createDataStreamService = new MetadataCreateDataStreamService(testThreadPool, clusterService, createIndexService);
     }
 
     @After
@@ -313,7 +313,7 @@ public class DataStreamGetWriteIndexTests extends ESTestCase {
         MaxDocsCondition condition = new MaxDocsCondition(randomNonNegativeLong());
         List<Condition<?>> metConditions = Collections.singletonList(condition);
         CreateIndexRequest createIndexRequest = new CreateIndexRequest("_na_");
-        return rolloverService.rolloverClusterState(state, name, null, createIndexRequest, metConditions, time, false, false, null);
+        return rolloverService.rolloverClusterState(state, name, null, createIndexRequest, metConditions, time, false, false);
     }
 
     private Index getWriteIndex(ClusterState state, String name, String timestamp) {

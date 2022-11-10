@@ -56,7 +56,6 @@ import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.SearchExecutionContext;
 import org.elasticsearch.index.shard.ShardId;
 import org.elasticsearch.indices.IndicesService;
-import org.elasticsearch.painless.spi.PainlessTestScript;
 import org.elasticsearch.rest.BaseRestHandler;
 import org.elasticsearch.rest.RestRequest;
 import org.elasticsearch.rest.action.RestToXContentListener;
@@ -167,7 +166,7 @@ public class PainlessExecuteAction extends ActionType<PainlessExecuteAction.Resp
                 }, DOCUMENT_FIELD);
                 PARSER.declareObject(
                     ConstructingObjectParser.optionalConstructorArg(),
-                    (p, c) -> AbstractQueryBuilder.parseTopLevelQuery(p),
+                    (p, c) -> AbstractQueryBuilder.parseInnerQueryBuilder(p),
                     QUERY_FIELD
                 );
             }
@@ -432,6 +431,32 @@ public class PainlessExecuteAction extends ActionType<PainlessExecuteAction.Resp
         public int hashCode() {
             return Objects.hash(result);
         }
+    }
+
+    public abstract static class PainlessTestScript {
+
+        private final Map<String, Object> params;
+
+        public PainlessTestScript(Map<String, Object> params) {
+            this.params = params;
+        }
+
+        /** Return the parameters for this script. */
+        public Map<String, Object> getParams() {
+            return params;
+        }
+
+        public abstract Object execute();
+
+        public interface Factory {
+
+            PainlessTestScript newInstance(Map<String, Object> params);
+
+        }
+
+        public static final String[] PARAMETERS = {};
+        public static final ScriptContext<Factory> CONTEXT = new ScriptContext<>("painless_test", Factory.class);
+
     }
 
     public static class TransportAction extends TransportSingleShardAction<Request, Response> {

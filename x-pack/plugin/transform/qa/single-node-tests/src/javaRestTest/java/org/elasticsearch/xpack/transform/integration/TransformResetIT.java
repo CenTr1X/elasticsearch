@@ -79,7 +79,7 @@ public class TransformResetIT extends TransformRestTestCase {
             getTransformEndpoint() + transformId,
             BASIC_AUTH_VALUE_TRANSFORM_ADMIN_1
         );
-        String config = formatted("""
+        String config = """
             {
               "dest": {
                 "index": "%s"
@@ -103,7 +103,7 @@ public class TransformResetIT extends TransformRestTestCase {
                   }
                 }
               }
-            }""", transformDest, REVIEWS_INDEX_NAME);
+            }""".formatted(transformDest, REVIEWS_INDEX_NAME);
         createTransformRequest.setJsonEntity(config);
         Map<String, Object> createTransformResponse = entityAsMap(client().performRequest(createTransformRequest));
         assertThat(createTransformResponse.get("acknowledged"), equalTo(Boolean.TRUE));

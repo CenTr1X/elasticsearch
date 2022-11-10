@@ -354,7 +354,7 @@ public class SearchableSnapshotAllocator implements ExistingShardsAllocator {
         if (shardRouting.unassignedInfo().isDelayed()) {
             String lastAllocatedNodeId = shardRouting.unassignedInfo().getLastAllocatedNodeId();
             if (lastAllocatedNodeId != null) {
-                SingleNodeShutdownMetadata nodeShutdownMetadata = allocation.metadata().nodeShutdowns().get(lastAllocatedNodeId);
+                SingleNodeShutdownMetadata nodeShutdownMetadata = allocation.nodeShutdowns().get(lastAllocatedNodeId);
                 return nodeShutdownMetadata != null && nodeShutdownMetadata.getType() == SingleNodeShutdownMetadata.Type.RESTART;
             }
         }
@@ -519,7 +519,7 @@ public class SearchableSnapshotAllocator implements ExistingShardsAllocator {
                     "{}: node [{}] has [{}/{}] bytes of re-usable cache data",
                     shard,
                     discoNode.getName(),
-                    ByteSizeValue.ofBytes(matchingBytes),
+                    new ByteSizeValue(matchingBytes),
                     matchingBytes
                 );
             }

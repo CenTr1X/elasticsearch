@@ -146,7 +146,7 @@ public class SnapshotLifecycleTaskTests extends ESTestCase {
             Settings.EMPTY,
             Sets.union(ClusterSettings.BUILT_IN_CLUSTER_SETTINGS, Set.of(SLM_HISTORY_INDEX_ENABLED_SETTING))
         );
-        final String createSnapResponse = formatted("""
+        final String createSnapResponse = """
             {
                 "snapshot": {
                     "snapshot": "snapshot_1",
@@ -168,7 +168,7 @@ public class SnapshotLifecycleTaskTests extends ESTestCase {
                         "successful": 0
                     }
                 }
-            }""", Version.CURRENT.id, Version.CURRENT);
+            }""".formatted(Version.CURRENT.id, Version.CURRENT);
 
         final AtomicBoolean clientCalled = new AtomicBoolean(false);
         final SetOnce<String> snapshotName = new SetOnce<>();

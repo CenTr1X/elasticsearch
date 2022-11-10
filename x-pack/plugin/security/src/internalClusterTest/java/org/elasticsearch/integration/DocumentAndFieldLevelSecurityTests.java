@@ -29,7 +29,6 @@ import org.elasticsearch.xpack.core.XPackSettings;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 
 import static org.elasticsearch.action.support.WriteRequest.RefreshPolicy.IMMEDIATE;
@@ -49,13 +48,13 @@ public class DocumentAndFieldLevelSecurityTests extends SecurityIntegTestCase {
     @Override
     protected String configUsers() {
         final String usersPasswdHashed = new String(getFastStoredHashAlgoForTests().hash(USERS_PASSWD));
-        return super.configUsers() + String.format(Locale.ROOT, """
+        return super.configUsers() + """
             user1:%s
             user2:%s
             user3:%s
             user4:%s
             user5:%s
-            """, usersPasswdHashed, usersPasswdHashed, usersPasswdHashed, usersPasswdHashed, usersPasswdHashed);
+            """.formatted(usersPasswdHashed, usersPasswdHashed, usersPasswdHashed, usersPasswdHashed, usersPasswdHashed);
     }
 
     @Override

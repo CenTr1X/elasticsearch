@@ -28,11 +28,11 @@ class WindowsServiceManagerCommand extends ProcrunCommand {
 
     @Override
     protected String getSuccessMessage(String serviceId) {
-        return String.format(java.util.Locale.ROOT, "Successfully started service manager for '%s'", serviceId);
+        return "Successfully started service manager for '%s'".formatted(serviceId);
     }
 
     @Override
     protected String getFailureMessage(String serviceId) {
-        return String.format(java.util.Locale.ROOT, "Failed starting service manager for '%s'", serviceId);
+        return "Failed starting service manager for '%s'".formatted(serviceId);
     }
 }

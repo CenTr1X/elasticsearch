@@ -256,8 +256,7 @@ public class DataStreamsSnapshotsIT extends AbstractSnapshotIntegTestCase {
         RolloverRequest rolloverRequest = new RolloverRequest("ds", null);
         RolloverResponse rolloverResponse = client.admin().indices().rolloverIndex(rolloverRequest).actionGet();
         assertThat(rolloverResponse.isRolledOver(), is(true));
-        String backingIndexAfterSnapshot = DataStream.getDefaultBackingIndexName("ds", 2);
-        assertThat(rolloverResponse.getNewIndex(), equalTo(backingIndexAfterSnapshot));
+        assertThat(rolloverResponse.getNewIndex(), equalTo(DataStream.getDefaultBackingIndexName("ds", 2)));
 
         // Close all backing indices of ds data stream:
         CloseIndexRequest closeIndexRequest = new CloseIndexRequest(".ds-ds-*");
@@ -288,7 +287,7 @@ public class DataStreamsSnapshotsIT extends AbstractSnapshotIntegTestCase {
         assertThat(backingIndices.stream().map(Index::getName).collect(Collectors.toList()), contains(equalTo(dsBackingIndexName)));
 
         // The backing index created as part of rollover should still exist (but just not part of the data stream)
-        assertThat(indexExists(backingIndexAfterSnapshot), is(true));
+        assertThat(indexExists(DataStream.getDefaultBackingIndexName("ds", 2)), is(true));
         // An additional rollover should create a new backing index (3th generation) and leave .ds-ds-...-2 index as is:
         rolloverRequest = new RolloverRequest("ds", null);
         rolloverResponse = client.admin().indices().rolloverIndex(rolloverRequest).actionGet();
@@ -858,11 +857,6 @@ public class DataStreamsSnapshotsIT extends AbstractSnapshotIntegTestCase {
         }
         refresh();
         assertDocCount(dataStream, 100L);
-        // Resolve backing index name after the data stream has been created because it has a date component,
-        // and running around midnight could lead to test failures otherwise
-        GetDataStreamAction.Request getDataStreamRequest = new GetDataStreamAction.Request(new String[] { dataStream });
-        GetDataStreamAction.Response getDataStreamResponse = client.execute(GetDataStreamAction.INSTANCE, getDataStreamRequest).actionGet();
-        String backingIndexName = getDataStreamResponse.getDataStreams().get(0).getDataStream().getIndices().get(0).getName();
 
         logger.info("--> snapshot");
         ActionFuture<CreateSnapshotResponse> future = client1.admin()
@@ -893,7 +887,7 @@ public class DataStreamsSnapshotsIT extends AbstractSnapshotIntegTestCase {
         SnapshotInfo snapshotInfo = createSnapshotResponse.getSnapshotInfo();
         assertThat(snapshotInfo.state(), equalTo((SnapshotState.SUCCESS)));
         assertThat(snapshotInfo.dataStreams(), contains(dataStream));
-        assertThat(snapshotInfo.indices(), contains(backingIndexName));
+        assertThat(snapshotInfo.indices(), contains(DataStream.getDefaultBackingIndexName(dataStream, 1)));
     }
 
     public void testCloneSnapshotThatIncludesDataStream() throws Exception {

@@ -41,6 +41,7 @@ import org.elasticsearch.xpack.core.security.authc.Subject;
 import org.elasticsearch.xpack.core.security.authc.support.UsernamePasswordToken;
 import org.elasticsearch.xpack.core.security.authz.AuthorizationEngine;
 import org.elasticsearch.xpack.core.security.authz.ResolvedIndices;
+import org.elasticsearch.xpack.core.security.authz.accesscontrol.IndicesAccessControl;
 import org.elasticsearch.xpack.core.security.authz.privilege.ApplicationPrivilegeDescriptor;
 import org.elasticsearch.xpack.security.LocalStateSecurity;
 
@@ -409,7 +410,7 @@ public class ProfileCancellationIntegTests extends AbstractProfileIntegTestCase 
                     Map<String, IndexAbstraction> aliasOrIndexLookup,
                     ActionListener<IndexAuthorizationResult> listener
                 ) {
-                    listener.onResponse(IndexAuthorizationResult.ALLOW_NO_INDICES);
+                    listener.onResponse(new IndexAuthorizationResult(true, IndicesAccessControl.ALLOW_NO_INDICES));
                 }
 
                 @Override

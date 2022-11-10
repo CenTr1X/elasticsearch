@@ -21,6 +21,7 @@ import org.junit.Before;
 import java.io.IOException;
 import java.time.Instant;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -380,7 +381,7 @@ public class TransformGetAndGetStatsIT extends TransformRestTestCase {
         String transformSrc = "reviews_cont_pivot_test";
         createReviewsIndex(transformSrc);
         final Request createTransformRequest = createRequestWithAuth("PUT", getTransformEndpoint() + transformId, null);
-        String config = formatted("""
+        String config = """
             {
               "dest": {
                 "index": "%s"
@@ -411,7 +412,7 @@ public class TransformGetAndGetStatsIT extends TransformRestTestCase {
                   }
                 }
               }
-            }""", transformDest, transformSrc);
+            }""".formatted(transformDest, transformSrc);
 
         createTransformRequest.setJsonEntity(config);
 
@@ -450,10 +451,10 @@ public class TransformGetAndGetStatsIT extends TransformRestTestCase {
         long now = Instant.now().toEpochMilli() - 1_000;
         for (int i = 0; i < numDocs; i++) {
             // Doing only new users so that there is a deterministic number of docs for progress
-            bulk.append(formatted("""
+            bulk.append("""
                 {"index":{"_index":"%s"}}
                 {"user_id":"user_%s","business_id":"business_%s","stars":%s,"timestamp":%s}
-                """, transformSrc, randomFrom(42, 47, 113), 10, 5, now));
+                """.formatted(transformSrc, randomFrom(42, 47, 113), 10, 5, now));
         }
         bulk.append("\r\n");
         final Request bulkRequest = new Request("POST", "/_bulk");
@@ -497,7 +498,7 @@ public class TransformGetAndGetStatsIT extends TransformRestTestCase {
 
         int numberOfTransforms = randomIntBetween(1_500, 4_000);
         for (int i = 0; i < numberOfTransforms; ++i) {
-            String transformId = formatted("t-%05d", i);
+            String transformId = String.format(Locale.ROOT, "t-%05d", i);
             final Request createTransformRequest = createRequestWithAuth("PUT", getTransformEndpoint() + transformId, null);
             createTransformRequest.setJsonEntity(config);
             assertOK(client().performRequest(createTransformRequest));
@@ -519,20 +520,20 @@ public class TransformGetAndGetStatsIT extends TransformRestTestCase {
             assertEquals(size, configs.size());
             assertEquals(size, stats.size());
 
-            assertThat(configs.get(0).get("id"), equalTo(formatted("t-%05d", from)));
-            assertThat(configs.get(configs.size() - 1).get("id"), equalTo(formatted("t-%05d", from + size - 1)));
-            assertThat(stats.get(0).get("id"), equalTo(formatted("t-%05d", from)));
-            assertThat(stats.get(stats.size() - 1).get("id"), equalTo(formatted("t-%05d", from + size - 1)));
+            assertThat(configs.get(0).get("id"), equalTo(String.format(Locale.ROOT, "t-%05d", from)));
+            assertThat(configs.get(configs.size() - 1).get("id"), equalTo(String.format(Locale.ROOT, "t-%05d", from + size - 1)));
+            assertThat(stats.get(0).get("id"), equalTo(String.format(Locale.ROOT, "t-%05d", from)));
+            assertThat(stats.get(stats.size() - 1).get("id"), equalTo(String.format(Locale.ROOT, "t-%05d", from + size - 1)));
 
             if (size > 2) {
                 int randomElement = randomIntBetween(1, size - 1);
-                assertThat(configs.get(randomElement).get("id"), equalTo(formatted("t-%05d", from + randomElement)));
-                assertThat(stats.get(randomElement).get("id"), equalTo(formatted("t-%05d", from + randomElement)));
+                assertThat(configs.get(randomElement).get("id"), equalTo(String.format(Locale.ROOT, "t-%05d", from + randomElement)));
+                assertThat(stats.get(randomElement).get("id"), equalTo(String.format(Locale.ROOT, "t-%05d", from + randomElement)));
             }
         }
 
         for (int i = 0; i < numberOfTransforms; ++i) {
-            deleteTransform(formatted("t-%05d", i));
+            deleteTransform(String.format(Locale.ROOT, "t-%05d", i));
         }
     }
 

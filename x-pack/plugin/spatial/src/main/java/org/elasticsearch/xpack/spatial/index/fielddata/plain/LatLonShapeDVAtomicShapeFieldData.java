@@ -10,6 +10,7 @@ package org.elasticsearch.xpack.spatial.index.fielddata.plain;
 import org.apache.lucene.index.BinaryDocValues;
 import org.apache.lucene.index.DocValues;
 import org.apache.lucene.index.LeafReader;
+import org.apache.lucene.util.Accountable;
 import org.elasticsearch.script.field.ToScriptFieldFactory;
 import org.elasticsearch.search.aggregations.support.ValuesSourceType;
 import org.elasticsearch.xpack.spatial.index.fielddata.GeoShapeValues;
@@ -17,6 +18,8 @@ import org.elasticsearch.xpack.spatial.index.fielddata.LeafShapeFieldData;
 import org.elasticsearch.xpack.spatial.search.aggregations.support.GeoShapeValuesSourceType;
 
 import java.io.IOException;
+import java.util.Collection;
+import java.util.Collections;
 
 final class LatLonShapeDVAtomicShapeFieldData extends LeafShapeFieldData<GeoShapeValues> {
     private final LeafReader reader;
@@ -31,6 +34,11 @@ final class LatLonShapeDVAtomicShapeFieldData extends LeafShapeFieldData<GeoShap
     @Override
     public long ramBytesUsed() {
         return 0; // not exposed by lucene
+    }
+
+    @Override
+    public Collection<Accountable> getChildResources() {
+        return Collections.emptyList();
     }
 
     @Override

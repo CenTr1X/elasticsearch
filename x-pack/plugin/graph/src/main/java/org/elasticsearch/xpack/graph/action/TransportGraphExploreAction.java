@@ -171,15 +171,13 @@ public class TransportGraphExploreAction extends HandledTransportAction<GraphExp
         /**
          * Step out from some existing vertex terms looking for useful
          * connections
-         *
-         * @param timedOut the value of timedOut field in the search response
          */
-        synchronized void expand(boolean timedOut) {
+        synchronized void expand() {
             Map<String, Set<Vertex>> lastHopFindings = hopFindings.get(currentHopNumber);
             if ((currentHopNumber >= (request.getHopNumbers() - 1)) || (lastHopFindings == null) || (lastHopFindings.size() == 0)) {
                 // Either we gathered no leads from the last hop or we have
                 // reached the final hop
-                listener.onResponse(buildResponse(timedOut));
+                listener.onResponse(buildResponse(false));
                 return;
             }
             Hop lastHop = request.getHop(currentHopNumber);
@@ -354,7 +352,7 @@ public class TransportGraphExploreAction extends HandledTransportAction<GraphExp
                     }
 
                     // Potentially run another round of queries to perform next"hop" - will terminate if no new additions
-                    expand(searchResponse.isTimedOut());
+                    expand();
 
                 }
 
@@ -717,7 +715,7 @@ public class TransportGraphExploreAction extends HandledTransportAction<GraphExp
                             }
                         }
                         // Expand out from these root vertices looking for connections with other terms
-                        expand(searchResponse.isTimedOut());
+                        expand();
 
                     }
 

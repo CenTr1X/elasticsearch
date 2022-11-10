@@ -9,8 +9,7 @@
             "processors": [
               {
                 "attachment" : {
-                  "field" : "field1",
-                  "remove_binary": false
+                  "field" : "field1"
                 }
               }
             ]
@@ -51,8 +50,7 @@
               {
                 "attachment" : {
                   "field" : "field1",
-                  "properties" : ["language"],
-                  "remove_binary": false
+                  "properties" : ["language"]
                 }
               }
             ]
@@ -86,8 +84,7 @@
               {
                 "attachment" : {
                   "field" : "field1",
-                  "indexed_chars": 30,
-                  "remove_binary": true
+                  "indexed_chars": 30
                 }
               }
             ]
@@ -123,8 +120,7 @@
                 "attachment" : {
                   "field" : "field1",
                   "indexed_chars": 30,
-                  "indexed_chars_field": "max_size",
-                  "remove_binary": true
+                  "indexed_chars_field": "max_size"
                 }
               }
             ]

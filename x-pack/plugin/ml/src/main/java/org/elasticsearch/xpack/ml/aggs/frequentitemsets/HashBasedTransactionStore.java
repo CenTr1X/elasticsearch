@@ -96,7 +96,6 @@ public final class HashBasedTransactionStore extends TransactionStore {
     private BytesRefHash transactions;
     private LongArray transactionCounts;
     private long totalTransactionCount;
-    private long filteredTransactionCount;
 
     public HashBasedTransactionStore(BigArrays bigArrays) {
         super(bigArrays);
@@ -210,14 +209,6 @@ public final class HashBasedTransactionStore extends TransactionStore {
         transactionCounts.increment(id, 1);
     }
 
-    /**
-     * Report a filtered transaction to the store.
-     */
-    public void addFilteredTransaction() {
-        ++filteredTransactionCount;
-        ++totalTransactionCount;
-    }
-
     @Override
     public long getTotalItemCount() {
         return totalItemCount;
@@ -226,11 +217,6 @@ public final class HashBasedTransactionStore extends TransactionStore {
     @Override
     public long getTotalTransactionCount() {
         return totalTransactionCount;
-    }
-
-    @Override
-    public long getFilteredTransactionCount() {
-        return filteredTransactionCount;
     }
 
     @Override
@@ -306,7 +292,6 @@ public final class HashBasedTransactionStore extends TransactionStore {
 
         totalItemCount += other.getTotalItemCount();
         totalTransactionCount += other.getTotalTransactionCount();
-        filteredTransactionCount += other.getFilteredTransactionCount();
     }
 
     /**
@@ -460,8 +445,7 @@ public final class HashBasedTransactionStore extends TransactionStore {
             totalItemCount,
             transactions.takeBytesRefsOwnership(),
             transactionCounts,
-            totalTransactionCount,
-            filteredTransactionCount
+            totalTransactionCount
         );
 
         items = null;

@@ -17,7 +17,6 @@ import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static org.elasticsearch.xpack.ql.type.DataTypes.DATETIME;
 
@@ -29,14 +28,8 @@ public class FieldHitExtractor extends AbstractFieldHitExtractor {
         super(in);
     }
 
-    public FieldHitExtractor(
-        String name,
-        DataType dataType,
-        ZoneId zoneId,
-        String hitName,
-        AbstractFieldHitExtractor.MultiValueSupport multiValueSupport
-    ) {
-        super(name, dataType, zoneId, hitName, multiValueSupport);
+    public FieldHitExtractor(String name, DataType dataType, ZoneId zoneId, String hitName, boolean arrayLeniency) {
+        super(name, dataType, zoneId, hitName, arrayLeniency);
     }
 
     @Override
@@ -54,13 +47,10 @@ public class FieldHitExtractor extends AbstractFieldHitExtractor {
         DataType dataType = dataType();
 
         if (dataType == DATETIME) {
-            if (values instanceof String str) {
+            if (values instanceof String) {
                 // We ask @timestamp (or the defined alternative field) to be returned as `epoch_millis`
                 // when matching sequence to avoid parsing into ZonedDateTime objects for performance reasons.
-                return parseEpochMillisAsString(str);
-            }
-            if (values instanceof List<?> list) {
-                return list.stream().map(x -> unwrapCustomValue(x)).collect(Collectors.toList());
+                return parseEpochMillisAsString(values.toString());
             }
         }
 

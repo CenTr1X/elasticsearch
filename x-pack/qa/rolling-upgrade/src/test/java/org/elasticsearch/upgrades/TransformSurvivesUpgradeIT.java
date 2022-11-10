@@ -256,7 +256,7 @@ public class TransformSurvivesUpgradeIT extends AbstractUpgradeTestCase {
             TRANSFORM_INTERNAL_INDEX_PREFIX + "*," + TRANSFORM_INTERNAL_INDEX_PREFIX_DEPRECATED + "*" + "/_search"
         );
 
-        getStatsDocsRequest.setJsonEntity(formatted("""
+        getStatsDocsRequest.setJsonEntity("""
             {
                "query": {
                  "bool": {
@@ -269,7 +269,7 @@ public class TransformSurvivesUpgradeIT extends AbstractUpgradeTestCase {
                },
                "sort": [ { "_index": { "order": "desc" } } ],
                "size": 1
-             }""", id));
+             }""".formatted(id));
         assertBusy(() -> {
             // Want to make sure we get the latest docs
             client().performRequest(new Request("POST", TRANSFORM_INTERNAL_INDEX_PREFIX + "*/_refresh"));
@@ -373,10 +373,10 @@ public class TransformSurvivesUpgradeIT extends AbstractUpgradeTestCase {
         final StringBuilder bulk = new StringBuilder();
         for (int i = 0; i < numDocs; i++) {
             for (String entity : entityIds) {
-                bulk.append(formatted("""
+                bulk.append("""
                     {"index":{"_index":"%s"}}
                     {"user_id":"%s","stars":%s,"timestamp":%s}
-                    """, indexName, entity, randomLongBetween(0, 5), timeStamp));
+                    """.formatted(indexName, entity, randomLongBetween(0, 5), timeStamp));
             }
         }
         bulk.append("\r\n");

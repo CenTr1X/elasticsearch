@@ -77,7 +77,7 @@ public class TransformOldTransformsIT extends TransformSingleNodeTestCase {
             Version.V_7_2_0,
             VersionUtils.getPreviousVersion(TransformDeprecations.MIN_TRANSFORM_VERSION)
         );
-        String config = formatted("""
+        String config = """
             {
               "dest": {
                 "index": "bar"
@@ -108,7 +108,7 @@ public class TransformOldTransformsIT extends TransformSingleNodeTestCase {
               },
               "frequency": "1s",
               "version": "%s"
-            }""", transformIndex, transformId, transformVersion);
+            }""".formatted(transformIndex, transformId, transformVersion);
         IndexRequest indexRequest = new IndexRequest(OLD_INDEX).id(TransformConfig.documentId(transformId))
             .source(config, XContentType.JSON)
             .setRefreshPolicy(WriteRequest.RefreshPolicy.IMMEDIATE);

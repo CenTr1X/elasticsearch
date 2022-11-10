@@ -365,12 +365,12 @@ public class TrainedModelIT extends ESRestTestCase {
 
     private void putModelDefinitionPart(String modelId, int totalSize, int numParts, int partNumber) throws IOException {
         Request request = new Request("PUT", "_ml/trained_models/" + modelId + "/definition/" + partNumber);
-        request.setJsonEntity(formatted("""
+        request.setJsonEntity("""
             {
               "total_definition_length": %s,
               "definition": "UEsDBAAACAgAAAAAAAAAAAAAAAAAAAAAAAAUAA4Ac2ltcGxlbW9kZW==",
               "total_parts": %s
-            }""", totalSize, numParts));
+            }""".formatted(totalSize, numParts));
         client().performRequest(request);
     }
 

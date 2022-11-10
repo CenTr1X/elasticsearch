@@ -78,37 +78,36 @@ public class ExecutingPolicyDocTests extends BaseMonitoringDocTestCase<Executing
             xContent.utf8ToString(),
             equalTo(
                 XContentHelper.stripWhitespace(
-                    formatted(
-                        """
-                            {
-                              "cluster_uuid": "_cluster",
-                              "timestamp": "%s",
-                              "interval_ms": %s,
-                              "type": "enrich_executing_policy_stats",
-                              "source_node": {
-                                "uuid": "_uuid",
-                                "host": "_host",
-                                "transport_address": "_addr",
-                                "ip": "_ip",
-                                "name": "_name",
-                                "timestamp": "%s"
-                              },
-                              "enrich_executing_policy_stats": {
-                                "name": "%s",
-                                "task": {
-                                  "node": "%s",
-                                  "id": %s,
-                                  "type": "%s",
-                                  "action": "%s",
-                                  "description": "%s",
-                                  "start_time_in_millis": %s,
-                                  "running_time_in_nanos": %s,
-                                  "cancellable": %s,
-                                  %s
-                                  "headers": %s
-                                }
-                              }
-                            }""",
+                    """
+                        {
+                          "cluster_uuid": "_cluster",
+                          "timestamp": "%s",
+                          "interval_ms": %s,
+                          "type": "enrich_executing_policy_stats",
+                          "source_node": {
+                            "uuid": "_uuid",
+                            "host": "_host",
+                            "transport_address": "_addr",
+                            "ip": "_ip",
+                            "name": "_name",
+                            "timestamp": "%s"
+                          },
+                          "enrich_executing_policy_stats": {
+                            "name": "%s",
+                            "task": {
+                              "node": "%s",
+                              "id": %s,
+                              "type": "%s",
+                              "action": "%s",
+                              "description": "%s",
+                              "start_time_in_millis": %s,
+                              "running_time_in_nanos": %s,
+                              "cancellable": %s,
+                              %s
+                              "headers": %s
+                            }
+                          }
+                        }""".formatted(
                         DATE_TIME_FORMATTER.formatMillis(timestamp),
                         intervalMillis,
                         DATE_TIME_FORMATTER.formatMillis(nodeTimestamp),
@@ -122,7 +121,7 @@ public class ExecutingPolicyDocTests extends BaseMonitoringDocTestCase<Executing
                         executingPolicy.getTaskInfo().runningTimeNanos(),
                         executingPolicy.getTaskInfo().cancellable(),
                         executingPolicy.getTaskInfo().cancellable()
-                            ? formatted("\"cancelled\": %s,", executingPolicy.getTaskInfo().cancelled())
+                            ? "\"cancelled\": %s,".formatted(executingPolicy.getTaskInfo().cancelled())
                             : "",
                         header.map(entry -> String.format(Locale.ROOT, """
                             {"%s":"%s"}""", entry.getKey(), entry.getValue())).orElse("{}")

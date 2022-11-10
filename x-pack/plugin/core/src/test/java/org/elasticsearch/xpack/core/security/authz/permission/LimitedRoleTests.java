@@ -28,7 +28,6 @@ import org.elasticsearch.xpack.core.security.authz.RestrictedIndices;
 import org.elasticsearch.xpack.core.security.authz.accesscontrol.IndicesAccessControl;
 import org.elasticsearch.xpack.core.security.authz.privilege.ApplicationPrivilege;
 import org.elasticsearch.xpack.core.security.authz.privilege.ApplicationPrivilegeDescriptor;
-import org.elasticsearch.xpack.core.security.authz.privilege.ApplicationPrivilegeTests;
 import org.elasticsearch.xpack.core.security.authz.privilege.ClusterPrivilegeResolver;
 import org.elasticsearch.xpack.core.security.authz.privilege.IndexPrivilege;
 import org.elasticsearch.xpack.core.security.support.Automatons;
@@ -46,7 +45,6 @@ import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
-import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -103,22 +101,20 @@ public class LimitedRoleTests extends ESTestCase {
             md.getIndicesLookup(),
             fieldPermissionsCache
         );
-        assertThat(iac.isGranted(), is(false));
         assertThat(iac.getIndexPermissions("_index"), is(notNullValue()));
-        assertThat(iac.hasIndexPermissions("_index"), is(true));
-        assertThat(iac.getIndexPermissions("_index1"), is(nullValue()));
-        assertThat(iac.hasIndexPermissions("_index1"), is(false));
+        assertThat(iac.getIndexPermissions("_index").isGranted(), is(true));
+        assertThat(iac.getIndexPermissions("_index1"), is(notNullValue()));
+        assertThat(iac.getIndexPermissions("_index1").isGranted(), is(false));
         iac = fromRole.authorize(
             CreateIndexAction.NAME,
             Sets.newHashSet("_index", "_index1"),
             md.getIndicesLookup(),
             fieldPermissionsCache
         );
-        assertThat(iac.isGranted(), is(true));
         assertThat(iac.getIndexPermissions("_index"), is(notNullValue()));
-        assertThat(iac.hasIndexPermissions("_index"), is(true));
+        assertThat(iac.getIndexPermissions("_index").isGranted(), is(true));
         assertThat(iac.getIndexPermissions("_index1"), is(notNullValue()));
-        assertThat(iac.hasIndexPermissions("_index1"), is(true));
+        assertThat(iac.getIndexPermissions("_index1").isGranted(), is(true));
 
         {
             Role limitedByRole = Role.builder(EMPTY_RESTRICTED_INDICES, "limited-role")
@@ -132,33 +128,30 @@ public class LimitedRoleTests extends ESTestCase {
                 md.getIndicesLookup(),
                 fieldPermissionsCache
             );
-            assertThat(iac.isGranted(), is(false));
             assertThat(iac.getIndexPermissions("_index"), is(notNullValue()));
-            assertThat(iac.hasIndexPermissions("_index"), is(true));
-            assertThat(iac.getIndexPermissions("_index1"), is(nullValue()));
-            assertThat(iac.hasIndexPermissions("_index1"), is(false));
+            assertThat(iac.getIndexPermissions("_index").isGranted(), is(true));
+            assertThat(iac.getIndexPermissions("_index1"), is(notNullValue()));
+            assertThat(iac.getIndexPermissions("_index1").isGranted(), is(false));
             iac = limitedByRole.authorize(
                 DeleteIndexAction.NAME,
                 Sets.newHashSet("_index", "_alias1"),
                 md.getIndicesLookup(),
                 fieldPermissionsCache
             );
-            assertThat(iac.isGranted(), is(false));
-            assertThat(iac.getIndexPermissions("_index"), is(nullValue()));
-            assertThat(iac.hasIndexPermissions("_index"), is(false));
-            assertThat(iac.getIndexPermissions("_index1"), is(nullValue()));
-            assertThat(iac.hasIndexPermissions("_index1"), is(false));
+            assertThat(iac.getIndexPermissions("_index"), is(notNullValue()));
+            assertThat(iac.getIndexPermissions("_index").isGranted(), is(false));
+            assertThat(iac.getIndexPermissions("_index1"), is(notNullValue()));
+            assertThat(iac.getIndexPermissions("_index1").isGranted(), is(false));
             iac = limitedByRole.authorize(
                 CreateIndexAction.NAME,
                 Sets.newHashSet("_index", "_alias1"),
                 md.getIndicesLookup(),
                 fieldPermissionsCache
             );
-            assertThat(iac.isGranted(), is(false));
-            assertThat(iac.getIndexPermissions("_index"), is(nullValue()));
-            assertThat(iac.hasIndexPermissions("_index"), is(false));
-            assertThat(iac.getIndexPermissions("_index1"), is(nullValue()));
-            assertThat(iac.hasIndexPermissions("_index1"), is(false));
+            assertThat(iac.getIndexPermissions("_index"), is(notNullValue()));
+            assertThat(iac.getIndexPermissions("_index").isGranted(), is(false));
+            assertThat(iac.getIndexPermissions("_index1"), is(notNullValue()));
+            assertThat(iac.getIndexPermissions("_index1").isGranted(), is(false));
 
             Role role;
             if (randomBoolean()) {
@@ -167,33 +160,30 @@ public class LimitedRoleTests extends ESTestCase {
                 role = fromRole.limitedBy(limitedByRole);
             }
             iac = role.authorize(SearchAction.NAME, Sets.newHashSet("_index", "_alias1"), md.getIndicesLookup(), fieldPermissionsCache);
-            assertThat(iac.isGranted(), is(false));
             assertThat(iac.getIndexPermissions("_index"), is(notNullValue()));
-            assertThat(iac.hasIndexPermissions("_index"), is(true));
-            assertThat(iac.getIndexPermissions("_index1"), is(nullValue()));
-            assertThat(iac.hasIndexPermissions("_index1"), is(false));
+            assertThat(iac.getIndexPermissions("_index").isGranted(), is(true));
+            assertThat(iac.getIndexPermissions("_index1"), is(notNullValue()));
+            assertThat(iac.getIndexPermissions("_index1").isGranted(), is(false));
             iac = role.authorize(
                 DeleteIndexAction.NAME,
                 Sets.newHashSet("_index", "_alias1"),
                 md.getIndicesLookup(),
                 fieldPermissionsCache
             );
-            assertThat(iac.isGranted(), is(false));
-            assertThat(iac.getIndexPermissions("_index"), is(nullValue()));
-            assertThat(iac.hasIndexPermissions("_index"), is(false));
-            assertThat(iac.getIndexPermissions("_index1"), is(nullValue()));
-            assertThat(iac.hasIndexPermissions("_index1"), is(false));
+            assertThat(iac.getIndexPermissions("_index"), is(notNullValue()));
+            assertThat(iac.getIndexPermissions("_index").isGranted(), is(false));
+            assertThat(iac.getIndexPermissions("_index1"), is(notNullValue()));
+            assertThat(iac.getIndexPermissions("_index1").isGranted(), is(false));
             iac = role.authorize(
                 CreateIndexAction.NAME,
                 Sets.newHashSet("_index", "_index1"),
                 md.getIndicesLookup(),
                 fieldPermissionsCache
             );
-            assertThat(iac.isGranted(), is(false));
-            assertThat(iac.getIndexPermissions("_index"), is(nullValue()));
-            assertThat(iac.hasIndexPermissions("_index"), is(false));
-            assertThat(iac.getIndexPermissions("_index1"), is(nullValue()));
-            assertThat(iac.hasIndexPermissions("_index1"), is(false));
+            assertThat(iac.getIndexPermissions("_index"), is(notNullValue()));
+            assertThat(iac.getIndexPermissions("_index").isGranted(), is(false));
+            assertThat(iac.getIndexPermissions("_index1"), is(notNullValue()));
+            assertThat(iac.getIndexPermissions("_index1").isGranted(), is(false));
         }
     }
 
@@ -874,7 +864,7 @@ public class LimitedRoleTests extends ESTestCase {
         applicationPrivilegeDescriptors.add(
             new ApplicationPrivilegeDescriptor(app, name, Sets.newHashSet(actions), Collections.emptyMap())
         );
-        return ApplicationPrivilegeTests.createPrivilege(app, name, actions);
+        return new ApplicationPrivilege(app, name, actions);
     }
 
     private static MapBuilder<String, ResourcePrivileges> mapBuilder() {

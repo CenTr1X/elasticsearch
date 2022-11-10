@@ -159,10 +159,21 @@ public class SettingsConfig implements Writeable, ToXContentObject {
     public SettingsConfig(final StreamInput in) throws IOException {
         this.maxPageSearchSize = in.readOptionalInt();
         this.docsPerSecond = in.readOptionalFloat();
-        this.datesAsEpochMillis = in.readOptionalInt();
-        this.alignCheckpoints = in.readOptionalInt();
-        this.usePit = in.readOptionalInt();
-
+        if (in.getVersion().onOrAfter(Version.V_7_11_0)) {
+            this.datesAsEpochMillis = in.readOptionalInt();
+        } else {
+            this.datesAsEpochMillis = DEFAULT_DATES_AS_EPOCH_MILLIS;
+        }
+        if (in.getVersion().onOrAfter(Version.V_7_15_0)) {
+            this.alignCheckpoints = in.readOptionalInt();
+        } else {
+            this.alignCheckpoints = DEFAULT_ALIGN_CHECKPOINTS;
+        }
+        if (in.getVersion().onOrAfter(Version.V_7_16_1)) {
+            this.usePit = in.readOptionalInt();
+        } else {
+            this.usePit = DEFAULT_USE_PIT;
+        }
         if (in.getVersion().onOrAfter(Version.V_8_1_0)) {
             deduceMappings = in.readOptionalInt();
         } else {
@@ -275,10 +286,15 @@ public class SettingsConfig implements Writeable, ToXContentObject {
     public void writeTo(StreamOutput out) throws IOException {
         out.writeOptionalInt(maxPageSearchSize);
         out.writeOptionalFloat(docsPerSecond);
-        out.writeOptionalInt(datesAsEpochMillis);
-        out.writeOptionalInt(alignCheckpoints);
-        out.writeOptionalInt(usePit);
-
+        if (out.getVersion().onOrAfter(Version.V_7_11_0)) {
+            out.writeOptionalInt(datesAsEpochMillis);
+        }
+        if (out.getVersion().onOrAfter(Version.V_7_15_0)) {
+            out.writeOptionalInt(alignCheckpoints);
+        }
+        if (out.getVersion().onOrAfter(Version.V_7_16_1)) {
+            out.writeOptionalInt(usePit);
+        }
         if (out.getVersion().onOrAfter(Version.V_8_1_0)) {
             out.writeOptionalInt(deduceMappings);
         }

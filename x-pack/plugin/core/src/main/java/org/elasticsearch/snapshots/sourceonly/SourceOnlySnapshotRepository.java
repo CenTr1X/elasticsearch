@@ -173,9 +173,7 @@ public final class SourceOnlySnapshotRepository extends FilterRepository {
                     // do nothing;
                 }
             }, Store.OnClose.EMPTY);
-            Supplier<Query> querySupplier = mapperService.hasNested()
-                ? () -> Queries.newNestedFilter(mapperService.getIndexSettings().getIndexVersionCreated())
-                : null;
+            Supplier<Query> querySupplier = mapperService.hasNested() ? Queries::newNestedFilter : null;
             // SourceOnlySnapshot will take care of soft- and hard-deletes no special casing needed here
             SourceOnlySnapshot snapshot;
             snapshot = new SourceOnlySnapshot(overlayDir, querySupplier);

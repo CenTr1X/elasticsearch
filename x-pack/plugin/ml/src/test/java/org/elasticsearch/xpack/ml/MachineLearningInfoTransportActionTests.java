@@ -57,7 +57,6 @@ import org.elasticsearch.xpack.core.ml.inference.TrainedModelConfigTests;
 import org.elasticsearch.xpack.core.ml.inference.assignment.AllocationStatus;
 import org.elasticsearch.xpack.core.ml.inference.assignment.AssignmentState;
 import org.elasticsearch.xpack.core.ml.inference.assignment.AssignmentStats;
-import org.elasticsearch.xpack.core.ml.inference.assignment.Priority;
 import org.elasticsearch.xpack.core.ml.inference.trainedmodel.ClassificationConfig;
 import org.elasticsearch.xpack.core.ml.inference.trainedmodel.NerConfig;
 import org.elasticsearch.xpack.core.ml.inference.trainedmodel.RegressionConfig;
@@ -347,7 +346,7 @@ public class MachineLearningInfoTransportActionTests extends ESTestCase {
                             ),
                             3,
                             null,
-                            new AssignmentStats("model_3", null, null, null, null, Instant.now(), List.of(), Priority.NORMAL).setState(
+                            new AssignmentStats("model_3", null, null, null, null, Instant.now(), List.of()).setState(
                                 AssignmentState.STOPPING
                             )
                         ),
@@ -382,7 +381,6 @@ public class MachineLearningInfoTransportActionTests extends ESTestCase {
                                         new DiscoveryNode("foo", new TransportAddress(TransportAddress.META_ADDRESS, 2), Version.CURRENT),
                                         5,
                                         42.0,
-                                        42.0,
                                         0,
                                         1,
                                         3L,
@@ -401,7 +399,6 @@ public class MachineLearningInfoTransportActionTests extends ESTestCase {
                                         new DiscoveryNode("bar", new TransportAddress(TransportAddress.META_ADDRESS, 3), Version.CURRENT),
                                         4,
                                         50.0,
-                                        50.0,
                                         0,
                                         1,
                                         1L,
@@ -416,8 +413,7 @@ public class MachineLearningInfoTransportActionTests extends ESTestCase {
                                         34.0,
                                         1L
                                     )
-                                ),
-                                Priority.NORMAL
+                                )
                             ).setState(AssignmentState.STARTED).setAllocationStatus(new AllocationStatus(2, 2))
                         )
                     ),

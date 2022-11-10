@@ -66,10 +66,10 @@ public class InferModelAction extends ActionType<InferModelAction.Response> {
             );
         }
 
-        public static Builder parseRequest(String modelId, XContentParser parser) {
+        public static Builder parseRequest(String deploymentId, XContentParser parser) {
             Builder builder = PARSER.apply(parser, null);
-            if (modelId != null) {
-                builder.setModelId(modelId);
+            if (deploymentId != null) {
+                builder.setModelId(deploymentId);
             }
             return builder;
         }
@@ -122,7 +122,7 @@ public class InferModelAction extends ActionType<InferModelAction.Response> {
         public Request(StreamInput in) throws IOException {
             super(in);
             this.modelId = in.readString();
-            this.objectsToInfer = in.readImmutableList(StreamInput::readMap);
+            this.objectsToInfer = Collections.unmodifiableList(in.readList(StreamInput::readMap));
             this.update = in.readNamedWriteable(InferenceConfigUpdate.class);
             this.previouslyLicensed = in.readBoolean();
             if (in.getVersion().onOrAfter(Version.V_8_3_0)) {

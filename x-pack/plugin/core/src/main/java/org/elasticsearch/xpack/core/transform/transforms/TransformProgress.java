@@ -7,6 +7,7 @@
 
 package org.elasticsearch.xpack.core.transform.transforms;
 
+import org.elasticsearch.Version;
 import org.elasticsearch.common.Strings;
 import org.elasticsearch.common.io.stream.StreamInput;
 import org.elasticsearch.common.io.stream.StreamOutput;
@@ -81,9 +82,17 @@ public class TransformProgress implements Writeable, ToXContentObject {
     }
 
     public TransformProgress(StreamInput in) throws IOException {
-        this.totalDocs = in.readOptionalLong();
-        this.documentsProcessed = in.readVLong();
-        this.documentsIndexed = in.readVLong();
+        if (in.getVersion().onOrAfter(Version.V_7_4_0)) {
+            this.totalDocs = in.readOptionalLong();
+            this.documentsProcessed = in.readVLong();
+            this.documentsIndexed = in.readVLong();
+        } else {
+            this.totalDocs = in.readLong();
+            long remainingDocs = in.readLong();
+            this.documentsProcessed = this.totalDocs - remainingDocs;
+            // was not previously tracked
+            this.documentsIndexed = 0;
+        }
     }
 
     public Double getPercentComplete() {
@@ -141,9 +150,18 @@ public class TransformProgress implements Writeable, ToXContentObject {
 
     @Override
     public void writeTo(StreamOutput out) throws IOException {
-        out.writeOptionalLong(totalDocs);
-        out.writeVLong(documentsProcessed);
-        out.writeVLong(documentsIndexed);
+        if (out.getVersion().onOrAfter(Version.V_7_4_0)) {
+            out.writeOptionalLong(totalDocs);
+            out.writeVLong(documentsProcessed);
+            out.writeVLong(documentsIndexed);
+        } else {
+            // What if our total docs number is `null` because we are in a continuous checkpoint, but are serializing to an old version?
+            // totalDocs was always incorrect in past versions when in a continuous checkpoint. So, just write 0
+            // which will imply documentsRemaining == 0.
+            long unboxedTotalDocs = totalDocs == null ? 0 : totalDocs;
+            out.writeLong(unboxedTotalDocs);
+            out.writeLong(unboxedTotalDocs < documentsProcessed ? 0 : unboxedTotalDocs - documentsProcessed);
+        }
     }
 
     @Override

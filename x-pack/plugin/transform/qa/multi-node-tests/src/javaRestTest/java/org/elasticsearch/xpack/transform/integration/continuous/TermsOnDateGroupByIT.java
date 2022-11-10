@@ -83,7 +83,7 @@ public class TermsOnDateGroupByIT extends ContinuousTestCase {
     @Override
     @SuppressWarnings("unchecked")
     public void testIteration(int iteration, Set<String> modifiedEvents) throws IOException {
-        String query = formatted("""
+        String query = """
             {
               "aggs": {
                 "some-timestamp": {
@@ -103,7 +103,7 @@ public class TermsOnDateGroupByIT extends ContinuousTestCase {
                 }
               }
             }
-            """, timestampField, missing ? "\"missing\": \"" + MISSING_BUCKET_KEY + "\"," : "", metricField);
+            """.formatted(timestampField, missing ? "\"missing\": \"" + MISSING_BUCKET_KEY + "\"," : "", metricField);
 
         Response searchResponseSource = search(
             CONTINUOUS_EVENTS_SOURCE_INDEX,

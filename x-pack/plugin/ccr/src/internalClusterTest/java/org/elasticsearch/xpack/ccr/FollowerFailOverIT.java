@@ -33,6 +33,7 @@ import org.elasticsearch.xpack.core.ccr.action.FollowStatsAction;
 import org.elasticsearch.xpack.core.ccr.action.PutFollowAction;
 import org.hamcrest.Matchers;
 
+import java.util.Locale;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Semaphore;
@@ -140,7 +141,7 @@ public class FollowerFailOverIT extends CcrIntegTestCase {
                 } catch (InterruptedException e) {
                     throw new AssertionError(e);
                 }
-                final String source = formatted("{\"f\":%d}", counter++);
+                final String source = String.format(Locale.ROOT, "{\"f\":%d}", counter++);
                 IndexResponse indexResp = leaderClient().prepareIndex("index1")
                     .setSource(source, XContentType.JSON)
                     .setTimeout(TimeValue.timeValueSeconds(1))

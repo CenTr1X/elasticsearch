@@ -135,10 +135,10 @@ public class IndexingIT extends AbstractRollingTestCase {
 
     public void testAutoIdWithOpTypeCreate() throws IOException {
         final String indexName = "auto_id_and_op_type_create_index";
-        String b = formatted("""
+        String b = """
             {"create": {"_index": "%s"}}
             {"f1": "v"}
-            """, indexName);
+            """.formatted(indexName);
         Request bulk = new Request("POST", "/_bulk");
         bulk.addParameter("refresh", "true");
         bulk.setJsonEntity(b);
@@ -325,10 +325,10 @@ public class IndexingIT extends AbstractRollingTestCase {
         long delta = TimeUnit.SECONDS.toMillis(20);
         double value = (timeStart - TSDB_TIMES[0]) / TimeUnit.SECONDS.toMillis(20) * rate;
         for (long t = timeStart; t < timeEnd; t += delta) {
-            bulk.append(formatted("""
+            bulk.append("""
                 {"index": {"_index": "tsdb"}}
                 {"@timestamp": %s, "dim": "%s", "value": %s}
-                """, t, dim, value));
+                """.formatted(t, dim, value));
             value += rate;
         }
     }

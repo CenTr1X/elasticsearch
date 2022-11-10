@@ -6,7 +6,6 @@
  */
 package org.elasticsearch.xpack.ql.execution.search.extractor;
 
-import org.elasticsearch.Version;
 import org.elasticsearch.common.document.DocumentField;
 import org.elasticsearch.common.io.stream.StreamInput;
 import org.elasticsearch.common.io.stream.StreamOutput;
@@ -32,34 +31,21 @@ public abstract class AbstractFieldHitExtractor implements HitExtractor {
     private final String fieldName, hitName;
     private final DataType dataType;
     private final ZoneId zoneId;
-
-    protected MultiValueSupport multiValueSupport;
-
-    public enum MultiValueSupport {
-        NONE,
-        LENIENT,
-        FULL
-    }
+    private final boolean arrayLeniency;
 
     protected AbstractFieldHitExtractor(String name, DataType dataType, ZoneId zoneId) {
-        this(name, dataType, zoneId, null, MultiValueSupport.NONE);
+        this(name, dataType, zoneId, null, false);
     }
 
-    protected AbstractFieldHitExtractor(String name, DataType dataType, ZoneId zoneId, MultiValueSupport multiValueSupport) {
-        this(name, dataType, zoneId, null, multiValueSupport);
+    protected AbstractFieldHitExtractor(String name, DataType dataType, ZoneId zoneId, boolean arrayLeniency) {
+        this(name, dataType, zoneId, null, arrayLeniency);
     }
 
-    protected AbstractFieldHitExtractor(
-        String name,
-        DataType dataType,
-        ZoneId zoneId,
-        String hitName,
-        MultiValueSupport multiValueSupport
-    ) {
+    protected AbstractFieldHitExtractor(String name, DataType dataType, ZoneId zoneId, String hitName, boolean arrayLeniency) {
         this.fieldName = name;
         this.dataType = dataType;
         this.zoneId = zoneId;
-        this.multiValueSupport = multiValueSupport;
+        this.arrayLeniency = arrayLeniency;
         this.hitName = hitName;
 
         if (hitName != null) {
@@ -74,11 +60,7 @@ public abstract class AbstractFieldHitExtractor implements HitExtractor {
         String typeName = in.readOptionalString();
         dataType = typeName != null ? loadTypeFromName(typeName) : null;
         hitName = in.readOptionalString();
-        if (in.getVersion().before(Version.V_8_6_0)) {
-            this.multiValueSupport = in.readBoolean() ? MultiValueSupport.LENIENT : MultiValueSupport.NONE;
-        } else {
-            this.multiValueSupport = in.readEnum(MultiValueSupport.class);
-        }
+        arrayLeniency = in.readBoolean();
         zoneId = readZoneId(in);
     }
 
@@ -93,12 +75,7 @@ public abstract class AbstractFieldHitExtractor implements HitExtractor {
         out.writeString(fieldName);
         out.writeOptionalString(dataType == null ? null : dataType.typeName());
         out.writeOptionalString(hitName);
-        if (out.getVersion().before(Version.V_8_6_0)) {
-            out.writeBoolean(multiValueSupport != MultiValueSupport.NONE);
-        } else {
-            out.writeEnum(multiValueSupport);
-        }
-
+        out.writeBoolean(arrayLeniency);
     }
 
     @Override
@@ -183,14 +160,8 @@ public abstract class AbstractFieldHitExtractor implements HitExtractor {
                 return null;
             } else {
                 if (isPrimitive(list) == false) {
-                    if (list.size() == 1 || multiValueSupport == MultiValueSupport.LENIENT) {
+                    if (list.size() == 1 || arrayLeniency) {
                         return unwrapFieldsMultiValue(list.get(0));
-                    } else if (multiValueSupport == MultiValueSupport.FULL) {
-                        List<Object> unwrappedValues = new ArrayList<>();
-                        for (Object value : list) {
-                            unwrappedValues.add(unwrapFieldsMultiValue(value));
-                        }
-                        values = unwrappedValues;
                     } else {
                         throw new QlIllegalArgumentException("Arrays (returned by [{}]) are not supported", fieldName);
                     }
@@ -199,26 +170,11 @@ public abstract class AbstractFieldHitExtractor implements HitExtractor {
         }
 
         Object unwrapped = unwrapCustomValue(values);
-        if (unwrapped != null && isListOfNulls(unwrapped) == false) {
+        if (unwrapped != null) {
             return unwrapped;
         }
 
         return values;
-    }
-
-    private boolean isListOfNulls(Object unwrapped) {
-        if (unwrapped instanceof List<?> list) {
-            if (list.size() == 0) {
-                return false;
-            }
-            for (Object o : list) {
-                if (o != null) {
-                    return false;
-                }
-            }
-            return true;
-        }
-        return false;
     }
 
     protected abstract Object unwrapCustomValue(Object values);
@@ -242,8 +198,8 @@ public abstract class AbstractFieldHitExtractor implements HitExtractor {
         return dataType;
     }
 
-    public MultiValueSupport multiValueSupport() {
-        return multiValueSupport;
+    public boolean arrayLeniency() {
+        return arrayLeniency;
     }
 
     @Override
@@ -257,11 +213,11 @@ public abstract class AbstractFieldHitExtractor implements HitExtractor {
             return false;
         }
         AbstractFieldHitExtractor other = (AbstractFieldHitExtractor) obj;
-        return fieldName.equals(other.fieldName) && hitName.equals(other.hitName) && multiValueSupport == other.multiValueSupport;
+        return fieldName.equals(other.fieldName) && hitName.equals(other.hitName) && arrayLeniency == other.arrayLeniency;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(fieldName, hitName, multiValueSupport);
+        return Objects.hash(fieldName, hitName, arrayLeniency);
     }
 }

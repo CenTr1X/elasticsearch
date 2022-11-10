@@ -595,8 +595,7 @@ public class TopMetricsAggregatorTests extends AggregatorTestCase {
             try (IndexReader indexReader = DirectoryReader.open(directory)) {
                 IndexSearcher indexSearcher = newSearcher(indexReader, true, true);
                 InternalAggregation agg = searchAndReduce(
-                    indexSearcher,
-                    new AggTestConfig(builder, fields).withShouldBeCached(shouldBeCached).withQuery(query)
+                    new AggTestConfig(indexSearcher, query, builder, fields).withShouldBeCached(shouldBeCached)
                 );
                 verifyOutputFieldNames(builder, agg);
                 return agg;

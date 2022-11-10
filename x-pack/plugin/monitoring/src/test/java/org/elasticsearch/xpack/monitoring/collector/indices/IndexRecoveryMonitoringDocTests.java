@@ -131,7 +131,7 @@ public class IndexRecoveryMonitoringDocTests extends BaseMonitoringDocTestCase<I
         );
 
         final BytesReference xContent = XContentHelper.toXContent(document, XContentType.JSON, false);
-        final String expected = XContentHelper.stripWhitespace(formatted("""
+        final String expected = XContentHelper.stripWhitespace("""
             {
               "cluster_uuid": "_cluster",
               "timestamp": "2017-08-09T08:18:59.402Z",
@@ -202,7 +202,7 @@ public class IndexRecoveryMonitoringDocTests extends BaseMonitoringDocTestCase<I
                   }
                 ]
               }
-            }""", timer.startTime(), timer.stopTime(), timer.time()));
+            }""".formatted(timer.startTime(), timer.stopTime(), timer.time()));
         assertEquals(expected, xContent.utf8ToString());
     }
 }

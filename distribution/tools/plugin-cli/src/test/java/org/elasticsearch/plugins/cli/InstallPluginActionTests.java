@@ -505,7 +505,8 @@ public class InstallPluginActionTests extends ESTestCase {
         final Path removing = env.v2().pluginsFile().resolve(".removing-failed");
         Files.createDirectory(removing);
         final IllegalStateException e = expectThrows(IllegalStateException.class, () -> installPlugin(pluginZip));
-        final String expected = formatted(
+        final String expected = String.format(
+            Locale.ROOT,
             "found file [%s] from a failed attempt to remove the plugin [failed]; execute [elasticsearch-plugin remove failed]",
             removing
         );

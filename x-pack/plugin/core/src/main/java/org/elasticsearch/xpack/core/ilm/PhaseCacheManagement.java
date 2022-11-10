@@ -102,11 +102,11 @@ public final class PhaseCacheManagement {
         }
 
         Step.StepKey currentStepKey = Step.getCurrentStepKey(executionState);
-        if (currentStepKey == null || currentStepKey.phase() == null) {
+        if (currentStepKey == null || currentStepKey.getPhase() == null) {
             return false;
         }
 
-        return ErrorStep.NAME.equals(currentStepKey.name()) == false;
+        return ErrorStep.NAME.equals(currentStepKey.getName()) == false;
     }
 
     /**
@@ -190,7 +190,7 @@ public final class PhaseCacheManagement {
 
         final LifecycleExecutionState executionState = metadata.getLifecycleExecutionState();
         final Step.StepKey currentStepKey = Step.getCurrentStepKey(executionState);
-        final String currentPhase = currentStepKey.phase();
+        final String currentPhase = currentStepKey.getPhase();
 
         final Set<Step.StepKey> newStepKeys = newPolicy.toSteps(client, licenseState)
             .stream()
@@ -221,7 +221,7 @@ public final class PhaseCacheManagement {
         }
 
         final Set<Step.StepKey> oldPhaseStepKeys = oldStepKeys.stream()
-            .filter(sk -> currentPhase.equals(sk.phase()))
+            .filter(sk -> currentPhase.equals(sk.getPhase()))
             .collect(Collectors.toCollection(LinkedHashSet::new));
 
         final PhaseExecutionInfo phaseExecutionInfo = new PhaseExecutionInfo(policyId, newPolicy.getPhases().get(currentPhase), 1L, 1L);

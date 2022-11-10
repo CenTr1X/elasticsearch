@@ -162,11 +162,11 @@ public class PutUserRequestBuilderTests extends ESTestCase {
     public void testWithValidPasswordHash() throws IOException {
         final Hasher hasher = getFastStoredHashAlgoForTests();
         final char[] hash = hasher.hash(new SecureString("secretpassword".toCharArray()));
-        final String json = formatted("""
+        final String json = """
             {
               "password_hash": "%s",
               "roles": []
-            }""", new String(hash));
+            }""".formatted(new String(hash));
 
         PutUserRequestBuilder requestBuilder = new PutUserRequestBuilder(mock(Client.class));
         PutUserRequest request = requestBuilder.source(
@@ -186,11 +186,11 @@ public class PutUserRequestBuilderTests extends ESTestCase {
             userHasher = getFastStoredHashAlgoForTests();
         }
         final char[] hash = userHasher.hash(new SecureString("secretpassword".toCharArray()));
-        final String json = formatted("""
+        final String json = """
             {
               "password_hash": "%s",
               "roles": []
-            }""", new String(hash));
+            }""".formatted(new String(hash));
 
         PutUserRequestBuilder builder = new PutUserRequestBuilder(mock(Client.class));
         final IllegalArgumentException ex = expectThrows(

@@ -29,6 +29,7 @@ import org.elasticsearch.common.logging.ECSJsonLayout;
 import org.elasticsearch.common.logging.Loggers;
 import org.elasticsearch.common.logging.RateLimitingFilter;
 import org.elasticsearch.common.settings.Settings;
+import org.elasticsearch.common.unit.ByteSizeUnit;
 import org.elasticsearch.common.unit.ByteSizeValue;
 import org.elasticsearch.common.util.concurrent.EsExecutors;
 import org.elasticsearch.core.TimeValue;
@@ -180,7 +181,7 @@ public class DeprecationIndexingComponent extends AbstractLifecycleComponent imp
             .setBackoffPolicy(BackoffPolicy.exponentialBackoff(TimeValue.timeValueMillis(1000), 3))
             .setConcurrentRequests(Math.max(2, EsExecutors.allocatedProcessors(settings)))
             .setBulkActions(-1)
-            .setBulkSize(ByteSizeValue.MINUS_ONE)
+            .setBulkSize(new ByteSizeValue(-1, ByteSizeUnit.BYTES))
             .setFlushInterval(TimeValue.timeValueSeconds(5))
             .setFlushCondition(() -> flushEnabled.get())
             .build();

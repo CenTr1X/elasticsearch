@@ -293,18 +293,14 @@ public final class GrokPatternCreator {
 
         overallGrokPatternBuilder.setLength(0);
 
-        if (seedPatternName == null) {
-            appendBestGrokMatchForStrings(true, sampleMessages, false, 0);
-        } else {
-            GrokPatternCandidate seedCandidate = new PrecalculatedMappingGrokPatternCandidate(
-                seedPatternName,
-                seedMapping,
-                seedFieldName,
-                grokPatternDefinitions
-            );
+        GrokPatternCandidate seedCandidate = new PrecalculatedMappingGrokPatternCandidate(
+            seedPatternName,
+            seedMapping,
+            seedFieldName,
+            grokPatternDefinitions
+        );
 
-            processCandidateAndSplit(seedCandidate, true, sampleMessages, false, 0, false, 0);
-        }
+        processCandidateAndSplit(seedCandidate, true, sampleMessages, false, 0, false, 0);
 
         return overallGrokPatternBuilder.toString().replace("\t", "\\t").replace("\n", "\\n");
     }

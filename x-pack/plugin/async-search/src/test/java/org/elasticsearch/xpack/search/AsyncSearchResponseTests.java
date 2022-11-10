@@ -145,14 +145,14 @@ public class AsyncSearchResponseTests extends ESTestCase {
         try (XContentBuilder builder = XContentBuilder.builder(XContentType.JSON.xContent())) {
             builder.prettyPrint();
             asyncSearchResponse.toXContent(builder, ToXContent.EMPTY_PARAMS);
-            assertEquals(formatted("""
+            assertEquals("""
                 {
                   "id" : "id",
                   "is_partial" : true,
                   "is_running" : true,
                   "start_time_in_millis" : %s,
                   "expiration_time_in_millis" : %s
-                }""", date.getTime(), date.getTime()), Strings.toString(builder));
+                }""".formatted(date.getTime(), date.getTime()), Strings.toString(builder));
         }
 
         try (XContentBuilder builder = XContentBuilder.builder(XContentType.JSON.xContent())) {
@@ -160,17 +160,16 @@ public class AsyncSearchResponseTests extends ESTestCase {
             builder.humanReadable(true);
             asyncSearchResponse.toXContent(builder, new ToXContent.MapParams(Collections.singletonMap("human", "true")));
             assertEquals(
-                formatted(
-                    """
-                        {
-                          "id" : "id",
-                          "is_partial" : true,
-                          "is_running" : true,
-                          "start_time" : "%s",
-                          "start_time_in_millis" : %s,
-                          "expiration_time" : "%s",
-                          "expiration_time_in_millis" : %s
-                        }""",
+                """
+                    {
+                      "id" : "id",
+                      "is_partial" : true,
+                      "is_running" : true,
+                      "start_time" : "%s",
+                      "start_time_in_millis" : %s,
+                      "expiration_time" : "%s",
+                      "expiration_time_in_millis" : %s
+                    }""".formatted(
                     XContentElasticsearchExtension.DEFAULT_FORMATTER.format(date.toInstant()),
                     date.getTime(),
                     XContentElasticsearchExtension.DEFAULT_FORMATTER.format(date.toInstant()),

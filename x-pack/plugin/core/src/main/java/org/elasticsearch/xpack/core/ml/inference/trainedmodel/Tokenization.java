@@ -27,16 +27,7 @@ public abstract class Tokenization implements NamedXContentObject, NamedWriteabl
     public enum Truncate {
         FIRST,
         SECOND,
-        NONE {
-            @Override
-            public boolean isInCompatibleWithSpan() {
-                return false;
-            }
-        };
-
-        public boolean isInCompatibleWithSpan() {
-            return true;
-        }
+        NONE;
 
         public static Truncate fromString(String value) {
             return valueOf(value.toUpperCase(Locale.ROOT));
@@ -59,7 +50,7 @@ public abstract class Tokenization implements NamedXContentObject, NamedWriteabl
     private static final boolean DEFAULT_DO_LOWER_CASE = false;
     private static final boolean DEFAULT_WITH_SPECIAL_TOKENS = true;
     private static final Truncate DEFAULT_TRUNCATION = Truncate.FIRST;
-    private static final int UNSET_SPAN_VALUE = -1;
+    private static final int DEFAULT_SPAN = -1;
 
     static <T extends Tokenization> void declareCommonFields(ConstructingObjectParser<T, ?> parser) {
         parser.declareBoolean(ConstructingObjectParser.optionalConstructorArg(), DO_LOWER_CASE);
@@ -70,7 +61,7 @@ public abstract class Tokenization implements NamedXContentObject, NamedWriteabl
     }
 
     public static BertTokenization createDefault() {
-        return new BertTokenization(null, null, null, Tokenization.DEFAULT_TRUNCATION, UNSET_SPAN_VALUE);
+        return new BertTokenization(null, null, null, Tokenization.DEFAULT_TRUNCATION, DEFAULT_SPAN);
     }
 
     protected final boolean doLowerCase;
@@ -93,14 +84,10 @@ public abstract class Tokenization implements NamedXContentObject, NamedWriteabl
         this.withSpecialTokens = Optional.ofNullable(withSpecialTokens).orElse(DEFAULT_WITH_SPECIAL_TOKENS);
         this.maxSequenceLength = Optional.ofNullable(maxSequenceLength).orElse(DEFAULT_MAX_SEQUENCE_LENGTH);
         this.truncate = Optional.ofNullable(truncate).orElse(DEFAULT_TRUNCATION);
-        this.span = Optional.ofNullable(span).orElse(UNSET_SPAN_VALUE);
-        if (this.span < 0 && this.span != UNSET_SPAN_VALUE) {
+        this.span = Optional.ofNullable(span).orElse(DEFAULT_SPAN);
+        if (this.span < 0 && this.span != -1) {
             throw new IllegalArgumentException(
-                "["
-                    + SPAN.getPreferredName()
-                    + "] must be non-negative to indicate span length or ["
-                    + UNSET_SPAN_VALUE
-                    + "] to indicate no windowing should occur"
+                "[" + SPAN.getPreferredName() + "] must be non-negative to indicate span length or -1 to indicate no windowing should occur"
             );
         }
         if (this.span > this.maxSequenceLength) {
@@ -116,7 +103,17 @@ public abstract class Tokenization implements NamedXContentObject, NamedWriteabl
                     + "]"
             );
         }
-        validateSpanAndTruncate(truncate, span);
+        if (this.span != -1 && truncate != Truncate.NONE) {
+            throw new IllegalArgumentException(
+                "["
+                    + SPAN.getPreferredName()
+                    + "] must not be provided when ["
+                    + TRUNCATE.getPreferredName()
+                    + "] is not ["
+                    + Truncate.NONE
+                    + "]"
+            );
+        }
     }
 
     public Tokenization(StreamInput in) throws IOException {
@@ -127,7 +124,7 @@ public abstract class Tokenization implements NamedXContentObject, NamedWriteabl
         if (in.getVersion().onOrAfter(Version.V_8_2_0)) {
             this.span = in.readInt();
         } else {
-            this.span = UNSET_SPAN_VALUE;
+            this.span = -1;
         }
     }
 
@@ -155,14 +152,6 @@ public abstract class Tokenization implements NamedXContentObject, NamedWriteabl
         builder = doXContentBody(builder, params);
         builder.endObject();
         return builder;
-    }
-
-    public static void validateSpanAndTruncate(@Nullable Truncate truncate, @Nullable Integer span) {
-        if ((span != null && span != UNSET_SPAN_VALUE) && (truncate != null && truncate.isInCompatibleWithSpan())) {
-            throw new IllegalArgumentException(
-                "[" + SPAN.getPreferredName() + "] must not be provided when [" + TRUNCATE.getPreferredName() + "] is [" + truncate + "]"
-            );
-        }
     }
 
     @Override

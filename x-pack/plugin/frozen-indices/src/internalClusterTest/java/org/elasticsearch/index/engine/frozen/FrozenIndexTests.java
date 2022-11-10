@@ -27,6 +27,7 @@ import org.elasticsearch.cluster.block.ClusterBlockException;
 import org.elasticsearch.cluster.metadata.DataStream;
 import org.elasticsearch.cluster.metadata.IndexMetadata;
 import org.elasticsearch.cluster.routing.RecoverySource;
+import org.elasticsearch.common.Strings;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.core.TimeValue;
 import org.elasticsearch.index.Index;
@@ -340,7 +341,17 @@ public class FrozenIndexTests extends ESSingleNodeTestCase {
             SearchRequest searchRequest = new SearchRequest().allowPartialSearchResults(true);
             assertTrue(
                 searchService.canMatch(
-                    new ShardSearchRequest(OriginalIndices.NONE, searchRequest, shard.shardId(), 0, 1, AliasFilter.EMPTY, 1f, -1, null)
+                    new ShardSearchRequest(
+                        OriginalIndices.NONE,
+                        searchRequest,
+                        shard.shardId(),
+                        0,
+                        1,
+                        new AliasFilter(null, Strings.EMPTY_ARRAY),
+                        1f,
+                        -1,
+                        null
+                    )
                 ).canMatch()
             );
 
@@ -349,14 +360,34 @@ public class FrozenIndexTests extends ESSingleNodeTestCase {
             sourceBuilder.query(QueryBuilders.rangeQuery("field").gte("2010-01-03||+2d").lte("2010-01-04||+2d/d"));
             assertTrue(
                 searchService.canMatch(
-                    new ShardSearchRequest(OriginalIndices.NONE, searchRequest, shard.shardId(), 0, 1, AliasFilter.EMPTY, 1f, -1, null)
+                    new ShardSearchRequest(
+                        OriginalIndices.NONE,
+                        searchRequest,
+                        shard.shardId(),
+                        0,
+                        1,
+                        new AliasFilter(null, Strings.EMPTY_ARRAY),
+                        1f,
+                        -1,
+                        null
+                    )
                 ).canMatch()
             );
 
             sourceBuilder.query(QueryBuilders.rangeQuery("field").gt("2010-01-06T02:00").lt("2010-01-07T02:00"));
             assertFalse(
                 searchService.canMatch(
-                    new ShardSearchRequest(OriginalIndices.NONE, searchRequest, shard.shardId(), 0, 1, AliasFilter.EMPTY, 1f, -1, null)
+                    new ShardSearchRequest(
+                        OriginalIndices.NONE,
+                        searchRequest,
+                        shard.shardId(),
+                        0,
+                        1,
+                        new AliasFilter(null, Strings.EMPTY_ARRAY),
+                        1f,
+                        -1,
+                        null
+                    )
                 ).canMatch()
             );
         }
@@ -373,7 +404,17 @@ public class FrozenIndexTests extends ESSingleNodeTestCase {
             SearchRequest searchRequest = new SearchRequest().allowPartialSearchResults(true);
             assertTrue(
                 searchService.canMatch(
-                    new ShardSearchRequest(OriginalIndices.NONE, searchRequest, shard.shardId(), 0, 1, AliasFilter.EMPTY, 1f, -1, null)
+                    new ShardSearchRequest(
+                        OriginalIndices.NONE,
+                        searchRequest,
+                        shard.shardId(),
+                        0,
+                        1,
+                        new AliasFilter(null, Strings.EMPTY_ARRAY),
+                        1f,
+                        -1,
+                        null
+                    )
                 ).canMatch()
             );
 
@@ -382,14 +423,34 @@ public class FrozenIndexTests extends ESSingleNodeTestCase {
             searchRequest.source(sourceBuilder);
             assertTrue(
                 searchService.canMatch(
-                    new ShardSearchRequest(OriginalIndices.NONE, searchRequest, shard.shardId(), 0, 1, AliasFilter.EMPTY, 1f, -1, null)
+                    new ShardSearchRequest(
+                        OriginalIndices.NONE,
+                        searchRequest,
+                        shard.shardId(),
+                        0,
+                        1,
+                        new AliasFilter(null, Strings.EMPTY_ARRAY),
+                        1f,
+                        -1,
+                        null
+                    )
                 ).canMatch()
             );
 
             sourceBuilder.query(QueryBuilders.rangeQuery("field").gt("2010-01-06T02:00").lt("2010-01-07T02:00"));
             assertFalse(
                 searchService.canMatch(
-                    new ShardSearchRequest(OriginalIndices.NONE, searchRequest, shard.shardId(), 0, 1, AliasFilter.EMPTY, 1f, -1, null)
+                    new ShardSearchRequest(
+                        OriginalIndices.NONE,
+                        searchRequest,
+                        shard.shardId(),
+                        0,
+                        1,
+                        new AliasFilter(null, Strings.EMPTY_ARRAY),
+                        1f,
+                        -1,
+                        null
+                    )
                 ).canMatch()
             );
 
@@ -410,7 +471,7 @@ public class FrozenIndexTests extends ESSingleNodeTestCase {
                         shard.shardId(),
                         0,
                         1,
-                        AliasFilter.EMPTY,
+                        new AliasFilter(null, Strings.EMPTY_ARRAY),
                         1f,
                         -1,
                         null,
@@ -430,7 +491,7 @@ public class FrozenIndexTests extends ESSingleNodeTestCase {
                         shard.shardId(),
                         0,
                         1,
-                        AliasFilter.EMPTY,
+                        new AliasFilter(null, Strings.EMPTY_ARRAY),
                         1f,
                         -1,
                         null,
@@ -451,7 +512,7 @@ public class FrozenIndexTests extends ESSingleNodeTestCase {
                             shard.shardId(),
                             0,
                             1,
-                            AliasFilter.EMPTY,
+                            new AliasFilter(null, Strings.EMPTY_ARRAY),
                             1f,
                             -1,
                             null,

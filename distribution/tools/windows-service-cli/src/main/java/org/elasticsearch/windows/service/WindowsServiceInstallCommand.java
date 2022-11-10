@@ -43,7 +43,7 @@ class WindowsServiceInstallCommand extends ProcrunCommand {
         addArg(args, "--JvmMs", "4m");
         addArg(args, "--JvmMx", "64m");
         addQuotedArg(args, "--JvmOptions", getJvmOptions(pinfo.sysprops()));
-        addArg(args, "--PidFile", String.format(java.util.Locale.ROOT, "%s.pid", serviceId));
+        addArg(args, "--PidFile", "%s.pid".formatted(serviceId));
         addArg(
             args,
             "--DisplayName",
@@ -53,10 +53,7 @@ class WindowsServiceInstallCommand extends ProcrunCommand {
             args,
             "--Description",
             pinfo.envVars()
-                .getOrDefault(
-                    "SERVICE_DESCRIPTION",
-                    String.format(java.util.Locale.ROOT, "Elasticsearch %s Windows Service - https://elastic.co", Version.CURRENT)
-                )
+                .getOrDefault("SERVICE_DESCRIPTION", "Elasticsearch %s Windows Service - https://elastic.co".formatted(Version.CURRENT))
         );
         addQuotedArg(args, "--Jvm", quote(getJvmDll(getJavaHome(pinfo.sysprops())).toString()));
         addArg(args, "--StartMode", "jvm");
@@ -64,7 +61,7 @@ class WindowsServiceInstallCommand extends ProcrunCommand {
         addQuotedArg(args, "--StartPath", quote(pinfo.workingDir().toString()));
         addArg(args, "++JvmOptions", "-Dcli.name=windows-service-daemon");
         addArg(args, "++JvmOptions", "-Dcli.libs=lib/tools/server-cli,lib/tools/windows-service-cli");
-        addArg(args, "++Environment", String.format(java.util.Locale.ROOT, "HOSTNAME=%s", pinfo.envVars().get("COMPUTERNAME")));
+        addArg(args, "++Environment", "HOSTNAME=%s".formatted(pinfo.envVars().get("COMPUTERNAME")));
 
         String serviceUsername = pinfo.envVars().get("SERVICE_USERNAME");
         if (serviceUsername != null) {
@@ -87,7 +84,7 @@ class WindowsServiceInstallCommand extends ProcrunCommand {
     private static void addArg(List<String> args, String arg, String value) {
         args.add(arg);
         if (value.contains(" ")) {
-            value = String.format(java.util.Locale.ROOT, "\"%s\"", value);
+            value = "\"%s\"".formatted(value);
         }
         args.add(value);
     }
@@ -125,8 +122,8 @@ class WindowsServiceInstallCommand extends ProcrunCommand {
     @Override
     protected void preExecute(Terminal terminal, ProcessInfo pinfo, String serviceId) throws UserException {
         Path javaHome = getJavaHome(pinfo.sysprops());
-        terminal.println(String.format(java.util.Locale.ROOT, "Installing service : %s", serviceId));
-        terminal.println(String.format(java.util.Locale.ROOT, "Using ES_JAVA_HOME : %s", javaHome.toString()));
+        terminal.println("Installing service : %s".formatted(serviceId));
+        terminal.println("Using ES_JAVA_HOME : %s".formatted(javaHome.toString()));
 
         Path javaDll = getJvmDll(javaHome);
         if (Files.exists(javaDll) == false) {
@@ -151,11 +148,11 @@ class WindowsServiceInstallCommand extends ProcrunCommand {
 
     @Override
     protected String getSuccessMessage(String serviceId) {
-        return String.format(java.util.Locale.ROOT, "The service '%s' has been installed", serviceId);
+        return "The service '%s' has been installed".formatted(serviceId);
     }
 
     @Override
     protected String getFailureMessage(String serviceId) {
-        return String.format(java.util.Locale.ROOT, "Failed installing '%s' service", serviceId);
+        return "Failed installing '%s' service".formatted(serviceId);
     }
 }

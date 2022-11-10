@@ -180,8 +180,8 @@ public abstract class AbstractIndexRecoveryIntegTestCase extends ESIntegTestCase
         };
         TransientReceiveRejected handlingBehavior = new TransientReceiveRejected(
             recoveryActionToBlock,
-            recoveryStarted,
             finalizeReceived,
+            recoveryStarted,
             connectionBreaker
         );
         redTransportService.addRequestHandlingBehavior(recoveryActionToBlock, handlingBehavior);

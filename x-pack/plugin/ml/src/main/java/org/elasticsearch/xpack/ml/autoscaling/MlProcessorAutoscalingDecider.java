@@ -15,7 +15,6 @@ import org.elasticsearch.core.TimeValue;
 import org.elasticsearch.logging.LogManager;
 import org.elasticsearch.logging.Logger;
 import org.elasticsearch.xpack.autoscaling.capacity.AutoscalingDeciderContext;
-import org.elasticsearch.xpack.core.ml.inference.assignment.Priority;
 import org.elasticsearch.xpack.core.ml.inference.assignment.TrainedModelAssignment;
 import org.elasticsearch.xpack.ml.inference.assignment.TrainedModelAssignmentMetadata;
 import org.elasticsearch.xpack.ml.utils.MlProcessors;
@@ -36,9 +35,11 @@ class MlProcessorAutoscalingDecider {
     private static final Logger logger = LogManager.getLogger(MlProcessorAutoscalingDecider.class);
 
     private final ScaleTimer scaleTimer;
+    private final NodeAvailabilityZoneMapper nodeAvailabilityZoneMapper;
 
-    MlProcessorAutoscalingDecider(ScaleTimer scaleTimer) {
+    MlProcessorAutoscalingDecider(ScaleTimer scaleTimer, NodeAvailabilityZoneMapper nodeAvailabilityZoneMapper) {
         this.scaleTimer = Objects.requireNonNull(scaleTimer);
+        this.nodeAvailabilityZoneMapper = Objects.requireNonNull(nodeAvailabilityZoneMapper);
     }
 
     public MlProcessorAutoscalingCapacity scale(Settings configuration, AutoscalingDeciderContext context, MlAutoscalingContext mlContext) {
@@ -107,28 +108,25 @@ class MlProcessorAutoscalingDecider {
         return trainedModelAssignmentMetadata.modelAssignments()
             .values()
             .stream()
-            .filter(deployment -> deployment.getTaskParams().getPriority() == Priority.NORMAL)
             .anyMatch(deployment -> deployment.isSatisfied(mlNodeIds) == false);
     }
 
     private MlProcessorAutoscalingCapacity.Builder computeRequiredCapacity(TrainedModelAssignmentMetadata trainedModelAssignmentMetadata) {
         int maxThreadsPerAllocation = 0;
-        double processorCount = 0;
-        boolean hasLowPriorityDeployments = false;
+        int processorCount = 0;
         for (TrainedModelAssignment assignment : trainedModelAssignmentMetadata.modelAssignments().values()) {
-            if (assignment.getTaskParams().getPriority() == Priority.LOW) {
-                hasLowPriorityDeployments = true;
-                continue;
-            }
             int threadsPerAllocation = assignment.getTaskParams().getThreadsPerAllocation();
             maxThreadsPerAllocation = Math.max(maxThreadsPerAllocation, threadsPerAllocation);
             processorCount += assignment.getTaskParams().getNumberOfAllocations() * threadsPerAllocation;
         }
 
-        if (hasLowPriorityDeployments) {
-            // If there are low priority deployments let us ensure there will at least be one node required.
-            processorCount = Math.max(0.1, processorCount);
+        final int numMlAvailabilityZones = nodeAvailabilityZoneMapper.getNumMlAvailabilityZones().orElse(1);
+        if (numMlAvailabilityZones > 1) {
+            // We assume cloud provides what we ask for tier processors for each availability zone.
+            // Thus we need to devide the total processor count required by the number of ML availability zones.
+            processorCount = (processorCount - 1) / numMlAvailabilityZones + 1;
         }
+        processorCount = Math.max(processorCount, maxThreadsPerAllocation);
 
         return MlProcessorAutoscalingCapacity.builder(
             maxThreadsPerAllocation > 0 ? Processors.of(Double.valueOf(maxThreadsPerAllocation)) : Processors.ZERO,

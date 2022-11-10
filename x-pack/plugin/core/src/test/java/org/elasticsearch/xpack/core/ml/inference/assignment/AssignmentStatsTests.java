@@ -50,8 +50,7 @@ public class AssignmentStatsTests extends AbstractWireSerializingTestCase<Assign
             randomBoolean() ? null : randomIntBetween(1, 10000),
             randomBoolean() ? null : ByteSizeValue.ofBytes(randomLongBetween(1, 10000000)),
             Instant.now(),
-            nodeStatsList,
-            randomFrom(Priority.values())
+            nodeStatsList
         );
     }
 
@@ -59,7 +58,6 @@ public class AssignmentStatsTests extends AbstractWireSerializingTestCase<Assign
         var lastAccess = Instant.now();
         var inferenceCount = randomNonNegativeLong();
         Double avgInferenceTime = randomDoubleBetween(0.0, 100.0, true);
-        Double avgInferenceTimeExcludingCacheHit = randomDoubleBetween(0.0, 100.0, true);
         Double avgInferenceTimeLastPeriod = randomDoubleBetween(0.0, 100.0, true);
 
         var noInferenceCallsOnNodeYet = randomBoolean();
@@ -67,14 +65,12 @@ public class AssignmentStatsTests extends AbstractWireSerializingTestCase<Assign
             lastAccess = null;
             inferenceCount = 0;
             avgInferenceTime = null;
-            avgInferenceTimeExcludingCacheHit = null;
             avgInferenceTimeLastPeriod = null;
         }
         return AssignmentStats.NodeStats.forStartedState(
             node,
             inferenceCount,
             avgInferenceTime,
-            avgInferenceTimeExcludingCacheHit,
             randomIntBetween(0, 100),
             randomIntBetween(0, 100),
             randomLongBetween(0, 100),
@@ -106,7 +102,6 @@ public class AssignmentStatsTests extends AbstractWireSerializingTestCase<Assign
                     new DiscoveryNode("node_started_1", buildNewFakeTransportAddress(), Version.CURRENT),
                     10L,
                     randomDoubleBetween(0.0, 100.0, true),
-                    randomDoubleBetween(0.0, 100.0, true),
                     randomIntBetween(1, 10),
                     5,
                     4L,
@@ -124,7 +119,6 @@ public class AssignmentStatsTests extends AbstractWireSerializingTestCase<Assign
                 AssignmentStats.NodeStats.forStartedState(
                     new DiscoveryNode("node_started_2", buildNewFakeTransportAddress(), Version.CURRENT),
                     12L,
-                    randomDoubleBetween(0.0, 100.0, true),
                     randomDoubleBetween(0.0, 100.0, true),
                     randomIntBetween(1, 10),
                     15,
@@ -145,8 +139,7 @@ public class AssignmentStatsTests extends AbstractWireSerializingTestCase<Assign
                     randomFrom(RoutingState.values()),
                     randomBoolean() ? null : "a good reason"
                 )
-            ),
-            randomFrom(Priority.values())
+            )
         );
         InferenceStats stats = existingStats.getOverallInferenceStats();
         assertThat(stats.getModelId(), equalTo(modelId));
@@ -164,8 +157,7 @@ public class AssignmentStatsTests extends AbstractWireSerializingTestCase<Assign
             randomBoolean() ? null : randomIntBetween(1, 10000),
             randomBoolean() ? null : ByteSizeValue.ofBytes(randomLongBetween(1, 1000000)),
             Instant.now(),
-            List.of(),
-            randomFrom(Priority.values())
+            List.of()
         );
         InferenceStats stats = existingStats.getOverallInferenceStats();
         assertThat(stats.getModelId(), equalTo(modelId));
@@ -194,8 +186,7 @@ public class AssignmentStatsTests extends AbstractWireSerializingTestCase<Assign
                     randomFrom(RoutingState.values()),
                     randomBoolean() ? null : "a good reason"
                 )
-            ),
-            randomFrom(Priority.values())
+            )
         );
         InferenceStats stats = existingStats.getOverallInferenceStats();
         assertThat(stats.getModelId(), equalTo(modelId));

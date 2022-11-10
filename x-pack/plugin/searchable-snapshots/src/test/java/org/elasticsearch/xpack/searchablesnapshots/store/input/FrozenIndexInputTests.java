@@ -55,30 +55,30 @@ public class FrozenIndexInputTests extends AbstractSearchableSnapshotsTestCase {
         final FileInfo fileInfo = new FileInfo(
             randomAlphaOfLength(10),
             new StoreFileMetadata(fileName, fileData.length, checksum, Version.CURRENT.luceneVersion.toString()),
-            ByteSizeValue.ofBytes(fileData.length)
+            new ByteSizeValue(fileData.length)
         );
 
         final ByteSizeValue rangeSize;
         if (rarely()) {
             rangeSize = FrozenCacheService.SHARED_CACHE_RANGE_SIZE_SETTING.get(Settings.EMPTY);
         } else if (randomBoolean()) {
-            rangeSize = ByteSizeValue.ofBytes(randomIntBetween(1, 16) * SharedBytes.PAGE_SIZE);
+            rangeSize = new ByteSizeValue(randomIntBetween(1, 16) * SharedBytes.PAGE_SIZE);
         } else {
-            rangeSize = ByteSizeValue.ofBytes(randomIntBetween(1, 16000) * SharedBytes.PAGE_SIZE);
+            rangeSize = new ByteSizeValue(randomIntBetween(1, 16000) * SharedBytes.PAGE_SIZE);
         }
 
         final ByteSizeValue regionSize;
         if (rarely()) {
             regionSize = FrozenCacheService.SHARED_CACHE_REGION_SIZE_SETTING.get(Settings.EMPTY);
         } else {
-            regionSize = ByteSizeValue.ofBytes(randomIntBetween(1, 16) * SharedBytes.PAGE_SIZE);
+            regionSize = new ByteSizeValue(randomIntBetween(1, 16) * SharedBytes.PAGE_SIZE);
         }
 
         final ByteSizeValue cacheSize;
         if (rarely()) {
             cacheSize = regionSize;
         } else {
-            cacheSize = ByteSizeValue.ofBytes(randomLongBetween(1L, 10L) * regionSize.getBytes() + randomIntBetween(0, 100));
+            cacheSize = new ByteSizeValue(randomLongBetween(1L, 10L) * regionSize.getBytes() + randomIntBetween(0, 100));
         }
 
         final Settings settings = Settings.builder()

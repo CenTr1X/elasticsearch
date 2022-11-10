@@ -15,7 +15,6 @@ import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.util.concurrent.CountDown;
 import org.elasticsearch.core.Tuple;
 import org.elasticsearch.index.IndexNotFoundException;
-import org.elasticsearch.index.mapper.extras.MapperExtrasPlugin;
 import org.elasticsearch.plugins.Plugin;
 import org.elasticsearch.test.ESIntegTestCase;
 import org.elasticsearch.test.store.MockFSIndexStore;
@@ -74,8 +73,7 @@ public abstract class MonitoringIntegTestCase extends ESIntegTestCase {
             LocalStateMonitoring.class,
             MockClusterAlertScriptEngine.TestPlugin.class,
             MockIngestPlugin.class,
-            CommonAnalysisPlugin.class,
-            MapperExtrasPlugin.class
+            CommonAnalysisPlugin.class
         );
     }
 

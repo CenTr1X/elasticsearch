@@ -104,7 +104,7 @@ public class LifecyclePolicy implements SimpleDiffable<LifecyclePolicy>, ToXCont
     public LifecyclePolicy(StreamInput in) throws IOException {
         type = in.readNamedWriteable(LifecycleType.class);
         name = in.readString();
-        phases = in.readImmutableMap(StreamInput::readString, Phase::new);
+        phases = Collections.unmodifiableMap(in.readMap(StreamInput::readString, Phase::new));
         this.metadata = in.readMap();
     }
 
@@ -265,21 +265,21 @@ public class LifecyclePolicy implements SimpleDiffable<LifecyclePolicy>, ToXCont
     }
 
     public boolean isActionSafe(StepKey stepKey) {
-        if ("new".equals(stepKey.phase())) {
+        if ("new".equals(stepKey.getPhase())) {
             return true;
         }
-        Phase phase = phases.get(stepKey.phase());
+        Phase phase = phases.get(stepKey.getPhase());
         if (phase != null) {
-            LifecycleAction action = phase.getActions().get(stepKey.action());
+            LifecycleAction action = phase.getActions().get(stepKey.getAction());
             if (action != null) {
                 return action.isSafeAction();
             } else {
                 throw new IllegalArgumentException(
-                    "Action [" + stepKey.action() + "] in phase [" + stepKey.phase() + "]  does not exist in policy [" + name + "]"
+                    "Action [" + stepKey.getAction() + "] in phase [" + stepKey.getPhase() + "]  does not exist in policy [" + name + "]"
                 );
             }
         } else {
-            throw new IllegalArgumentException("Phase [" + stepKey.phase() + "]  does not exist in policy [" + name + "]");
+            throw new IllegalArgumentException("Phase [" + stepKey.getPhase() + "]  does not exist in policy [" + name + "]");
         }
     }
 

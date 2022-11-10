@@ -59,7 +59,7 @@ public class CheckShrinkReadyStep extends ClusterStateWaitStep {
 
         if (idxMeta == null) {
             // Index must have been since deleted, ignore it
-            logger.debug("[{}] lifecycle action for index [{}] executed but index no longer exists", getKey().action(), index.getName());
+            logger.debug("[{}] lifecycle action for index [{}] executed but index no longer exists", getKey().getAction(), index.getName());
             return new Result(false, null);
         }
 
@@ -104,7 +104,7 @@ public class CheckShrinkReadyStep extends ClusterStateWaitStep {
                 index,
                 expectedShardCount,
                 idShardsShouldBeOn,
-                getKey().action()
+                getKey().getAction()
             );
             return new Result(true, null);
         } else {
@@ -122,7 +122,7 @@ public class CheckShrinkReadyStep extends ClusterStateWaitStep {
                 expectedShardCount,
                 foundShards,
                 idShardsShouldBeOn,
-                getKey().action()
+                getKey().getAction()
             );
             return new Result(
                 false,

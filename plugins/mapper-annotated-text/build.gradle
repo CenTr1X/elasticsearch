@@ -9,6 +9,7 @@ import org.elasticsearch.gradle.internal.info.BuildParams
  */
 apply plugin: 'elasticsearch.internal-yaml-rest-test'
 apply plugin: 'elasticsearch.yaml-rest-compat-test'
+apply plugin: 'elasticsearch.internal-cluster-test'
 
 esplugin {
   description 'The Mapper Annotated_text plugin adds support for text fields with markup used to inject annotation tokens into the index.'
@@ -16,9 +17,13 @@ esplugin {
 }
 
 if (BuildParams.isSnapshotBuild() == false) {
-  tasks.named("test").configure {
+  tasks.named("internalClusterTest").configure {
     systemProperty 'es.index_mode_feature_flag_registered', 'true'
   }
+}
+
+tasks.named('internalClusterTestTestingConventions').configure {
+  baseClass 'org.elasticsearch.index.mapper.MapperTestCase'
 }
 
 restResources {

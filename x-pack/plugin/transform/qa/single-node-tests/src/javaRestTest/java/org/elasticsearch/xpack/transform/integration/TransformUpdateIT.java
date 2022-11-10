@@ -87,7 +87,7 @@ public class TransformUpdateIT extends TransformRestTestCase {
             getTransformEndpoint() + transformId,
             BASIC_AUTH_VALUE_TRANSFORM_ADMIN_1
         );
-        String config = formatted("""
+        String config = """
             {
               "dest": {
                 "index": "%s"
@@ -112,7 +112,7 @@ public class TransformUpdateIT extends TransformRestTestCase {
                 },
                 "max_page_search_size": 555
               }
-            }""", transformDest, REVIEWS_INDEX_NAME);
+            }""".formatted(transformDest, REVIEWS_INDEX_NAME);
 
         createTransformRequest.setJsonEntity(config);
         Map<String, Object> createTransformResponse = entityAsMap(client().performRequest(createTransformRequest));
@@ -181,7 +181,7 @@ public class TransformUpdateIT extends TransformRestTestCase {
             )
             : createRequestWithAuth("PUT", getTransformEndpoint() + transformIdCloned, BASIC_AUTH_VALUE_TRANSFORM_ADMIN_2);
 
-        String config = formatted("""
+        String config = """
             {
               "dest": {
                 "index": "%s"
@@ -205,7 +205,7 @@ public class TransformUpdateIT extends TransformRestTestCase {
                   }
                 }
               }
-            }""", transformDest, REVIEWS_INDEX_NAME);
+            }""".formatted(transformDest, REVIEWS_INDEX_NAME);
 
         createTransformRequest.setJsonEntity(config);
         Map<String, Object> createTransformResponse = entityAsMap(client().performRequest(createTransformRequest));

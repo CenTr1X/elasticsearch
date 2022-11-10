@@ -41,8 +41,6 @@ public final class TextStructureUtils {
     public static final String NANOSECOND_DATE_OUTPUT_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSSSSSSSSXXX";
     public static final Set<String> CONVERTIBLE_TYPES = Set.of("integer", "long", "float", "double", "boolean");
 
-    public static final String NULL_TIMESTAMP_FORMAT = "null";
-
     private static final Map<String, String> EXTENDED_PATTERNS;
     static {
         Map<String, String> patterns = new HashMap<>();
@@ -113,10 +111,6 @@ public final class TextStructureUtils {
         TimeoutChecker timeoutChecker
     ) {
         if (sampleRecords.isEmpty()) {
-            return null;
-        }
-
-        if (NULL_TIMESTAMP_FORMAT.equals(overrides.getTimestampFormat())) {
             return null;
         }
 
@@ -262,22 +256,14 @@ public final class TextStructureUtils {
      *                    can be appended by this method.
      * @param sampleRecords The sampled records.
      * @param timeoutChecker Will abort the operation if its timeout is exceeded.
-     * @param timestampFormatOverride The format of the timestamp as given in the request overrides.
      * @return A map of field name to mapping settings.
      */
     static Tuple<SortedMap<String, Object>, SortedMap<String, FieldStats>> guessMappingsAndCalculateFieldStats(
         List<String> explanation,
         List<Map<String, ?>> sampleRecords,
-        TimeoutChecker timeoutChecker,
-        String timestampFormatOverride
+        TimeoutChecker timeoutChecker
     ) {
-        return guessMappingsAndCalculateFieldStats(
-            explanation,
-            sampleRecords,
-            timeoutChecker,
-            DEFAULT_ECS_COMPATIBILITY,
-            timestampFormatOverride
-        );
+        return guessMappingsAndCalculateFieldStats(explanation, sampleRecords, timeoutChecker, DEFAULT_ECS_COMPATIBILITY);
     }
 
     /**
@@ -286,7 +272,7 @@ public final class TextStructureUtils {
      *                    can be appended by this method.
      * @param sampleRecords The sampled records.
      * @param timeoutChecker Will abort the operation if its timeout is exceeded.
-     * @param ecsCompatibility The mode of compatibility with ECS Grok patterns.
+     * @param ecsCompatibility The mode of compatibility with ECS Grok patterns
      * @return A map of field name to mapping settings.
      */
     static Tuple<SortedMap<String, Object>, SortedMap<String, FieldStats>> guessMappingsAndCalculateFieldStats(
@@ -294,26 +280,6 @@ public final class TextStructureUtils {
         List<Map<String, ?>> sampleRecords,
         TimeoutChecker timeoutChecker,
         boolean ecsCompatibility
-    ) {
-        return guessMappingsAndCalculateFieldStats(explanation, sampleRecords, timeoutChecker, ecsCompatibility, null);
-    }
-
-    /**
-     * Given the sampled records, guess appropriate Elasticsearch mappings.
-     * @param explanation List of reasons for making decisions.  May contain items when passed and new reasons
-     *                    can be appended by this method.
-     * @param sampleRecords The sampled records.
-     * @param timeoutChecker Will abort the operation if its timeout is exceeded.
-     * @param ecsCompatibility The mode of compatibility with ECS Grok patterns.
-     * @param timestampFormatOverride The format of the timestamp as given in the request overrides.
-     * @return A map of field name to mapping settings.
-     */
-    static Tuple<SortedMap<String, Object>, SortedMap<String, FieldStats>> guessMappingsAndCalculateFieldStats(
-        List<String> explanation,
-        List<Map<String, ?>> sampleRecords,
-        TimeoutChecker timeoutChecker,
-        boolean ecsCompatibility,
-        String timestampFormatOverride
     ) {
 
         SortedMap<String, Object> mappings = new TreeMap<>();
@@ -333,8 +299,7 @@ public final class TextStructureUtils {
                 fieldName,
                 fieldValues,
                 timeoutChecker,
-                ecsCompatibility,
-                timestampFormatOverride
+                ecsCompatibility
             );
             if (mappingAndFieldStats != null) {
                 if (mappingAndFieldStats.v1() != null) {
@@ -349,50 +314,12 @@ public final class TextStructureUtils {
         return new Tuple<>(mappings, fieldStats);
     }
 
-    /**
-     * Given the sampled records, guess appropriate Elasticsearch mappings.
-     * @param explanation List of reasons for choosing the overall text structure.  This list
-     *                    may be non-empty when the method is called, and this method may
-     *                    append to it.
-     * @param fieldName Name of the field for which mappings are to be guessed.
-     * @param fieldValues Values of the field for which mappings are to be guessed.  The guessed
-     *                    mapping will be compatible with all the provided values.  Must not be
-     *                    empty.
-     * @param timeoutChecker Will abort the operation if its timeout is exceeded.
-     * @param ecsCompatibility The mode of compatibility with ECS Grok patterns.
-     * @return A tuple comprised of the field mappings and field stats.
-     */
     static Tuple<Map<String, String>, FieldStats> guessMappingAndCalculateFieldStats(
         List<String> explanation,
         String fieldName,
         List<Object> fieldValues,
         TimeoutChecker timeoutChecker,
         boolean ecsCompatibility
-    ) {
-        return guessMappingAndCalculateFieldStats(explanation, fieldName, fieldValues, timeoutChecker, ecsCompatibility, null);
-    }
-
-    /**
-     * Given the sampled records, guess appropriate Elasticsearch mappings.
-     * @param explanation List of reasons for choosing the overall text structure.  This list
-     *                    may be non-empty when the method is called, and this method may
-     *                    append to it.
-     * @param fieldName Name of the field for which mappings are to be guessed.
-     * @param fieldValues Values of the field for which mappings are to be guessed.  The guessed
-     *                    mapping will be compatible with all the provided values.  Must not be
-     *                    empty.
-     * @param timeoutChecker Will abort the operation if its timeout is exceeded.
-     * @param ecsCompatibility The mode of compatibility with ECS Grok patterns.
-     * @param timestampFormatOverride The format of the timestamp as given in the request overrides.
-     * @return A tuple comprised of the field mappings and field stats.
-     */
-    static Tuple<Map<String, String>, FieldStats> guessMappingAndCalculateFieldStats(
-        List<String> explanation,
-        String fieldName,
-        List<Object> fieldValues,
-        TimeoutChecker timeoutChecker,
-        boolean ecsCompatibility,
-        String timestampFormatOverride
     ) {
         if (fieldValues == null || fieldValues.isEmpty()) {
             // We can get here if all the records that contained a given field had a null value for it.
@@ -416,20 +343,12 @@ public final class TextStructureUtils {
                 fieldName,
                 fieldValues.stream().flatMap(TextStructureUtils::flatten).collect(Collectors.toList()),
                 timeoutChecker,
-                ecsCompatibility,
-                timestampFormatOverride
+                ecsCompatibility
             );
         }
 
         Collection<String> fieldValuesAsStrings = fieldValues.stream().map(Object::toString).collect(Collectors.toList());
-        Map<String, String> mapping = guessScalarMapping(
-            explanation,
-            fieldName,
-            fieldValuesAsStrings,
-            timeoutChecker,
-            ecsCompatibility,
-            timestampFormatOverride
-        );
+        Map<String, String> mapping = guessScalarMapping(explanation, fieldName, fieldValuesAsStrings, timeoutChecker, ecsCompatibility);
         timeoutChecker.check("mapping determination");
         return new Tuple<>(mapping, calculateFieldStats(mapping, fieldValuesAsStrings, timeoutChecker));
     }
@@ -456,7 +375,6 @@ public final class TextStructureUtils {
      *                    mapping will be compatible with all the provided values.  Must not be
      *                    empty.
      * @param timeoutChecker Will abort the operation if its timeout is exceeded.
-     * @param ecsCompatibility The mode of compatibility with ECS Grok patterns.
      * @return The sub-section of the index mappings most appropriate for the field.
      */
     static Map<String, String> findTimestampMapping(
@@ -490,7 +408,6 @@ public final class TextStructureUtils {
      *                    mapping will be compatible with all the provided values.  Must not be
      *                    empty.
      * @param timeoutChecker Will abort the operation if its timeout is exceeded.
-     * @param ecsCompatibility The mode of compatibility with ECS Grok patterns.
      * @return The sub-section of the index mappings most appropriate for the field,
      *         for example <code>{ "type" : "keyword" }</code>.
      */
@@ -500,33 +417,6 @@ public final class TextStructureUtils {
         Collection<String> fieldValues,
         TimeoutChecker timeoutChecker,
         boolean ecsCompatibility
-    ) {
-        return guessScalarMapping(explanation, fieldName, fieldValues, timeoutChecker, ecsCompatibility, null);
-    }
-
-    /**
-     * Given some sample values for a field, guess the most appropriate index mapping for the
-     * field.
-     * @param explanation List of reasons for choosing the overall text structure.  This list
-     *                    may be non-empty when the method is called, and this method may
-     *                    append to it.
-     * @param fieldName Name of the field for which mappings are to be guessed.
-     * @param fieldValues Values of the field for which mappings are to be guessed.  The guessed
-     *                    mapping will be compatible with all the provided values.  Must not be
-     *                    empty.
-     * @param timeoutChecker Will abort the operation if its timeout is exceeded.
-     * @param ecsCompatibility The mode of compatibility with ECS Grok patterns.
-     * @param timestampFormatOverride The format of the timestamp as given in the request overrides.
-     * @return The sub-section of the index mappings most appropriate for the field,
-     *         for example <code>{ "type" : "keyword" }</code>.
-     */
-    static Map<String, String> guessScalarMapping(
-        List<String> explanation,
-        String fieldName,
-        Collection<String> fieldValues,
-        TimeoutChecker timeoutChecker,
-        boolean ecsCompatibility,
-        String timestampFormatOverride
     ) {
         assert fieldValues.isEmpty() == false;
 
@@ -609,7 +499,6 @@ public final class TextStructureUtils {
      *                         May be <code>null</code> if {@code timestampField} is also <code>null</code>.
      * @param needClientTimezone Is the timezone of the client supplying data to ingest required to uniquely parse the timestamp?
      * @param needNanosecondPrecision Does the timestamp have more than millisecond accuracy?
-     * @param ecsCompatibility The mode of compatibility with ECS Grok patterns.
      * @return The ingest pipeline definition, or <code>null</code> if none is required.
      */
     public static Map<String, Object> makeIngestPipelineDefinition(

@@ -145,7 +145,6 @@ public class InternalCategorizationAggregation extends InternalMultiBucketAggreg
             builder.field(CommonFields.DOC_COUNT.getPreferredName(), serializableCategory.getNumMatches());
             builder.field(CommonFields.KEY.getPreferredName());
             key.toXContent(builder, params);
-            builder.field(CategoryDefinition.REGEX.getPreferredName(), serializableCategory.getRegex());
             builder.field(CategoryDefinition.MAX_MATCHING_LENGTH.getPreferredName(), serializableCategory.maxMatchingStringLen());
             aggregations.toXContentInternal(builder, params);
             builder.endObject();

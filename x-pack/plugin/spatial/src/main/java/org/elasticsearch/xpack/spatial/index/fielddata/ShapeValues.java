@@ -9,6 +9,7 @@ package org.elasticsearch.xpack.spatial.index.fielddata;
 
 import org.apache.lucene.document.ShapeField;
 import org.apache.lucene.geo.Component2D;
+import org.apache.lucene.geo.LatLonGeometry;
 import org.apache.lucene.util.BytesRef;
 import org.elasticsearch.common.geo.SpatialPoint;
 import org.elasticsearch.geometry.Geometry;
@@ -29,10 +30,10 @@ import java.util.function.Supplier;
  * A stateful lightweight per document geo values.
  * To iterate over values in a document use the following pattern:
  * <pre>
- *   ShapeValues values = ..;
+ *   MultiGeoValues values = ..;
  *   // for each docID
  *   if (values.advanceExact(docId)) {
- *     ShapeValue value = values.value()
+ *     GeoValue value = values.value()
  *     final int numValues = values.count();
  *     // process value
  *   }
@@ -84,23 +85,23 @@ public abstract class ShapeValues<T extends ShapeValues.ShapeValue> {
         }
     }
 
-    /**
-     * thin wrapper around a {@link GeometryDocValueReader} which encodes / decodes values using
-     * the provided decoder (could be geo or cartesian)
-     */
+    /** thin wrapper around a {@link GeometryDocValueReader} which encodes / decodes values using
+     * the Geo decoder */
     protected abstract static class ShapeValue implements ToXContentFragment {
         protected final GeometryDocValueReader reader;
         private final BoundingBox boundingBox;
+        private final Tile2DVisitor tile2DVisitor;
         protected final CoordinateEncoder encoder;
         private final BiFunction<Double, Double, SpatialPoint> pointMaker;
-        private final Component2DRelationVisitor component2DRelationVisitor;
+        private final LatLonGeometryRelationVisitor component2DRelationVisitor;
 
         public ShapeValue(CoordinateEncoder encoder, BiFunction<Double, Double, SpatialPoint> pointMaker) {
             this.reader = new GeometryDocValueReader();
             this.boundingBox = new BoundingBox();
+            this.tile2DVisitor = new Tile2DVisitor();
             this.encoder = encoder;
             this.pointMaker = pointMaker;
-            this.component2DRelationVisitor = new Component2DRelationVisitor(encoder);
+            this.component2DRelationVisitor = new LatLonGeometryRelationVisitor(encoder);
         }
 
         /**
@@ -121,7 +122,7 @@ public abstract class ShapeValues<T extends ShapeValues.ShapeValue> {
             Component2DVisitor visitor = Component2DVisitor.getVisitor(
                 centroidAsComponent2D(),
                 ShapeField.QueryRelation.INTERSECTS,
-                this.encoder
+                CoordinateEncoder.GEO
             );
             reader.visit(visitor);
             return visitor.matches();
@@ -136,18 +137,28 @@ public abstract class ShapeValues<T extends ShapeValues.ShapeValue> {
                 return pointMaker.apply(getX(), getY());
             }
             // For all other cases, use the first triangle (or line or point) in the tree which will always intersect the shape
-            LabelPositionVisitor visitor = new LabelPositionVisitor(this.encoder, pointMaker);
+            LabelPositionVisitor visitor = new LabelPositionVisitor(CoordinateEncoder.GEO, pointMaker);
             reader.visit(visitor);
             return visitor.labelPosition();
         }
 
         /**
-         * Determine the {@link GeoRelation} between the current shape and a {@link Component2D}. It only supports
+         * Determine the {@link GeoRelation} between the current shape and a bounding box provided in
+         * the encoded space.
+         */
+        public GeoRelation relate(int minX, int maxX, int minY, int maxY) throws IOException {
+            tile2DVisitor.reset(minX, minY, maxX, maxY);
+            reader.visit(tile2DVisitor);
+            return tile2DVisitor.relation();
+        }
+
+        /**
+         * Determine the {@link GeoRelation} between the current shape and a {@link LatLonGeometry}. It only supports
          * simple geometries, therefore it will fail if the LatLonGeometry is a {@link org.apache.lucene.geo.Rectangle}
          * that crosses the dateline.
          */
-        protected GeoRelation relate(Component2D component2D) throws IOException {
-            component2DRelationVisitor.reset(component2D);
+        public GeoRelation relate(LatLonGeometry latLonGeometry) throws IOException {
+            component2DRelationVisitor.reset(latLonGeometry);
             reader.visit(component2DRelationVisitor);
             return component2DRelationVisitor.relation();
         }

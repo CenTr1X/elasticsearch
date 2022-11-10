@@ -120,8 +120,7 @@ public class HistogramFieldMapper extends FieldMapper {
         this.ignoreMalformedByDefault = builder.ignoreMalformed.getDefaultValue().value();
     }
 
-    @Override
-    public boolean ignoreMalformed() {
+    boolean ignoreMalformed() {
         return ignoreMalformed.value();
     }
 

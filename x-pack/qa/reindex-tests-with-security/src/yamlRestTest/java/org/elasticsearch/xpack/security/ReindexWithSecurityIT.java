@@ -6,21 +6,27 @@
  */
 package org.elasticsearch.xpack.security;
 
-import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
+import org.elasticsearch.ElasticsearchStatusException;
 import org.elasticsearch.action.admin.indices.alias.IndicesAliasesRequest;
 import org.elasticsearch.action.admin.indices.alias.IndicesAliasesRequest.AliasActions;
+import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.support.master.AcknowledgedResponse;
 import org.elasticsearch.client.Request;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.Response;
-import org.elasticsearch.client.ResponseException;
+import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.common.Strings;
 import org.elasticsearch.common.settings.SecureString;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.util.concurrent.ThreadContext;
 import org.elasticsearch.core.PathUtils;
+import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.index.reindex.BulkByScrollResponse;
+import org.elasticsearch.index.reindex.DeleteByQueryRequest;
+import org.elasticsearch.index.reindex.ReindexRequest;
+import org.elasticsearch.index.reindex.UpdateByQueryRequest;
 import org.elasticsearch.test.rest.ESRestTestCase;
 import org.elasticsearch.xcontent.XContentBuilder;
 import org.junit.AfterClass;
@@ -30,12 +36,13 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Path;
-import java.util.Map;
+import java.util.Collections;
 
 import static org.elasticsearch.xcontent.XContentFactory.jsonBuilder;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
 
+@SuppressWarnings("removal")
 public class ReindexWithSecurityIT extends ESRestTestCase {
 
     private static final String USER = "test_admin";
@@ -77,28 +84,25 @@ public class ReindexWithSecurityIT extends ESRestTestCase {
     public void testDeleteByQuery() throws IOException {
         createIndicesWithRandomAliases("test1", "test2", "test3");
 
-        final Map<String, String> waitForCompletion = Map.of("wait_for_completion", "true");
-        final String matchAllQuery = """
-            {
-                "query": {
-                    "match_all": {}
-                }
-            }""";
-
-        Response response = executeIgnoringConflicts(
-            HttpPost.METHOD_NAME,
-            "test1,test2/_delete_by_query",
-            matchAllQuery,
-            waitForCompletion
+        RestHighLevelClient restClient = new TestRestHighLevelClient();
+        BulkByScrollResponse response = restClient.deleteByQuery(
+            new DeleteByQueryRequest().setQuery(QueryBuilders.matchAllQuery()).indices("test1", "test2"),
+            RequestOptions.DEFAULT
         );
         assertNotNull(response);
 
-        response = executeIgnoringConflicts(HttpPost.METHOD_NAME, "test*/_delete_by_query", matchAllQuery, waitForCompletion);
+        response = restClient.deleteByQuery(
+            new DeleteByQueryRequest().setQuery(QueryBuilders.matchAllQuery()).indices("test*"),
+            RequestOptions.DEFAULT
+        );
         assertNotNull(response);
 
-        ResponseException e = expectThrows(
-            ResponseException.class,
-            () -> execute(HttpPost.METHOD_NAME, "test1,index1/_delete_by_query", matchAllQuery, waitForCompletion)
+        ElasticsearchStatusException e = expectThrows(
+            ElasticsearchStatusException.class,
+            () -> restClient.deleteByQuery(
+                new DeleteByQueryRequest().setQuery(QueryBuilders.matchAllQuery()).indices("test1", "index1"),
+                RequestOptions.DEFAULT
+            )
         );
         assertThat(e.getMessage(), containsString("no such index [index1]"));
     }
@@ -106,15 +110,22 @@ public class ReindexWithSecurityIT extends ESRestTestCase {
     public void testUpdateByQuery() throws IOException {
         createIndicesWithRandomAliases("test1", "test2", "test3");
 
-        Response response = executeIgnoringConflicts(HttpPost.METHOD_NAME, "test1,test2/_update_by_query", "", Map.of());
+        RestHighLevelClient restClient = new TestRestHighLevelClient();
+        BulkByScrollResponse response = restClient.updateByQuery(
+            (UpdateByQueryRequest) new UpdateByQueryRequest().indices("test1", "test2"),
+            RequestOptions.DEFAULT
+        );
         assertNotNull(response);
 
-        response = executeIgnoringConflicts(HttpPost.METHOD_NAME, "test*/_update_by_query", "", Map.of());
+        response = restClient.updateByQuery((UpdateByQueryRequest) new UpdateByQueryRequest().indices("test*"), RequestOptions.DEFAULT);
         assertNotNull(response);
 
-        ResponseException e = expectThrows(
-            ResponseException.class,
-            () -> execute(HttpPost.METHOD_NAME, "test1,index1/_update_by_query", "", Map.of())
+        ElasticsearchStatusException e = expectThrows(
+            ElasticsearchStatusException.class,
+            () -> restClient.updateByQuery(
+                (UpdateByQueryRequest) new UpdateByQueryRequest().indices("test1", "index1"),
+                RequestOptions.DEFAULT
+            )
         );
         assertThat(e.getMessage(), containsString("no such index [index1]"));
     }
@@ -122,41 +133,20 @@ public class ReindexWithSecurityIT extends ESRestTestCase {
     public void testReindex() throws IOException {
         createIndicesWithRandomAliases("test1", "test2", "test3", "dest");
 
-        final Map<String, String> waitForCompletion = Map.of("wait_for_completion", "true");
-        Response response = execute(HttpPost.METHOD_NAME, "/_reindex", """
-            {
-               "source":{
-                 "index": ["test1", "test2"]
-               },
-               "dest":{
-                 "index":"dest"
-               }
-            }
-            """, waitForCompletion);
+        RestHighLevelClient restClient = new TestRestHighLevelClient();
+        BulkByScrollResponse response = restClient.reindex(
+            new ReindexRequest().setSourceIndices("test1", "test2").setDestIndex("dest"),
+            RequestOptions.DEFAULT
+        );
         assertNotNull(response);
 
-        response = execute(HttpPost.METHOD_NAME, "/_reindex", """
-            {
-               "source":{
-                 "index": "test*"
-               },
-               "dest":{
-                 "index":"dest"
-               }
-            }
-            """, waitForCompletion);
+        response = restClient.reindex(new ReindexRequest().setSourceIndices("test*").setDestIndex("dest"), RequestOptions.DEFAULT);
         assertNotNull(response);
 
-        ResponseException e = expectThrows(ResponseException.class, () -> { execute(HttpPost.METHOD_NAME, "/_reindex", """
-            {
-              "source":{
-                "index": ["test1", "index1"]
-              },
-              "dest":{
-                "index":"dest"
-              }
-            }
-            """, waitForCompletion); });
+        ElasticsearchStatusException e = expectThrows(
+            ElasticsearchStatusException.class,
+            () -> restClient.reindex(new ReindexRequest().setSourceIndices("test1", "index1").setDestIndex("dest"), RequestOptions.DEFAULT)
+        );
         assertThat(e.getMessage(), containsString("no such index [index1]"));
     }
 
@@ -169,6 +159,7 @@ public class ReindexWithSecurityIT extends ESRestTestCase {
             createIndex(index, Settings.EMPTY);
         }
 
+        RestHighLevelClient restClient = new TestRestHighLevelClient();
         if (frequently()) {
             boolean aliasAdded = false;
 
@@ -188,43 +179,24 @@ public class ReindexWithSecurityIT extends ESRestTestCase {
                     request.addAliasAction(AliasActions.add().index(index).alias("alias"));
                 }
             }
-            Request restRequest = new Request(HttpPost.METHOD_NAME, "/_aliases");
+            Request restRequest = new Request("POST", "/_aliases");
             XContentBuilder builder = jsonBuilder();
             request.toXContent(builder, null);
             restRequest.setEntity(new StringEntity(Strings.toString(builder), ContentType.APPLICATION_JSON));
-            Response restResponse = client().performRequest(restRequest);
+            Response restResponse = restClient.getLowLevelClient().performRequest(restRequest);
             AcknowledgedResponse response = AcknowledgedResponse.fromXContent(responseAsParser(restResponse));
             assertThat(response.isAcknowledged(), is(true));
         }
 
         for (String index : indices) {
-            execute(HttpPost.METHOD_NAME, index + "/_doc", """
-                {"field":"value"}
-                """, Map.of());
+            restClient.index(new IndexRequest(index).source("field", "value"), RequestOptions.DEFAULT);
         }
-        refresh(client(), String.join(",", indices));
+        refresh(restClient.getLowLevelClient(), String.join(",", indices));
     }
 
-    private static Response execute(String method, String endpoint, String jsonBody, Map<String, String> parameters) throws IOException {
-        Request request = new Request(method, endpoint);
-        request.setJsonEntity(jsonBody);
-        if (parameters != null && parameters.size() > 0) {
-            request.addParameters(parameters);
-        }
-        request.setOptions(RequestOptions.DEFAULT);
-        return client().performRequest(request);
-    }
-
-    private static Response executeIgnoringConflicts(String method, String endpoint, String jsonBody, Map<String, String> parameters)
-        throws IOException {
-        try {
-            return execute(method, endpoint, jsonBody, parameters);
-        } catch (ResponseException e) {
-            if (e.getResponse().getStatusLine().getStatusCode() == 409) {
-                return e.getResponse();
-            } else {
-                throw e;
-            }
+    private class TestRestHighLevelClient extends RestHighLevelClient {
+        TestRestHighLevelClient() {
+            super(client(), restClient -> {}, Collections.emptyList());
         }
     }
 }

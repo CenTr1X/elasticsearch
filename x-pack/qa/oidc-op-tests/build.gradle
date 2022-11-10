@@ -1,3 +1,5 @@
+import org.elasticsearch.gradle.Architecture
+
 apply plugin: 'elasticsearch.internal-java-rest-test'
 apply plugin: 'elasticsearch.test.fixtures'
 
@@ -14,4 +16,9 @@ tasks.named("processJavaRestTestResources").configure {
           .files(
                   'src/test/resources/org/elasticsearch/xpack/security/transport/ssl/certs/simple/testnode_ec.crt'
           )
+}
+
+tasks.named("javaRestTest").configure {
+  // OpenID Connect fixture does not support aarm64
+  onlyIf { Architecture.current() == Architecture.X64 }
 }

@@ -69,10 +69,7 @@ public class ApiKeyBoolQueryBuilderTests extends ESTestCase {
         final QueryBuilder query = randomSimpleQuery("name");
         final ApiKeyBoolQueryBuilder apiKeysQuery = ApiKeyBoolQueryBuilder.build(query, authentication);
         assertThat(apiKeysQuery.filter().get(0), is(QueryBuilders.termQuery("doc_type", "api_key")));
-        assertThat(
-            apiKeysQuery.filter().get(1),
-            is(QueryBuilders.termQuery("creator.principal", authentication.getEffectiveSubject().getUser().principal()))
-        );
+        assertThat(apiKeysQuery.filter().get(1), is(QueryBuilders.termQuery("creator.principal", authentication.getUser().principal())));
         if (authentication.getDomain().realms().size() == 1) {
             assertThat(
                 apiKeysQuery.filter().get(2),
@@ -330,10 +327,7 @@ public class ApiKeyBoolQueryBuilderTests extends ESTestCase {
             return;
         }
         assertTrue(
-            tqb.stream()
-                .anyMatch(
-                    q -> q.equals(QueryBuilders.termQuery("creator.principal", authentication.getEffectiveSubject().getUser().principal()))
-                )
+            tqb.stream().anyMatch(q -> q.equals(QueryBuilders.termQuery("creator.principal", authentication.getUser().principal())))
         );
         assertTrue(
             tqb.stream()

@@ -18,9 +18,6 @@ import java.util.Random;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicReference;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
 public class BlockClusterStateProcessing extends SingleNodeDisruption {
 
     private final AtomicReference<CountDownLatch> disruptionLatch = new AtomicReference<>();
@@ -41,20 +38,18 @@ public class BlockClusterStateProcessing extends SingleNodeDisruption {
             return;
         }
         logger.info("delaying cluster state updates on node [{}]", disruptionNodeCopy);
-        assertTrue(disruptionLatch.compareAndSet(null, new CountDownLatch(1)));
+        boolean success = disruptionLatch.compareAndSet(null, new CountDownLatch(1));
+        assert success : "startDisrupting called without waiting on stopDisrupting to complete";
         final CountDownLatch started = new CountDownLatch(1);
         clusterService.getClusterApplierService().runOnApplierThread("service_disruption_block", Priority.IMMEDIATE, currentState -> {
             started.countDown();
             CountDownLatch latch = disruptionLatch.get();
-            assertNotNull(latch);
-            try {
-                logger.info("waiting for removal of cluster state update disruption on node [{}]", disruptionNodeCopy);
-                latch.await();
-                logger.info("removing cluster state update disruption on node [{}]", disruptionNodeCopy);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-                logger.error("interrupted during disruption", e);
-                Throwables.rethrow(e);
+            if (latch != null) {
+                try {
+                    latch.await();
+                } catch (InterruptedException e) {
+                    Throwables.rethrow(e);
+                }
             }
         }, new ActionListener<>() {
             @Override
@@ -63,24 +58,20 @@ public class BlockClusterStateProcessing extends SingleNodeDisruption {
             @Override
             public void onFailure(Exception e) {
                 logger.error("unexpected error during disruption", e);
-                assert false : e;
             }
         });
         try {
             started.await();
-            logger.info("cluster state updates on node [{}] are now being delayed", disruptionNodeCopy);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            logger.error("interrupted waiting for disruption to start", e);
-            assert false : e;
-        }
+        } catch (InterruptedException e) {}
     }
 
     @Override
     public void stopDisrupting() {
         CountDownLatch latch = disruptionLatch.get();
-        assertNotNull(latch);
-        latch.countDown();
+        if (latch != null) {
+            latch.countDown();
+        }
+
     }
 
     @Override

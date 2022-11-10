@@ -44,7 +44,9 @@ public class FieldPermissionsCacheTests extends ESTestCase {
         FieldPermissions fieldPermissions2 = randomBoolean()
             ? fieldPermissionsCache.getFieldPermissions(allowed2, denied2)
             : new FieldPermissions(fieldPermissionDef(allowed2, denied2));
-        FieldPermissions mergedFieldPermissions = fieldPermissionsCache.union(Arrays.asList(fieldPermissions1, fieldPermissions2));
+        FieldPermissions mergedFieldPermissions = fieldPermissionsCache.getFieldPermissions(
+            Arrays.asList(fieldPermissions1, fieldPermissions2)
+        );
         assertTrue(mergedFieldPermissions.grantsAccessTo(allowedPrefix1 + "b"));
         assertTrue(mergedFieldPermissions.grantsAccessTo(allowedPrefix2 + "b"));
         assertFalse(mergedFieldPermissions.grantsAccessTo(denied1[0]));
@@ -60,7 +62,7 @@ public class FieldPermissionsCacheTests extends ESTestCase {
         fieldPermissions2 = randomBoolean()
             ? fieldPermissionsCache.getFieldPermissions(allowed2, denied2)
             : new FieldPermissions(fieldPermissionDef(allowed2, denied2));
-        mergedFieldPermissions = fieldPermissionsCache.union(Arrays.asList(fieldPermissions1, fieldPermissions2));
+        mergedFieldPermissions = fieldPermissionsCache.getFieldPermissions(Arrays.asList(fieldPermissions1, fieldPermissions2));
         assertFalse(mergedFieldPermissions.hasFieldLevelSecurity());
 
         allowed1 = new String[] {};
@@ -73,7 +75,7 @@ public class FieldPermissionsCacheTests extends ESTestCase {
         fieldPermissions2 = randomBoolean()
             ? fieldPermissionsCache.getFieldPermissions(allowed2, denied2)
             : new FieldPermissions(fieldPermissionDef(allowed2, denied2));
-        mergedFieldPermissions = fieldPermissionsCache.union(Arrays.asList(fieldPermissions1, fieldPermissions2));
+        mergedFieldPermissions = fieldPermissionsCache.getFieldPermissions(Arrays.asList(fieldPermissions1, fieldPermissions2));
         for (String field : allowed2) {
             assertTrue(mergedFieldPermissions.grantsAccessTo(field));
         }
@@ -91,7 +93,7 @@ public class FieldPermissionsCacheTests extends ESTestCase {
         fieldPermissions2 = randomBoolean()
             ? fieldPermissionsCache.getFieldPermissions(allowed2, denied2)
             : new FieldPermissions(fieldPermissionDef(allowed2, denied2));
-        mergedFieldPermissions = fieldPermissionsCache.union(Arrays.asList(fieldPermissions1, fieldPermissions2));
+        mergedFieldPermissions = fieldPermissionsCache.getFieldPermissions(Arrays.asList(fieldPermissions1, fieldPermissions2));
         assertTrue(mergedFieldPermissions.grantsAccessTo("a"));
         assertTrue(mergedFieldPermissions.grantsAccessTo("b"));
 
@@ -105,7 +107,7 @@ public class FieldPermissionsCacheTests extends ESTestCase {
         fieldPermissions2 = randomBoolean()
             ? fieldPermissionsCache.getFieldPermissions(allowed2, denied2)
             : new FieldPermissions(fieldPermissionDef(allowed2, denied2));
-        mergedFieldPermissions = fieldPermissionsCache.union(Arrays.asList(fieldPermissions1, fieldPermissions2));
+        mergedFieldPermissions = fieldPermissionsCache.getFieldPermissions(Arrays.asList(fieldPermissions1, fieldPermissions2));
         assertTrue(mergedFieldPermissions.grantsAccessTo("a"));
         assertTrue(mergedFieldPermissions.grantsAccessTo("b"));
         assertFalse(mergedFieldPermissions.grantsAccessTo("aa"));
@@ -124,7 +126,7 @@ public class FieldPermissionsCacheTests extends ESTestCase {
         FieldPermissionsCache cache = new FieldPermissionsCache(Settings.EMPTY);
         for (int i = 0; i < scaledRandomIntBetween(1, 12); i++) {
             Collections.shuffle(permissionsList, random());
-            FieldPermissions result = cache.union(permissionsList);
+            FieldPermissions result = cache.getFieldPermissions(permissionsList);
             assertFalse(result.hasFieldLevelSecurity());
         }
     }

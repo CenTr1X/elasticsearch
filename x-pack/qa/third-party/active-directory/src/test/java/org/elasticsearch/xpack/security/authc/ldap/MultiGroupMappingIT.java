@@ -34,14 +34,14 @@ public class MultiGroupMappingIT extends AbstractAdLdapRealmTestCase {
 
     @Override
     protected String configRoles() {
-        return formatted("""
+        return """
             %s
             MarvelCharacters:
               cluster: [ NONE ]
               indices:
                 - names: 'marvel_comics'
                   privileges: [ all ]
-            """, super.configRoles());
+            """.formatted(super.configRoles());
     }
 
     public void testGroupMapping() throws IOException {

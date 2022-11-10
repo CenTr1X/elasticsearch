@@ -49,7 +49,7 @@ public class ReindexFromOldRemoteIT extends ESRestTestCase {
                 Request reindex = new Request("POST", "/_reindex");
                 if (randomBoolean()) {
                     // Reindex using the external version_type
-                    reindex.setJsonEntity(String.format(java.util.Locale.ROOT, """
+                    reindex.setJsonEntity("""
                         {
                           "source":{
                             "index": "test",
@@ -62,10 +62,10 @@ public class ReindexFromOldRemoteIT extends ESRestTestCase {
                             "index": "test",
                             "version_type": "external"
                           }
-                        }""", oldEsPort));
+                        }""".formatted(oldEsPort));
                 } else {
                     // Reindex using the default internal version_type
-                    reindex.setJsonEntity(String.format(java.util.Locale.ROOT, """
+                    reindex.setJsonEntity("""
                         {
                           "source":{
                             "index": "test",
@@ -77,7 +77,7 @@ public class ReindexFromOldRemoteIT extends ESRestTestCase {
                           "dest": {
                             "index": "test"
                           }
-                        }""", oldEsPort));
+                        }""".formatted(oldEsPort));
                 }
                 reindex.addParameter("refresh", "true");
                 reindex.addParameter("pretty", "true");

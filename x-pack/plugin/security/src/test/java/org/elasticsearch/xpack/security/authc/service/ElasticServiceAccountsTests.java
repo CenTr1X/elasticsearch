@@ -29,7 +29,6 @@ import org.elasticsearch.action.search.SearchAction;
 import org.elasticsearch.action.update.UpdateAction;
 import org.elasticsearch.cluster.metadata.IndexAbstraction;
 import org.elasticsearch.common.Strings;
-import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.test.ESTestCase;
 import org.elasticsearch.transport.TransportRequest;
 import org.elasticsearch.xpack.core.ilm.action.GetLifecycleAction;
@@ -108,10 +107,8 @@ import org.elasticsearch.xpack.core.security.action.user.PutUserAction;
 import org.elasticsearch.xpack.core.security.authc.Authentication;
 import org.elasticsearch.xpack.core.security.authc.AuthenticationTestHelper;
 import org.elasticsearch.xpack.core.security.authz.RoleDescriptor;
-import org.elasticsearch.xpack.core.security.authz.permission.FieldPermissionsCache;
 import org.elasticsearch.xpack.core.security.authz.permission.Role;
-import org.elasticsearch.xpack.core.security.authz.privilege.ApplicationPrivilegeDescriptor;
-import org.elasticsearch.xpack.core.security.authz.privilege.ApplicationPrivilegeTests;
+import org.elasticsearch.xpack.core.security.authz.privilege.ApplicationPrivilege;
 import org.elasticsearch.xpack.core.security.authz.store.ReservedRolesStore;
 import org.elasticsearch.xpack.core.security.user.KibanaSystemUser;
 import org.elasticsearch.xpack.core.security.user.User;
@@ -120,7 +117,6 @@ import org.elasticsearch.xpack.security.authc.service.ElasticServiceAccounts.Ela
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import static org.elasticsearch.xpack.core.security.test.TestRestrictedIndices.RESTRICTED_INDICES;
 import static org.hamcrest.Matchers.containsString;
@@ -149,21 +145,11 @@ public class ElasticServiceAccountsTests extends ESTestCase {
     }
 
     public void testElasticFleetServerPrivileges() {
-        final String allowedApplicationActionPattern = "example/custom/action/*";
-        final String kibanaApplication = "kibana-" + randomFrom(randomAlphaOfLengthBetween(8, 24), ".kibana");
-        final Role role = Role.buildFromRoleDescriptor(
+        final Role role = Role.builder(
             ElasticServiceAccounts.ACCOUNTS.get("elastic/fleet-server").roleDescriptor(),
-            new FieldPermissionsCache(Settings.EMPTY),
-            RESTRICTED_INDICES,
-            List.of(
-                new ApplicationPrivilegeDescriptor(
-                    kibanaApplication,
-                    "reserved_fleet-setup",
-                    Set.of(allowedApplicationActionPattern),
-                    Map.of()
-                )
-            )
-        );
+            null,
+            RESTRICTED_INDICES
+        ).build();
         final Authentication authentication = AuthenticationTestHelper.builder().serviceAccount().build();
         assertThat(
             role.cluster()
@@ -248,10 +234,10 @@ public class ElasticServiceAccountsTests extends ESTestCase {
         assertThat(role.indices().allowedIndicesMatcher(DeleteIndexAction.NAME).test(apmSampledTracesIndex), is(false));
         assertThat(role.indices().allowedIndicesMatcher(UpdateSettingsAction.NAME).test(apmSampledTracesIndex), is(false));
 
+        final String kibanaApplication = "kibana-" + randomFrom(randomAlphaOfLengthBetween(8, 24), ".kibana");
         final String privilegeName = randomAlphaOfLengthBetween(3, 16);
         assertThat(
-            role.application()
-                .grants(ApplicationPrivilegeTests.createPrivilege(kibanaApplication, privilegeName, allowedApplicationActionPattern), "*"),
+            role.application().grants(new ApplicationPrivilege(kibanaApplication, privilegeName, "reserved_fleet-setup"), "*"),
             is(true)
         );
 
@@ -259,15 +245,14 @@ public class ElasticServiceAccountsTests extends ESTestCase {
             + "-"
             + randomAlphaOfLengthBetween(8, 24);
         assertThat(
-            role.application()
-                .grants(ApplicationPrivilegeTests.createPrivilege(otherApplication, privilegeName, allowedApplicationActionPattern), "*"),
+            role.application().grants(new ApplicationPrivilege(otherApplication, privilegeName, "reserved_fleet-setup"), "*"),
             is(false)
         );
 
         assertThat(
             role.application()
                 .grants(
-                    ApplicationPrivilegeTests.createPrivilege(
+                    new ApplicationPrivilege(
                         kibanaApplication,
                         privilegeName,
                         randomArray(1, 5, String[]::new, () -> randomAlphaOfLengthBetween(3, 16))
@@ -320,11 +305,11 @@ public class ElasticServiceAccountsTests extends ESTestCase {
     }
 
     public void testElasticEnterpriseSearchServerAccount() {
-        final Role role = Role.buildFromRoleDescriptor(
+        final Role role = Role.builder(
             ElasticServiceAccounts.ACCOUNTS.get("elastic/enterprise-search-server").roleDescriptor(),
-            new FieldPermissionsCache(Settings.EMPTY),
+            null,
             RESTRICTED_INDICES
-        );
+        ).build();
 
         final Authentication authentication = AuthenticationTestHelper.builder().serviceAccount().build();
         final TransportRequest request = mock(TransportRequest.class);
@@ -374,9 +359,7 @@ public class ElasticServiceAccountsTests extends ESTestCase {
             "logs-app_search.search_relevance_suggestions-default",
             "logs-crawler-default",
             "logs-workplace_search.analytics-default",
-            "logs-workplace_search.content_events-default",
-            ".elastic-connectors*",
-            "logs-elastic_crawler-default"
+            "logs-workplace_search.content_events-default"
         ).forEach(index -> {
             final IndexAbstraction enterpriseSearchIndex = mockIndexAbstraction(index);
             assertThat(role.indices().allowedIndicesMatcher(AutoCreateAction.NAME).test(enterpriseSearchIndex), is(true));

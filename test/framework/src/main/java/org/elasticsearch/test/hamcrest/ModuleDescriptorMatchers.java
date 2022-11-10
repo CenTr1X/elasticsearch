@@ -69,7 +69,7 @@ public class ModuleDescriptorMatchers {
 
         @Override
         public void describeTo(final Description description) {
-            description.appendText(String.format(java.util.Locale.ROOT, "Exports[%s]", exportsToString(source, targets)));
+            description.appendText("Exports[%s]".formatted(exportsToString(source, targets)));
         }
 
         @Override
@@ -78,7 +78,7 @@ public class ModuleDescriptorMatchers {
             if (item == null) {
                 mismatchDescription.appendText("was null");
             } else {
-                mismatchDescription.appendText(String.format(java.util.Locale.ROOT, ", actual Exports[%s]", exportsToString(item)));
+                mismatchDescription.appendText(", actual Exports[%s]".formatted(exportsToString(item)));
             }
         }
 
@@ -153,7 +153,7 @@ public class ModuleDescriptorMatchers {
 
         @Override
         public void describeTo(final Description description) {
-            description.appendText(String.format(java.util.Locale.ROOT, "Opens[%s]", opensToString(source, targets)));
+            description.appendText("Opens[%s]".formatted(opensToString(source, targets)));
         }
 
         @Override
@@ -162,7 +162,7 @@ public class ModuleDescriptorMatchers {
             if (item == null) {
                 mismatchDescription.appendText("was null");
             } else {
-                mismatchDescription.appendText(String.format(java.util.Locale.ROOT, ", actual Opens[%s]", opensToString(item)));
+                mismatchDescription.appendText(", actual Opens[%s]".formatted(opensToString(item)));
             }
         }
 
@@ -203,7 +203,7 @@ public class ModuleDescriptorMatchers {
 
         @Override
         public void describeTo(final Description description) {
-            description.appendText(String.format(java.util.Locale.ROOT, "Provides[%s]", providesToString(service, providers)));
+            description.appendText("Provides[%s]".formatted(providesToString(service, providers)));
         }
 
         @Override
@@ -212,7 +212,7 @@ public class ModuleDescriptorMatchers {
             if (item == null) {
                 mismatchDescription.appendText("was null");
             } else {
-                mismatchDescription.appendText(String.format(java.util.Locale.ROOT, ", actual Provides[%s]", item));
+                mismatchDescription.appendText(", actual Provides[%s]".formatted(item));
             }
         }
 

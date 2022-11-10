@@ -210,12 +210,12 @@ public class FollowParameters implements Writeable, ToXContentObject {
     void fromStreamInput(StreamInput in) throws IOException {
         maxReadRequestOperationCount = in.readOptionalVInt();
         maxOutstandingReadRequests = in.readOptionalVInt();
-        maxReadRequestSize = in.readOptionalWriteable(ByteSizeValue::readFrom);
+        maxReadRequestSize = in.readOptionalWriteable(ByteSizeValue::new);
         maxWriteRequestOperationCount = in.readOptionalVInt();
-        maxWriteRequestSize = in.readOptionalWriteable(ByteSizeValue::readFrom);
+        maxWriteRequestSize = in.readOptionalWriteable(ByteSizeValue::new);
         maxOutstandingWriteRequests = in.readOptionalVInt();
         maxWriteBufferCount = in.readOptionalVInt();
-        maxWriteBufferSize = in.readOptionalWriteable(ByteSizeValue::readFrom);
+        maxWriteBufferSize = in.readOptionalWriteable(ByteSizeValue::new);
         maxRetryDelay = in.readOptionalTimeValue();
         readPollTimeout = in.readOptionalTimeValue();
     }

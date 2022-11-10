@@ -49,9 +49,9 @@ public abstract class CustomDateFormatTestCase extends BaseRestSqlTestCase {
         for (int i = 0; i < customFormats.length; i++) {
             String field = "date_" + i;
             String format = DateTimeFormatter.ofPattern(customFormats[i], Locale.ROOT).format(DateUtils.nowWithMillisResolution());
-            docs[i] = formatted("""
+            docs[i] = """
                 {"%s":"%s"}
-                """, field, format);
+                """.formatted(field, format);
             datesConditions.append(i > 0 ? " OR " : "").append(field + randomFrom(operators) + randomFrom(nowFunctions));
         }
 

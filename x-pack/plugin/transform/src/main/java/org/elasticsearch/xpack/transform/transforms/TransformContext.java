@@ -16,7 +16,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 
-public class TransformContext {
+class TransformContext {
 
     public interface Listener {
         void shutdown();
@@ -28,16 +28,12 @@ public class TransformContext {
 
     private final AtomicReference<TransformTaskState> taskState;
     private final AtomicReference<String> stateReason;
-    private volatile Instant stateFailureTime;
     private final Listener taskListener;
     private volatile int numFailureRetries = Transform.DEFAULT_FAILURE_RETRIES;
     private final AtomicInteger failureCount;
     // Keeps track of the last failure that occurred, used for throttling logs and audit
-    private final AtomicReference<Throwable> lastFailure = new AtomicReference<>();
-    private volatile Instant lastFailureStartTime;
+    private final AtomicReference<String> lastFailure = new AtomicReference<>();
     private final AtomicInteger statePersistenceFailureCount = new AtomicInteger();
-    private final AtomicReference<Throwable> lastStatePersistenceFailure = new AtomicReference<>();
-    private volatile Instant lastStatePersistenceFailureStartTime;
     private volatile Instant changesLastDetectedAt;
     private volatile Instant lastSearchTime;
     private volatile boolean shouldStopAtCheckpoint = false;
@@ -47,7 +43,7 @@ public class TransformContext {
     // Note: Each indexer run creates a new future checkpoint which becomes the current checkpoint only after the indexer run finished
     private final AtomicLong currentCheckpoint;
 
-    public TransformContext(TransformTaskState taskState, String stateReason, long currentCheckpoint, Listener taskListener) {
+    TransformContext(TransformTaskState taskState, String stateReason, long currentCheckpoint, Listener taskListener) {
         this.taskState = new AtomicReference<>(taskState);
         this.stateReason = new AtomicReference<>(stateReason);
         this.currentCheckpoint = new AtomicLong(currentCheckpoint);
@@ -71,24 +67,17 @@ public class TransformContext {
     void setTaskStateToFailed(String reason) {
         taskState.set(TransformTaskState.FAILED);
         stateReason.set(reason);
-        stateFailureTime = Instant.now();
     }
 
     void resetReasonAndFailureCounter() {
         stateReason.set(null);
         failureCount.set(0);
         lastFailure.set(null);
-        stateFailureTime = null;
-        lastFailureStartTime = null;
         taskListener.failureCountChanged();
     }
 
     String getStateReason() {
         return stateReason.get();
-    }
-
-    Instant getStateFailureTime() {
-        return stateFailureTime;
     }
 
     void setCheckpoint(long newValue) {
@@ -115,23 +104,15 @@ public class TransformContext {
         return failureCount.get();
     }
 
-    int incrementAndGetFailureCount(Throwable failure) {
+    int incrementAndGetFailureCount(String failure) {
         int newFailureCount = failureCount.incrementAndGet();
         lastFailure.set(failure);
-        if (newFailureCount == 1) {
-            lastFailureStartTime = Instant.now();
-        }
-
         taskListener.failureCountChanged();
         return newFailureCount;
     }
 
-    Throwable getLastFailure() {
+    String getLastFailure() {
         return lastFailure.get();
-    }
-
-    Instant getLastFailureStartTime() {
-        return lastFailureStartTime;
     }
 
     void setChangesLastDetectedAt(Instant time) {
@@ -168,29 +149,14 @@ public class TransformContext {
 
     void resetStatePersistenceFailureCount() {
         statePersistenceFailureCount.set(0);
-        lastStatePersistenceFailure.set(null);
-        lastStatePersistenceFailureStartTime = null;
     }
 
     int getStatePersistenceFailureCount() {
         return statePersistenceFailureCount.get();
     }
 
-    Throwable getLastStatePersistenceFailure() {
-        return lastStatePersistenceFailure.get();
-    }
-
-    int incrementAndGetStatePersistenceFailureCount(Throwable failure) {
-        lastStatePersistenceFailure.set(failure);
-        int newFailureCount = statePersistenceFailureCount.incrementAndGet();
-        if (newFailureCount == 1) {
-            lastStatePersistenceFailureStartTime = Instant.now();
-        }
-        return newFailureCount;
-    }
-
-    Instant getLastStatePersistenceFailureStartTime() {
-        return lastStatePersistenceFailureStartTime;
+    int incrementAndGetStatePersistenceFailureCount() {
+        return statePersistenceFailureCount.incrementAndGet();
     }
 
     void shutdown() {

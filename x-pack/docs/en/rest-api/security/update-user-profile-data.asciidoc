@@ -5,10 +5,7 @@
 <titleabbrev>Update user profile data</titleabbrev>
 ++++
 
-NOTE: The user profile feature is designed only for use by {kib} and
-Elastic’s {observability}, {ents}, and {elastic-sec} solutions. Individual
-users and external applications should not call this API directly. Elastic reserves
-the right to change or remove this feature in future releases without prior notice.
+beta::[]
 
 Updates specific data for the user profile that's associated with the specified
 unique ID.

@@ -151,7 +151,7 @@ public class EstimateModelMemoryAction extends ActionType<EstimateModelMemoryAct
         }
 
         public Response(StreamInput in) throws IOException {
-            modelMemoryEstimate = ByteSizeValue.readFrom(in);
+            modelMemoryEstimate = new ByteSizeValue(in);
         }
 
         @Override

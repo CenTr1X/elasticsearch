@@ -10,7 +10,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.elasticsearch.ElasticsearchException;
 import org.elasticsearch.common.ssl.SslConfiguration;
-import org.elasticsearch.core.TimeValue;
 import org.elasticsearch.watcher.FileChangesListener;
 import org.elasticsearch.watcher.FileWatcher;
 import org.elasticsearch.watcher.ResourceWatcherService;
@@ -144,22 +143,16 @@ public final class SSLConfigurationReloader {
 
         @Override
         public void onFileChanged(Path file) {
-            final long reloadedNanos = System.nanoTime();
-            final List<String> settingPrefixes = new ArrayList<>(sslConfigurations.size());
+            boolean reloaded = false;
             for (SslConfiguration sslConfiguration : sslConfigurations) {
                 if (sslConfiguration.getDependentFiles().contains(file)) {
                     reloadConsumer.accept(sslConfiguration);
-                    settingPrefixes.add(sslConfiguration.settingPrefix());
+                    reloaded = true;
                 }
             }
-            if (settingPrefixes.isEmpty() == false) {
-                logger.info(
-                    "updated {} ssl contexts in {}ms for prefix names {} using file [{}]",
-                    settingPrefixes.size(),
-                    TimeValue.timeValueNanos(System.nanoTime() - reloadedNanos).millisFrac(),
-                    settingPrefixes,
-                    file
-                );
+
+            if (reloaded) {
+                logger.info("reloaded [{}] and updated ssl contexts using this file", file);
             }
         }
     }

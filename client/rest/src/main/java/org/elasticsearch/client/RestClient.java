@@ -513,7 +513,9 @@ public class RestClient implements Closeable {
                 return singletonList(Collections.min(selectedDeadNodes).node);
             }
         }
-        throw new IOException("NodeSelector [" + nodeSelector + "] rejected all nodes, living " + livingNodes + " and dead " + deadNodes);
+        throw new IOException(
+            "NodeSelector [" + nodeSelector + "] rejected all nodes, " + "living " + livingNodes + " and dead " + deadNodes
+        );
     }
 
     /**

@@ -182,7 +182,7 @@ public class SecurityActionFilterTests extends ESTestCase {
             threadContext.putHeader(AuthenticationField.AUTHENTICATION_KEY, "foo");
             threadContext.putTransient(AuthorizationServiceField.ORIGINATING_ACTION_KEY, "indices:foo");
             if (hasExistingAccessControl) {
-                new SecurityContext(Settings.EMPTY, threadContext).putIndicesAccessControl(IndicesAccessControl.ALLOW_NO_INDICES);
+                threadContext.putTransient(INDICES_PERMISSIONS_KEY, IndicesAccessControl.ALLOW_NO_INDICES);
             }
         } else {
             assertNull(AuditUtil.extractRequestId(threadContext));
@@ -198,7 +198,6 @@ public class SecurityActionFilterTests extends ESTestCase {
             return Void.TYPE;
         }).when(authcService).authenticate(eq(action), eq(request), eq(SystemUser.INSTANCE), anyActionListener());
         IndicesAccessControl authzAccessControl = mock(IndicesAccessControl.class);
-        when(authzAccessControl.isGranted()).thenReturn(true);
         mockAuthorize(authzAccessControl);
 
         filter.apply(task, action, request, listener, chain);
@@ -213,7 +212,7 @@ public class SecurityActionFilterTests extends ESTestCase {
         }
         assertNotNull(authenticationSetOnce.get());
         assertNotEquals(authentication, authenticationSetOnce.get());
-        assertEquals(SystemUser.INSTANCE, authenticationSetOnce.get().getEffectiveSubject().getUser());
+        assertEquals(SystemUser.INSTANCE, authenticationSetOnce.get().getUser());
         assertThat(accessControlSetOnce.get(), sameInstance(authzAccessControl));
         assertThat(requestIdOnActionHandler.get(), is(requestIdFromAuthn.get()));
     }
@@ -324,7 +323,7 @@ public class SecurityActionFilterTests extends ESTestCase {
             assertThat(args, arrayWithSize(4));
             ActionListener callback = (ActionListener) args[args.length - 1];
             assertNull(threadContext.getTransient(INDICES_PERMISSIONS_KEY));
-            new SecurityContext(Settings.EMPTY, threadContext).putIndicesAccessControl(indicesAccessControl);
+            threadContext.putTransient(INDICES_PERMISSIONS_KEY, indicesAccessControl);
             callback.onResponse(null);
             return Void.TYPE;
         }).when(authzService).authorize(any(Authentication.class), any(String.class), any(TransportRequest.class), anyActionListener());

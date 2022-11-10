@@ -16,6 +16,7 @@ import org.elasticsearch.search.aggregations.AggregatorFactory;
 import org.elasticsearch.search.aggregations.metrics.PercentilesMethod;
 import org.elasticsearch.search.aggregations.support.AggregationContext;
 import org.elasticsearch.search.aggregations.support.CoreValuesSourceType;
+import org.elasticsearch.search.aggregations.support.ValuesSource;
 import org.elasticsearch.search.aggregations.support.ValuesSourceAggregationBuilder;
 import org.elasticsearch.search.aggregations.support.ValuesSourceConfig;
 import org.elasticsearch.search.aggregations.support.ValuesSourceRegistry;
@@ -31,7 +32,9 @@ import java.util.Set;
 
 import static org.elasticsearch.search.aggregations.metrics.PercentilesMethod.COMPRESSION_FIELD;
 
-public class BoxplotAggregationBuilder extends ValuesSourceAggregationBuilder.MetricsAggregationBuilder<BoxplotAggregationBuilder> {
+public class BoxplotAggregationBuilder extends ValuesSourceAggregationBuilder.MetricsAggregationBuilder<
+    ValuesSource,
+    BoxplotAggregationBuilder> {
     public static final String NAME = "boxplot";
     public static final ValuesSourceRegistry.RegistryKey<BoxplotAggregatorSupplier> REGISTRY_KEY = new ValuesSourceRegistry.RegistryKey<>(
         NAME,

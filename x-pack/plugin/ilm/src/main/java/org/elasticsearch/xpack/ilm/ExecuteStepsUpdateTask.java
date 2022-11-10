@@ -206,7 +206,7 @@ public class ExecuteStepsUpdateTask extends IndexLifecycleClusterStateUpdateTask
                 // transition happens, so even if we would continue in the while
                 // loop, if we are about to go into a new phase, return so that
                 // other processing can occur
-                if (currentStep.getKey().phase().equals(currentStep.getNextStepKey().phase()) == false) {
+                if (currentStep.getKey().getPhase().equals(currentStep.getNextStepKey().getPhase()) == false) {
                     return state;
                 }
                 currentStep = policyStepsRegistry.getStep(indexMetadata, currentStep.getNextStepKey());
@@ -275,13 +275,10 @@ public class ExecuteStepsUpdateTask extends IndexLifecycleClusterStateUpdateTask
     private ClusterState moveToErrorStep(final ClusterState state, Step.StepKey currentStepKey, Exception cause) {
         this.failure = cause;
         logger.warn(
-            () -> format(
-                "policy [%s] for index [%s] failed on cluster state step [%s]. Moving to ERROR step",
-                policy,
-                index.getName(),
-                currentStepKey
-            ),
-            cause
+            "policy [{}] for index [{}] failed on cluster state step [{}]. Moving to ERROR step",
+            policy,
+            index.getName(),
+            currentStepKey
         );
         return IndexLifecycleTransition.moveClusterStateToErrorStep(index, state, cause, nowSupplier, policyStepsRegistry::getStep);
     }

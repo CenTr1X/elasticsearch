@@ -11,7 +11,7 @@ import org.elasticsearch.cluster.ClusterModule;
 import org.elasticsearch.common.io.stream.NamedWriteableRegistry;
 import org.elasticsearch.common.io.stream.Writeable;
 import org.elasticsearch.common.util.CollectionUtils;
-import org.elasticsearch.test.AbstractXContentSerializingTestCase;
+import org.elasticsearch.test.AbstractSerializingTestCase;
 import org.elasticsearch.xcontent.NamedXContentRegistry;
 import org.elasticsearch.xcontent.ParseField;
 import org.elasticsearch.xcontent.XContentParser;
@@ -21,7 +21,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-public class ExplainLifecycleResponseTests extends AbstractXContentSerializingTestCase<ExplainLifecycleResponse> {
+public class ExplainLifecycleResponseTests extends AbstractSerializingTestCase<ExplainLifecycleResponse> {
 
     @Override
     protected ExplainLifecycleResponse createTestInstance() {

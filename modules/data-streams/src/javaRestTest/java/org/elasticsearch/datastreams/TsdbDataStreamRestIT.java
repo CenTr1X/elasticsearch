@@ -18,7 +18,6 @@ import java.io.IOException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -47,17 +46,6 @@ public class TsdbDataStreamRestIT extends ESRestTestCase {
                     }
                 },
                 "mappings":{
-                    "dynamic_templates": [
-                        {
-                            "labels": {
-                                "path_match": "pod.labels.*",
-                                "mapping": {
-                                    "type": "keyword",
-                                    "time_series_dimension": true
-                                }
-                            }
-                        }
-                    ],
                     "properties": {
                         "@timestamp" : {
                             "type": "date"
@@ -224,8 +212,6 @@ public class TsdbDataStreamRestIT extends ESRestTestCase {
         assertThat(startTimeFirstBackingIndex, notNullValue());
         String endTimeFirstBackingIndex = ObjectPath.evaluate(indices, escapedBackingIndex + ".settings.index.time_series.end_time");
         assertThat(endTimeFirstBackingIndex, notNullValue());
-        List<?> routingPaths = ObjectPath.evaluate(indices, escapedBackingIndex + ".settings.index.routing_path");
-        assertThat(routingPaths, containsInAnyOrder("metricset", "k8s.pod.uid", "pod.labels.*"));
 
         var rolloverRequest = new Request("POST", "/k8s/_rollover");
         assertOK(client().performRequest(rolloverRequest));
@@ -347,7 +333,7 @@ public class TsdbDataStreamRestIT extends ESRestTestCase {
         assertThat(ObjectPath.evaluate(responseBody, "template.settings.index.time_series.end_time"), notNullValue());
         assertThat(
             ObjectPath.evaluate(responseBody, "template.settings.index.routing_path"),
-            containsInAnyOrder("metricset", "k8s.pod.uid", "pod.labels.*")
+            containsInAnyOrder("metricset", "k8s.pod.uid")
         );
         assertThat(ObjectPath.evaluate(responseBody, "overlapping"), empty());
     }

@@ -64,6 +64,7 @@ public class CustomAuthorizationEngineTests extends ESTestCase {
             engine.authorizeRunAs(info, authzInfo, resultFuture);
             AuthorizationResult result = resultFuture.actionGet();
             assertThat(result.isGranted(), is(false));
+            assertThat(result.isAuditable(), is(true));
         }
 
         // authorized
@@ -79,6 +80,7 @@ public class CustomAuthorizationEngineTests extends ESTestCase {
             engine.authorizeRunAs(info, authzInfo, resultFuture);
             AuthorizationResult result = resultFuture.actionGet();
             assertThat(result.isGranted(), is(true));
+            assertThat(result.isAuditable(), is(true));
         }
     }
 
@@ -95,6 +97,7 @@ public class CustomAuthorizationEngineTests extends ESTestCase {
             engine.authorizeClusterAction(requestInfo, authzInfo, resultFuture);
             AuthorizationResult result = resultFuture.actionGet();
             assertThat(result.isGranted(), is(true));
+            assertThat(result.isAuditable(), is(true));
         }
 
         // unauthorized
@@ -111,6 +114,7 @@ public class CustomAuthorizationEngineTests extends ESTestCase {
             engine.authorizeClusterAction(unauthReqInfo, authzInfo, resultFuture);
             AuthorizationResult result = resultFuture.actionGet();
             assertThat(result.isGranted(), is(false));
+            assertThat(result.isAuditable(), is(true));
         }
     }
 
@@ -138,8 +142,10 @@ public class CustomAuthorizationEngineTests extends ESTestCase {
                 indicesMap, resultFuture);
             IndexAuthorizationResult result = resultFuture.actionGet();
             assertThat(result.isGranted(), is(true));
+            assertThat(result.isAuditable(), is(true));
             IndicesAccessControl indicesAccessControl = result.getIndicesAccessControl();
             assertNotNull(indicesAccessControl.getIndexPermissions("index"));
+            assertThat(indicesAccessControl.getIndexPermissions("index").isGranted(), is(true));
         }
 
         // unauthorized
@@ -158,6 +164,7 @@ public class CustomAuthorizationEngineTests extends ESTestCase {
                 indicesMap, resultFuture);
             IndexAuthorizationResult result = resultFuture.actionGet();
             assertThat(result.isGranted(), is(false));
+            assertThat(result.isAuditable(), is(true));
             IndicesAccessControl indicesAccessControl = result.getIndicesAccessControl();
             assertNull(indicesAccessControl.getIndexPermissions("index"));
         }

@@ -101,11 +101,7 @@ public class WatcherLifeCycleService implements ClusterStateListener {
         // if this is not a data node, we need to start it ourselves possibly
         if (event.state().nodes().getLocalNode().canContainData() == false && isWatcherStoppedManually == false && isStoppedOrStopping) {
             this.state.set(WatcherState.STARTING);
-            watcherService.start(
-                event.state(),
-                () -> this.state.set(WatcherState.STARTED),
-                (exception -> this.state.set(WatcherState.STOPPED))
-            );
+            watcherService.start(event.state(), () -> this.state.set(WatcherState.STARTED));
             return;
         }
 
@@ -169,10 +165,7 @@ public class WatcherLifeCycleService implements ClusterStateListener {
                     watcherService.reload(event.state(), "new local watcher shard allocation ids");
                 } else if (isStoppedOrStopping) {
                     this.state.set(WatcherState.STARTING);
-                    watcherService.start(event.state(), () -> this.state.set(WatcherState.STARTED), (exception) -> {
-                        clearAllocationIds();
-                        this.state.set(WatcherState.STOPPED);
-                    });
+                    watcherService.start(event.state(), () -> this.state.set(WatcherState.STARTED));
                 }
             } else {
                 clearAllocationIds();

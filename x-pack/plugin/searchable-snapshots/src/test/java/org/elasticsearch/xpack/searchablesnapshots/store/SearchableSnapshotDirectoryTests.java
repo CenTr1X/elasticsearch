@@ -735,7 +735,7 @@ public class SearchableSnapshotDirectoryTests extends AbstractSearchableSnapshot
                     new BlobStoreIndexShardSnapshot.FileInfo(
                         blobName,
                         new StoreFileMetadata(fileName, input.length, checksum, Version.CURRENT.luceneVersion.toString()),
-                        ByteSizeValue.ofBytes(input.length)
+                        new ByteSizeValue(input.length)
                     )
                 );
             }

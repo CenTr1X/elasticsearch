@@ -25,6 +25,7 @@ import org.elasticsearch.cluster.metadata.Template;
 import org.elasticsearch.common.Strings;
 import org.elasticsearch.common.regex.Regex;
 import org.elasticsearch.common.settings.Settings;
+import org.elasticsearch.common.unit.ByteSizeUnit;
 import org.elasticsearch.common.unit.ByteSizeValue;
 import org.elasticsearch.core.CheckedRunnable;
 import org.elasticsearch.core.TimeValue;
@@ -290,7 +291,7 @@ public class AutoFollowIT extends CcrIntegTestCase {
             request.getParameters().setMaxReadRequestOperationCount(randomIntBetween(0, Integer.MAX_VALUE));
         }
         if (randomBoolean()) {
-            request.getParameters().setMaxReadRequestSize(ByteSizeValue.ofBytes(randomNonNegativeLong()));
+            request.getParameters().setMaxReadRequestSize(new ByteSizeValue(randomNonNegativeLong(), ByteSizeUnit.BYTES));
         }
         if (randomBoolean()) {
             request.getParameters().setMaxRetryDelay(TimeValue.timeValueMillis(500));
@@ -302,10 +303,10 @@ public class AutoFollowIT extends CcrIntegTestCase {
             request.getParameters().setMaxWriteRequestOperationCount(randomIntBetween(0, Integer.MAX_VALUE));
         }
         if (randomBoolean()) {
-            request.getParameters().setMaxWriteBufferSize(ByteSizeValue.ofBytes(randomNonNegativeLong()));
+            request.getParameters().setMaxWriteBufferSize(new ByteSizeValue(randomNonNegativeLong(), ByteSizeUnit.BYTES));
         }
         if (randomBoolean()) {
-            request.getParameters().setMaxWriteRequestSize(ByteSizeValue.ofBytes(randomNonNegativeLong()));
+            request.getParameters().setMaxWriteRequestSize(new ByteSizeValue(randomNonNegativeLong()));
         }
 
         request.setName("my-pattern");

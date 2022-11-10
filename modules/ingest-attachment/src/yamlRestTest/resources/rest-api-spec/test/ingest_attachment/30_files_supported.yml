@@ -12,8 +12,7 @@
             "processors": [
               {
                 "attachment" : {
-                  "field" : "field1",
-                  "remove_binary": true
+                  "field" : "field1"
                 }
               }
             ]
@@ -56,8 +55,7 @@
             "processors": [
               {
                 "attachment" : {
-                  "field" : "field1",
-                  "remove_binary": true
+                  "field" : "field1"
                 }
               }
             ]

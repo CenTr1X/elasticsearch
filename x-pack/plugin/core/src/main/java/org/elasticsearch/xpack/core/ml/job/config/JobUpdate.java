@@ -398,7 +398,7 @@ public class JobUpdate implements Writeable, ToXContentObject {
 
     @Override
     public String toString() {
-        return Strings.toString(this);
+        return Strings.toString(this::toXContent);
     }
 
     public Set<String> getUpdateFields() {

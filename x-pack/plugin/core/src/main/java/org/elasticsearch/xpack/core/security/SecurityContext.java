@@ -15,13 +15,10 @@ import org.elasticsearch.common.util.concurrent.ThreadContext;
 import org.elasticsearch.common.util.concurrent.ThreadContext.StoredContext;
 import org.elasticsearch.core.Nullable;
 import org.elasticsearch.node.Node;
-import org.elasticsearch.search.internal.ReaderContext;
 import org.elasticsearch.xpack.core.security.authc.Authentication;
 import org.elasticsearch.xpack.core.security.authc.support.AuthenticationContextSerializer;
 import org.elasticsearch.xpack.core.security.authc.support.SecondaryAuthentication;
 import org.elasticsearch.xpack.core.security.authz.AuthorizationEngine;
-import org.elasticsearch.xpack.core.security.authz.AuthorizationServiceField;
-import org.elasticsearch.xpack.core.security.authz.accesscontrol.IndicesAccessControl;
 import org.elasticsearch.xpack.core.security.user.SystemUser;
 import org.elasticsearch.xpack.core.security.user.User;
 
@@ -68,7 +65,7 @@ public class SecurityContext {
     @Nullable
     public User getUser() {
         Authentication authentication = getAuthentication();
-        return authentication == null ? null : authentication.getEffectiveSubject().getUser();
+        return authentication == null ? null : authentication.getUser();
     }
 
     /** Returns the authentication information, or null if the current request has no authentication info. */
@@ -101,27 +98,6 @@ public class SecurityContext {
 
     public ThreadContext getThreadContext() {
         return threadContext;
-    }
-
-    public void putIndicesAccessControl(@Nullable IndicesAccessControl indicesAccessControl) {
-        if (indicesAccessControl != null) {
-            if (indicesAccessControl.isGranted() == false) {
-                throw new IllegalStateException("Unexpected unauthorized access control :" + indicesAccessControl);
-            }
-            threadContext.putTransient(AuthorizationServiceField.INDICES_PERMISSIONS_KEY, indicesAccessControl);
-        }
-    }
-
-    public void copyIndicesAccessControlToReaderContext(ReaderContext readerContext) {
-        IndicesAccessControl indicesAccessControl = getThreadContext().getTransient(AuthorizationServiceField.INDICES_PERMISSIONS_KEY);
-        assert indicesAccessControl != null : "thread context does not contain index access control";
-        readerContext.putInContext(AuthorizationServiceField.INDICES_PERMISSIONS_KEY, indicesAccessControl);
-    }
-
-    public void copyIndicesAccessControlFromReaderContext(ReaderContext readerContext) {
-        IndicesAccessControl scrollIndicesAccessControl = readerContext.getFromContext(AuthorizationServiceField.INDICES_PERMISSIONS_KEY);
-        assert scrollIndicesAccessControl != null : "scroll does not contain index access control";
-        getThreadContext().putTransient(AuthorizationServiceField.INDICES_PERMISSIONS_KEY, scrollIndicesAccessControl);
     }
 
     /**

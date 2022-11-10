@@ -196,7 +196,7 @@ public class MatchOnlyTextFieldMapper extends FieldMapper {
                 return docID -> {
                     try {
                         sourceLookup.setSegmentAndDocument(context, docID);
-                        return valueFetcher.fetchValues(sourceLookup, docID, new ArrayList<>());
+                        return valueFetcher.fetchValues(sourceLookup, new ArrayList<>());
                     } catch (IOException e) {
                         throw new UncheckedIOException(e);
                     }
