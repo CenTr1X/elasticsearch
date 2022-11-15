@@ -343,6 +343,8 @@ public class RestController implements HttpServerTransport.Dispatcher {
 
     private void dispatchRequest(RestRequest request, RestChannel channel, RestHandler handler, ThreadContext threadContext)
         throws Exception {
+        System.out.println("dispatch!!!!!!!!!!!!!!1");
+        System.out.println(request);
         final int contentLength = request.contentLength();
         if (contentLength > 0) {
             if (isContentTypeDisallowed(request) || handler.mediaTypesValid(request) == false) {

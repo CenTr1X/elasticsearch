@@ -1,5 +1,7 @@
 package api.model;
 
+import api.model.document.*;
+
 import java.util.List;
 
 public class IndexRequest {

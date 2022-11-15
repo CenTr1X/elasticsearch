@@ -70,6 +70,7 @@ public class RestIndexAction extends BaseRestHandler {
         public RestChannelConsumer prepareRequest(RestRequest request, final NodeClient client) throws IOException {
             validateOpType(request.params().get("op_type"));
             request.params().put("op_type", "create");
+            System.out.println("call document_create_action!!!!!!!!!!!!!");
             return super.prepareRequest(request, client);
         }
 
@@ -108,6 +109,7 @@ public class RestIndexAction extends BaseRestHandler {
                 // default to op_type create
                 request.params().put("op_type", "create");
             }
+            System.out.println("call document_create_action_auto_id!!!!!!!!!!!!!");
             return super.prepareRequest(request, client);
         }
     }
@@ -138,7 +140,8 @@ public class RestIndexAction extends BaseRestHandler {
         if (sOpType != null) {
             indexRequest.opType(sOpType);
         }
-
+        System.out.print("IndexRequest!!!!!!!!!!!");
+        System.out.print(indexRequest.toString());
         return channel -> client.index(
             indexRequest,
             new RestStatusToXContentListener<>(channel, r -> r.getLocation(indexRequest.routing()))

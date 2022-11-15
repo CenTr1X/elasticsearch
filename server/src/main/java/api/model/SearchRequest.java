@@ -5,16 +5,16 @@ import java.util.List;
 public class SearchRequest {
     private int requestId;
 
-    private int indexId;
+    private List<String> indicesName;
 
-    private Statement statement;
+    private String source;
 
     private List<Option> options;
 
-    public SearchRequest(int requestId, int indexId, Statement statement, List<Option> options) {
+    public SearchRequest(int requestId, List<String> indicesName, String source, List<Option> options) {
         this.requestId = requestId;
-        this.indexId = indexId;
-        this.statement = statement;
+        this.indicesName = indicesName;
+        this.source = source;
         this.options = options;
     }
 
@@ -26,27 +26,27 @@ public class SearchRequest {
         this.requestId = requestId;
     }
 
-    public int getIndexId() {
-        return indexId;
-    }
-
-    public void setIndexId(int indexId) {
-        this.indexId = indexId;
-    }
-
-    public Statement getStatement() {
-        return statement;
-    }
-
-    public void setStatement(Statement statement) {
-        this.statement = statement;
-    }
-
     public List<Option> getOptions() {
         return options;
     }
 
     public void setOptions(List<Option> options) {
         this.options = options;
+    }
+
+    public String getSource() {
+        return source;
+    }
+
+    public void setSource(String source) {
+        this.source = source;
+    }
+
+    public List<String> getIndicesName() {
+        return indicesName;
+    }
+
+    public void setIndicesName(List<String> indicesName) {
+        this.indicesName = indicesName;
     }
 }

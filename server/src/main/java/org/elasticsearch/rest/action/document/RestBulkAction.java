@@ -90,7 +90,9 @@ public class RestBulkAction extends BaseRestHandler {
             request.getXContentType(),
             request.getRestApiVersion()
         );
-
+        System.out.println("bulk request called!!!!!!!!!!!!!1");
+        System.out.println(bulkRequest.getDescription());
+        
         return channel -> client.bulk(bulkRequest, new RestStatusToXContentListener<>(channel));
     }
 

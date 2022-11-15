@@ -28,7 +28,7 @@ public class ClientApp {
         System.out.println("1111111111111111111111111111");
         config = new TransportConfig();
         System.out.println("222222222222222222222222222222");
-        starlightClient = new SingleStarlightClient("192.168.180.128", 33333, config);
+        starlightClient = new SingleStarlightClient("127.0.0.1", 33333, config);
         /*System.out.println("33333333333333333333333333333333");*/
         starlightClient.init();
         /*System.out.println("44444444444444444444444444444444444"); */
@@ -84,6 +84,14 @@ public class ClientApp {
         System.out.println(response.getDeleteIndexRequestId());
         System.out.println(response.getResult().isSuccess());
         System.out.println(response.getResult().getError());
+    }
+
+    public void sendSearchRequest(int requestId, List<String> indicesName, String source, List<Option> options)
+    {
+        SearchRequest request = new SearchRequest(requestId, indicesName, source, options);
+
+        SearchResponse response = service.Search(request);
+        System.out.println(response.getSearchRequestId());
     }
 /* 
     public static void main(String[] args) {

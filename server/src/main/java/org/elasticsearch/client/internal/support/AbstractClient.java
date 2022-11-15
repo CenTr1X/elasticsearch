@@ -397,6 +397,8 @@ public abstract class AbstractClient implements Client {
 
     @Override
     public void index(final IndexRequest request, final ActionListener<IndexResponse> listener) {
+        System.out.print("IndexRequest!!!!!!!!!!!");
+        System.out.print(request.toString());
         execute(IndexAction.INSTANCE, request, listener);
     }
 

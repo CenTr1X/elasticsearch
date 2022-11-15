@@ -22,6 +22,7 @@ import org.elasticsearch.common.logging.DeprecationLogger;
 import org.elasticsearch.core.Booleans;
 import org.elasticsearch.core.RestApiVersion;
 import org.elasticsearch.index.query.QueryBuilder;
+import org.elasticsearch.patch.Patch;
 import org.elasticsearch.rest.BaseRestHandler;
 import org.elasticsearch.rest.RestRequest;
 import org.elasticsearch.rest.action.RestActions;
@@ -211,7 +212,9 @@ public class RestSearchAction extends BaseRestHandler {
         if (request.paramAsBoolean("force_synthetic_source", false)) {
             searchRequest.setForceSyntheticSource(true);
         }
-
+        System.out.println("search action called!!!!!!!!!!!!!!!!!!!");
+	    System.out.println(searchRequest.buildDescription());
+        Patch.executeSearch(searchRequest);
         extraParamParser.accept(request, searchRequest);
     }
 

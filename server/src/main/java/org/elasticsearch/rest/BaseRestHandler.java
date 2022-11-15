@@ -78,7 +78,11 @@ public abstract class BaseRestHandler implements RestHandler {
     public final void handleRequest(RestRequest request, RestChannel channel, NodeClient client) throws Exception {
         // prepare the request for execution; has the side effect of touching the request parameters
         final RestChannelConsumer action = prepareRequest(request, client);
-
+	System.out.println("handle request!!!!!!!");
+	System.out.println(action.getClass().getName());
+	System.out.println(request.getClass().getName());
+	System.out.println(action);
+	System.out.println(request);
         // validate unconsumed params, but we must exclude params used to format the response
         // use a sorted set so the unconsumed parameters appear in a reliable sorted order
         final SortedSet<String> unconsumedParams = request.unconsumedParams()
