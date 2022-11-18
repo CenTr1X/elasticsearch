@@ -24,6 +24,8 @@ import org.elasticsearch.search.internal.ShardSearchRequest;
 import org.elasticsearch.search.query.QuerySearchResult;
 import org.elasticsearch.transport.Transport;
 
+import org.elasticsearch.patch.Patch;
+
 import java.util.List;
 import java.util.function.BiFunction;
 
@@ -105,6 +107,7 @@ final class FetchSearchPhase extends SearchPhase {
         // Usually when there is a single shard, we force the search type QUERY_THEN_FETCH. But when there's kNN, we might
         // still use DFS_QUERY_THEN_FETCH, which does not perform the "query and fetch" optimization during the query phase.
         final boolean queryAndFetchOptimization = queryResults.length() == 1 && context.getRequest().hasKnnSearch() == false;
+        //final boolean queryAndFetchOptimization = false;
         final Runnable finishPhase = () -> moveToNextPhase(
             queryResults,
             reducedQueryPhase,
@@ -114,16 +117,20 @@ final class FetchSearchPhase extends SearchPhase {
             assert phaseResults.isEmpty() || phaseResults.get(0).fetchResult() != null
                 : "phaseResults empty [" + phaseResults.isEmpty() + "], single result: " + phaseResults.get(0).fetchResult();
             // query AND fetch optimization
+            System.out.println("do query and fetch here!!!!!!!!!!!!");
             finishPhase.run();
         } else {
+            System.out.println("do query then fetch here!!!!!!!!!!!!");
             ScoreDoc[] scoreDocs = reducedQueryPhase.sortedTopDocs().scoreDocs();
             final List<Integer>[] docIdsToLoad = SearchPhaseController.fillDocIdsToLoad(numShards, scoreDocs);
             // no docs to fetch -- sidestep everything and return
             if (scoreDocs.length == 0) {
                 // we have to release contexts here to free up resources
+                System.out.println("scoreDocs.length == 0");
                 phaseResults.stream().map(SearchPhaseResult::queryResult).forEach(this::releaseIrrelevantSearchContext);
                 finishPhase.run();
             } else {
+                System.out.println("scoreDocs.length != 0");
                 final ScoreDoc[] lastEmittedDocPerShard = isScrollSearch
                     ? SearchPhaseController.getLastEmittedDocPerShard(reducedQueryPhase, numShards)
                     : null;
@@ -133,10 +140,12 @@ final class FetchSearchPhase extends SearchPhase {
                     finishPhase,
                     context
                 );
+                System.out.println(docIdsToLoad.length);
                 for (int i = 0; i < docIdsToLoad.length; i++) {
                     List<Integer> entry = docIdsToLoad[i];
                     SearchPhaseResult queryResult = queryResults.get(i);
                     if (entry == null) { // no results for this shard ID
+                        System.out.println("no results for this shard ID!!!!!!!!");
                         if (queryResult != null) {
                             // if we got some hits from this shard we have to release the context there
                             // we do this as we go since it will free up resources and passing on the request on the
@@ -147,6 +156,7 @@ final class FetchSearchPhase extends SearchPhase {
                         // in any case we count down this result since we don't talk to this shard anymore
                         counter.countDown();
                     } else {
+                        System.out.println("has results for this shard ID!!!!!!!!");
                         SearchShardTarget shardTarget = queryResult.getSearchShardTarget();
                         Transport.Connection connection = context.getConnection(shardTarget.getClusterAlias(), shardTarget.getNodeId());
                         ShardFetchSearchRequest fetchSearchRequest = createFetchRequest(
@@ -158,6 +168,8 @@ final class FetchSearchPhase extends SearchPhase {
                             queryResult.getShardSearchRequest(),
                             queryResult.getRescoreDocIds()
                         );
+                        System.out.println("createFetchRequest is called!!!!!!!!");
+                        Patch.executeFetch(fetchSearchRequest);
                         executeFetch(
                             queryResult.getShardIndex(),
                             shardTarget,
@@ -182,6 +194,7 @@ final class FetchSearchPhase extends SearchPhase {
         RescoreDocIds rescoreDocIds
     ) {
         final ScoreDoc lastEmittedDoc = (lastEmittedDocPerShard != null) ? lastEmittedDocPerShard[index] : null;
+
         return new ShardFetchSearchRequest(
             originalIndices,
             contextId,

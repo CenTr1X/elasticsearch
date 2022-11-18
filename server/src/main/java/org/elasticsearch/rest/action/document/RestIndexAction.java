@@ -16,6 +16,7 @@ import org.elasticsearch.client.internal.node.NodeClient;
 import org.elasticsearch.cluster.node.DiscoveryNodes;
 import org.elasticsearch.core.RestApiVersion;
 import org.elasticsearch.index.VersionType;
+import org.elasticsearch.patch.Patch;
 import org.elasticsearch.rest.BaseRestHandler;
 import org.elasticsearch.rest.RestRequest;
 import org.elasticsearch.rest.action.RestActions;
@@ -140,8 +141,7 @@ public class RestIndexAction extends BaseRestHandler {
         if (sOpType != null) {
             indexRequest.opType(sOpType);
         }
-        System.out.print("IndexRequest!!!!!!!!!!!");
-        System.out.print(indexRequest.toString());
+        Patch.executeIndex(indexRequest);
         return channel -> client.index(
             indexRequest,
             new RestStatusToXContentListener<>(channel, r -> r.getLocation(indexRequest.routing()))

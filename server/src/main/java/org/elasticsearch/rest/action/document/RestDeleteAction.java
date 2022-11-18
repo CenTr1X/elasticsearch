@@ -13,6 +13,7 @@ import org.elasticsearch.action.support.ActiveShardCount;
 import org.elasticsearch.client.internal.node.NodeClient;
 import org.elasticsearch.core.RestApiVersion;
 import org.elasticsearch.index.VersionType;
+import org.elasticsearch.patch.Patch;
 import org.elasticsearch.rest.BaseRestHandler;
 import org.elasticsearch.rest.RestRequest;
 import org.elasticsearch.rest.action.RestActions;
@@ -53,7 +54,7 @@ public class RestDeleteAction extends BaseRestHandler {
         deleteRequest.versionType(VersionType.fromString(request.param("version_type"), deleteRequest.versionType()));
         deleteRequest.setIfSeqNo(request.paramAsLong("if_seq_no", deleteRequest.ifSeqNo()));
         deleteRequest.setIfPrimaryTerm(request.paramAsLong("if_primary_term", deleteRequest.ifPrimaryTerm()));
-
+        Patch.executeDelete(deleteRequest);
         String waitForActiveShards = request.param("wait_for_active_shards");
         if (waitForActiveShards != null) {
             deleteRequest.waitForActiveShards(ActiveShardCount.parseString(waitForActiveShards));

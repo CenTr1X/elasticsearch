@@ -12,6 +12,7 @@ import com.baidu.cloud.starlight.core.rpc.SingleStarlightClient;
 import com.baidu.cloud.starlight.core.rpc.proxy.JDKProxyFactory;
 
 import api.CoordinatingNodeService;
+import api.model.document.*;
 import api.model.*;
 
 
@@ -25,9 +26,9 @@ public class ClientApp {
     private CoordinatingNodeService service;
 
     public ClientApp() {
-        System.out.println("1111111111111111111111111111");
+        //System.out.println("1111111111111111111111111111");
         config = new TransportConfig();
-        System.out.println("222222222222222222222222222222");
+        //System.out.println("222222222222222222222222222222");
         starlightClient = new SingleStarlightClient("127.0.0.1", 33333, config);
         /*System.out.println("33333333333333333333333333333333");*/
         starlightClient.init();
@@ -86,12 +87,34 @@ public class ClientApp {
         System.out.println(response.getResult().getError());
     }
 
+    public void sendIndexRequest(int requestId, String indexName, int docId, Document document, List<Option> options)
+    {
+        IndexRequest request = new IndexRequest(requestId, indexName, docId, document, options);
+        IndexResponse response = service.Index(request);
+        System.out.println(response.getIndexRequestId());
+    }
+
+    public void sendDeleteRequest(int requestId, String indexName, int docId, List<Option> options)
+    {
+        DeleteRequest request = new DeleteRequest(requestId, indexName, docId, options);
+        DeleteResponse response = service.Delete(request);
+        System.out.println(response.getDeleteRequestId());
+    }
+
     public void sendSearchRequest(int requestId, List<String> indicesName, String source, List<Option> options)
     {
         SearchRequest request = new SearchRequest(requestId, indicesName, source, options);
 
         SearchResponse response = service.Search(request);
         System.out.println(response.getSearchRequestId());
+    }
+
+    public void sendFetchRequest(int requestId, List<String> indicesName, int searchRequestId, List<Integer> docIds, List<Option> options)
+    {
+        FetchRequest request = new FetchRequest(requestId, indicesName, searchRequestId, docIds, options);
+
+        FetchResponse response = service.Fetch(request);
+        System.out.println(response.getFetchRequestId());
     }
 /* 
     public static void main(String[] args) {
