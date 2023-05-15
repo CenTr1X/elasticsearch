@@ -38,13 +38,13 @@ FileTree tree = fileTree('libs')
 println (tree.getFiles())
 println files("/home/centrix/elasticsearch/server/dependency/starlight-api-2022.2.0-SNAPSHOT.jar")
 dependencies {
-  api 'com.baidu.cloud:starlight-all:2022.2.0-SNAPSHOT'
+  api 'com.baidu.cloud:starlight-all:2022.2.1-SNAPSHOT'
   //implementation 'com.baidu.cloud:starlight-all:2022.2.0-SNAPSHOT-source'
   //implementation 'ch.qos.logback:logback-classic:1.2.9'
   //implementation 'ch.qos.logback:logback-core:1.2.9'
   implementation 'com.google.protobuf:protobuf-java:3.21.1'
-  implementation 'com.baidu.cloud:spring-cloud-baidu-thirdparty-commons:2022.2.0-SNAPSHOT'
-  implementation 'com.baidu.cloud:spring-cloud-baidu-thirdparty:2022.2.0-SNAPSHOT'
+  implementation 'com.baidu.cloud:spring-cloud-baidu-thirdparty-commons:2022.2.0'
+  implementation 'com.baidu.cloud:spring-cloud-baidu-thirdparty:2022.2.0'
   //api 'com.baidu.cloud:starlight-core:2022.2.0-SNAPSHOT'
   implementation 'org.slf4j:slf4j-api:1.6.2'
   implementation 'com.baidu:brpc-spring-boot-starter:3.0.5'
