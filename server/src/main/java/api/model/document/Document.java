@@ -6,9 +6,9 @@ public class Document {
 
     private DocumentData data;
 
-    private int score;
+    private double score;
 
-    public Document(int docId, DocumentData data, int score) {
+    public Document(int docId, DocumentData data, double score) {
         this.docId = docId;
         this.data = data;
         this.score = score;
@@ -30,11 +30,11 @@ public class Document {
         this.data = data;
     }
 
-    public int getScore() {
+    public double getScore() {
         return score;
     }
 
-    public void setScore(int score) {
+    public void setScore(double score) {
         this.score = score;
     }
 }

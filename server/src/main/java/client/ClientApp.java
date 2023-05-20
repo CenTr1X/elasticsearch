@@ -15,6 +15,8 @@ import api.CoordinatingNodeService;
 import api.model.document.*;
 import api.model.*;
 
+import api.PersistenceEngineService;
+import api.model.new_document.*;
 
 public class ClientApp {
     private TransportConfig config;
@@ -25,21 +27,26 @@ public class ClientApp {
 
     private CoordinatingNodeService service;
 
+    private PersistenceEngineService service2;
+
     public ClientApp() {
-        //System.out.println("1111111111111111111111111111");
         config = new TransportConfig();
-        //System.out.println("222222222222222222222222222222");
         starlightClient = new SingleStarlightClient("127.0.0.1", 33333, config);
-        /*System.out.println("33333333333333333333333333333333");*/
         starlightClient.init();
-        /*System.out.println("44444444444444444444444444444444444"); */
  
         clientConfig = new ServiceConfig(); // 服务配置
+        
         clientConfig.setServiceId("rpc.CoordinatingNodeService");
         clientConfig.setProtocol("brpc");
 
         JDKProxyFactory proxyFactory = new JDKProxyFactory();
         service = proxyFactory.getProxy(CoordinatingNodeService.class, clientConfig, starlightClient);
+         
+        ServiceConfig clientConfig2 = new ServiceConfig();
+        clientConfig2.setServiceId("monad.content.PersistenceEngineService");
+        clientConfig2.setProtocol("brpc");
+        service2 = proxyFactory.getProxy(PersistenceEngineService.class, clientConfig2, starlightClient);
+
 
         //Statement s = new Statement("test123");
 
@@ -69,10 +76,11 @@ public class ClientApp {
             System.out.println(o.getValue());
         }
         //sendTest();
+        /* 
         CreateIndexResponse response = service.CreateIndex(request);
         System.out.println(response.getCreateIndexRequestId());
         System.out.println(response.getResult().isSuccess());
-        System.out.println(response.getResult().getError());
+        System.out.println(response.getResult().getError());*/
     }
 
     public void sendDeleteIndexRequest(int requestId, String indexName, List<Option> options)
@@ -90,8 +98,8 @@ public class ClientApp {
     public void sendIndexRequest(int requestId, String indexName, int docId, Document document, List<Option> options)
     {
         IndexRequest request = new IndexRequest(requestId, indexName, docId, document, options);
-        IndexResponse response = service.Index(request);
-        System.out.println(response.getIndexRequestId());
+        /*IndexResponse response = service.Index(request);
+        System.out.println(response.getIndexRequestId());*/
     }
 
     public void sendDeleteRequest(int requestId, String indexName, int docId, List<Option> options)
@@ -158,5 +166,13 @@ public class ClientApp {
         TestResponse response = service.Test(request);
 
         System.out.println(response.getL().get(0).getText());
+    }
+
+    public void sendPut(String docId)
+    {
+        NewDocument doc = new NewDocument(docId);
+        PutRequest request = new PutRequest(doc);
+        System.out.println(docId);
+        PutResponse response = service2.Put(request);
     }
 }

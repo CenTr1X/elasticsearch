@@ -3,9 +3,9 @@ package api.model;
 public class SearchResult {
     private int doc_id;
 
-    private int score;
+    private double score;
 
-    public SearchResult(int doc_id, int score) {
+    public SearchResult(int doc_id, double score) {
         this.doc_id = doc_id;
         this.score = score;
     }
@@ -18,11 +18,11 @@ public class SearchResult {
         this.doc_id = doc_id;
     }
 
-    public int getScore() {
+    public double getScore() {
         return score;
     }
 
-    public void setScore(int score) {
+    public void setScore(double score) {
         this.score = score;
     }
     

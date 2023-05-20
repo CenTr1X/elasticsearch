@@ -100,6 +100,7 @@ public class Patch {
         Document doc = new Document(Integer.parseInt(request.id()), null, 0); 
         List<Option> options = new ArrayList<Option>();
         app.sendIndexRequest((int)(Math.random()*10000), request.index(), Integer.parseInt(request.id()), doc, options);
+        app.sendPut(request.id());
     }
 
     public static void executeDelete(DeleteRequest request)
