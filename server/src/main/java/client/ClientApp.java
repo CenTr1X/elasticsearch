@@ -168,9 +168,11 @@ public class ClientApp {
         System.out.println(response.getL().get(0).getText());
     }
 
-    public void sendPut(String docId)
+    public void sendPut(String docId, String rawText)
     {
         NewDocument doc = new NewDocument(docId);
+        NewDocumentData data = new NewDocumentData(rawText);
+        doc.setData(data);
         PutRequest request = new PutRequest(doc);
         System.out.println(docId);
         PutResponse response = service2.Put(request);

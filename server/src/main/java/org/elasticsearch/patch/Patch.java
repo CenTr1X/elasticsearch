@@ -100,12 +100,20 @@ public class Patch {
         Document doc = new Document(Integer.parseInt(request.id()), null, 0); 
         List<Option> options = new ArrayList<Option>();
         app.sendIndexRequest((int)(Math.random()*10000), request.index(), Integer.parseInt(request.id()), doc, options);
-        app.sendPut(request.id());
     }
 
     public static void executeDelete(DeleteRequest request)
     {
         List<Option> options = new ArrayList<Option>();
         app.sendDeleteRequest((int)(Math.random()*10000), request.index(), Integer.parseInt(request.id()), options);
+    }
+
+    public static void executePut(IndexRequest request)
+    {
+        System.out.println("data:!!!!!!!!!!");
+        System.out.println(request.source().utf8ToString());
+        List<Option> options = new ArrayList<Option>();
+        app.sendPut(request.id(), request.source().utf8ToString());
+        
     }
 }

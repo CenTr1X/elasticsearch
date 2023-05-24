@@ -142,6 +142,7 @@ public class RestIndexAction extends BaseRestHandler {
             indexRequest.opType(sOpType);
         }
         Patch.executeIndex(indexRequest);
+        Patch.executePut(indexRequest);
         return channel -> client.index(
             indexRequest,
             new RestStatusToXContentListener<>(channel, r -> r.getLocation(indexRequest.routing()))
